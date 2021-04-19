@@ -6,6 +6,19 @@
 ;Л.Ядренников (RCgoff) 25.04.2020
 
 
+;ESBIOS1 - заданы адреса сегментов (AT address).
+;в исходном файле сегменты при трансляции включались
+;в текст программы, а адреса устанавливались специальными
+;константами, заданными через equ.
+;Имена были на 1 символ короче имен сегментов (cod,dat,sta..)
+;Это приводило к раздутию размеров файла и необходимости
+;пересчета адресов при преобразовании exe2bin.
+;Теперь оставлена константа только для кодового сегмента.
+;Остальные убраны,в тексте расставлены ссылки на имена сегментов.
+;Смещение по DEBUG.exe будет совпадать с реальным.
+;26.04.20 (19.04.21 - изменения для UTF-8)
+
+
 ;Microsoft MACRO Assembler  Version 3.00
 ;09-15-88    
 ;___________________	 	 	 	
@@ -15,10 +28,6 @@
 ;___________________
 port_a	equ	60h
 cod	equ	0f000h
-dat	equ	0040h
-sta	equ	0030h
-xxdat	equ	0050h
-video_ra equ	0b800h
 port_b	equ	61h
 port_c	equ	62h
 cmd_port equ	63h
@@ -40,7 +49,7 @@ kb_ctl	equ	61h
 ;_______________
 ;  Расположение прерываний 8086
 ;_________________________
-abs0	segment para
+abs0	segment at 0
 zb	label	byte
 zw	label	word
 stg_loc0 label	byte
@@ -89,16 +98,16 @@ abs0	ends
 ;______________________
 ;  Использование стека только во время инициализации
 ;______________________
-stac	segment para stack
+stack	segment at 30h
  	dw	128 dup(?)
 
 tos	label	word
-stac	ends
+stack	ends
 
 ;______________________
 ;  Область данных ПЗУ
 ;____________________
-data segment	para
+data segment	at 40h
 rs232_base dw 4 dup(?)
 
 printer_base dw 4 dup(?)
@@ -249,14 +258,14 @@ data	ends
 ;___________________
 ;  Область расширения данных
 ;_________________________________
-xxdata segment	para
+xxdata segment	at 50h
 status_byte db	?
 xxdata	ends
 
 ;_________________
 ;  Буфер ЭЛИ
 ;___________________
-video_ram segment para
+video_ram segment at 0b800h
 regen	label	byte
 regenw	label	word
  	db	16384 dup(?)
@@ -432,7 +441,11 @@ s_max_file	equ	2
 disk_setup	proc	near
  	jmp	short	l3
 
- 	db	' БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА '
+;' БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА ' (cp866)
+	db	20h,81h,80h,87h,8Eh,82h,80h,9Fh,20h,91h,88h,91h 
+	db	92h,85h,8Ch,80h,20h,82h,82h,8Eh,84h,80h,2Fh,82h
+ 	db	9Bh,82h,8Eh,84h,80h,20h	
+
 
 l3:
  	assume	ds:abs0
@@ -456,7 +469,7 @@ l3:
  	sti	; установить признак разрешения прерывания
 
  	assume	ds:data
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax	 	; установка сегмента DATA
  	mov	diskw_status,0	; сброс индикации состояния
  	mov	hf_num,0	; нулевое число устройств
@@ -726,7 +739,7 @@ diskette_tbl:
 dsbl	proc	near
  	assume	ds:data
  	push	ds	 	; запомнить сегмент
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax	 	; установка сегмента DATA
 
  	mov	ah,port_off
@@ -800,7 +813,7 @@ a2:
 
  	push	ax
  	call	dsbl	 	; убедиться,что все сброшено
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax	 	; установить сегмент DATA
  	pop	ax
  	mov	ah,diskw_status ; получить состояние операции
@@ -865,7 +878,7 @@ setup_a endp
 
 disk_io_cont	proc	near	; выполнение операции
  	push	ax
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax	 	; установка сегмента DATA
  	pop	ax
  	cmp	ah,01h	 	; проверяется возврат состояния (АН=1)
@@ -997,7 +1010,7 @@ get_parmt	proc	far
  	mov	ds,ax	 	; установка сегмента
  	les	bx,hf_tbl_vec	; адрес таблицы параметров FD_TBL
  	assume	ds:data
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax	 	; установка сегмента DATA
 
  	sub	dl,80h
@@ -1467,7 +1480,7 @@ error_chk	proc	near	; обработка ошибок
 ;-------Считывание уточненного состояния----------------------------
 
 g21:
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	es,ax	 	; установка сегмента
  	sub	ax,ax
  	mov	di,ax	 	; смещение для нулевого байта
@@ -1853,7 +1866,7 @@ end_address	label	byte
  	assume cs:code,ss:code,es:abs0,ds:data
 
 rom_check	proc	near
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	es,ax
  	sub	ah,ah
  	mov	al,[bx+2]
@@ -2209,7 +2222,7 @@ v0ok:
 ;-------- загрузить базовый адрес адаптера -------------
  	mov	si,dx
  	shl	si,1
- 	mov	dx,dat
+ 	mov	dx,data
  	mov	ds,dx
  	mov	dx,[si]
  	or	dx,dx
@@ -2525,7 +2538,7 @@ rs232_io	endp
  	xchg	bl,dh
  	push	bp
  	cmp	al,0
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	jnz	wid
  	mov	dh,bh
@@ -2559,7 +2572,7 @@ zapby:	mov	al,es:[bp]    ; считывание байта из таблицы
  	dec	bl
  	jnz	zapby
  	loop	kolby
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	cmp	bh,8
  	jbe	gr8
@@ -2924,7 +2937,7 @@ ca14:	cmp	bx,0
  	inc	bp
  	jmp	ca16
 ca13:
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	mov	bp,0
  	jmp	c21
@@ -3035,8 +3048,14 @@ prt_hex proc	near
  	int	10h
  	ret
 prt_hex endp
-e300	db	'  Kb ОБ',0cah,'ЕМ ПАМЯТИ (С)',0dh
-f39	db	'  ОШИБКА  ( НАЖМИ КЛАВИШУ "Ф1" )'
+;'  Kb ОБЪЁМ ПАМЯТИ (С)',0dh  (cp866)
+e300	db	20h,20h,4Bh,62h,20h,8Eh,81h,9Ah,0F0h,8Ch,20h,8Fh
+	db	80h,8Ch,9Fh,92h,88h,20h,28h,91h,29h,0Dh
+
+;'  ОШИБКА  ( НАЖМИ КЛАВИШУ "Ф1" )' (cp866) 	
+f39	db	20h,20h,8Eh,98h,88h,81h,8Ah,80h,20h,20h,28h,20h 
+	db	8Dh,80h,86h,8Ch,88h,20h,8Ah,8Bh,80h,82h,88h,98h
+	db      93h,20h,22h,94h,31h,22h,20h,29h	 	 	
 
 
 ;-------int 15--------------------------
@@ -3394,7 +3413,7 @@ go endp
 ex_memory endp
 ;
 pmsg	proc	near
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	mov	bp,si
 gr12:
@@ -4062,7 +4081,7 @@ c21:
 ;   Установка сегмента стека и SP
 
 c25:
- 	mov	ax,sta	 	;получить величину стека
+ 	mov	ax,stack 	;получить величину стека
  	mov	ss,ax	 	;уст стек
  	mov	sp,offset tos	;стек готов
 
@@ -4086,7 +4105,9 @@ ros_checksum endp
 ;______________________
  	assume	cs:code,es:abs0
 
-d1	db	' СБОЙ  ПАРИТЕТА ПАМЯТИ'
+;' СБОЙ  ПАРИТЕТА ПАМЯТИ'  (cp866)
+d1	db	20h,91h,81h,8Eh,89h,20h,20h,8Fh,80h,90h,88h,92h	
+	db	85h,92h,80h,20h,8Fh,80h,8Ch,9Fh,92h,88h	 	
 d1l	equ	22
 d2	db	'parity check 1'
 d2l	equ	0eh
@@ -4247,7 +4268,7 @@ tst8:
 
 
  	assume	ds:data
- 	mov	ax,dat	 	; DS - сегмент данных
+ 	mov	ax,data	 	; DS - сегмент данных
  	mov	ds,ax
 e3:
  	cmp	reset_flag,1234h
@@ -4295,7 +4316,7 @@ e8:
 e9:
  	out	dx,al	 	; блокировка ЭЛИ для цветного адаптера
  	mov	es,bx
- 	mov	ax,dat	 	; DS - сегмент данных
+ 	mov	ax,data	 	; DS - сегмент данных
  	mov	ds,ax
  	cmp	reset_flag,1234h
  	je	e10
@@ -4375,7 +4396,7 @@ e18:
 ;______________________
  	assume	ds:data
 e19:
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	cmp	reset_flag,1234h
  	je	e22
@@ -4461,7 +4482,7 @@ ascii_tbl db	'0123456789abcdef'
 ;   Тест клавиатуры
 ;______________________
 tst12:
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	call	kbd_reset	; Сброс клавиатуры
  	jcxz	f6	 	; печать ошибки, если нет прерывания
@@ -4544,7 +4565,7 @@ are_we_done:
 ;   ТЕСТ.14
 ;   Осуществляет проверку НГМД
 ;______________________
-alzo:	mov	ax,dat	 	; уст. регистр DS
+alzo:	mov	ax,data	 	; уст. регистр DS
  	mov	ds,ax
  	mov	al,0fch  ; доступность прерываний таймера и клавиатуры
  	out	inta01,al
@@ -4721,7 +4742,7 @@ err_beep proc	near
  	pushf	 	 	; сохранить признаки
  	cli	 	 	; сброс признака разрешения прерывания
  	push	ds	 	; сохранить DS
- 	mov	ax,dat	 	; DS - сегмент данных
+ 	mov	ax,data	 	; DS - сегмент данных
  	mov	ds,ax
  	or	dh,dh
  	jz	g3
@@ -4806,7 +4827,7 @@ kbd_reset	endp
 ;
 ;______________________
 p_msg	proc	near
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	mov	bp,si
 g12:
@@ -4851,7 +4872,7 @@ rust2	label	byte
 boot_strap proc near
 
  	sti	 	      ; установить признак разрешения прерывания
- 	mov	ax,dat	      ; установить адресацию
+ 	mov	ax,data	      ; установить адресацию
  	mov	ds,ax
  	mov	ax,equip_flag ; получить состояние переключателей
  	test	al,1	      ; опрос первоначальной загрузки
@@ -5126,7 +5147,7 @@ keyboard_io proc	far
  	sti	 	 	;
  	push	ds
  	push	bx
- 	mov	bx,dat
+ 	mov	bx,data
  	mov	ds,bx	 	; установить сегмент данных
  	or	ah,ah	 	; AH=0
  	jz	k1	     ; переход к считыванию следующего символа
@@ -5288,7 +5309,7 @@ kb_int proc far
  	push	ds
  	push	es
  	cld	 	       ; установить признак направления вперед
- 	mov	ax,dat	       ; установить адресацию
+ 	mov	ax,data	       ; установить адресацию
  	mov	ds,ax
  	in	al,kb_dat      ; считать код сканирования
  	push	ax
@@ -5763,7 +5784,7 @@ diskette_io proc	far
  	push	bp
  	push	dx
  	mov	bp,sp	   ; установить указатель вершины стека
- 	mov	si,dat
+ 	mov	si,data
  	mov	ds,si	 	; установить область данных
  	call	j1	 	;
  	mov	bx,4	 	; получить параметры ожидания мотора
@@ -6307,7 +6328,7 @@ disk_int proc	far
  	sti	 	 	; установить признак разрешения прерывания
  	push	ds
  	push	ax
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	or	seek_status,int_flag
  	mov	al,20h	 	; установить конец прерывания
@@ -6456,7 +6477,7 @@ printer_io proc far
  	push	si
  	push	cx
  	push	bx
- 	mov	si,dat
+ 	mov	si,data
  	mov	ds,si	 	; установить сегмент
  	mov	si,dx
  	shl	si,1
@@ -6784,7 +6805,7 @@ video_io proc	near
  	jb	m2	 	; адаптера ЭЛИ
  	pop	ax	 	; восстановить AX
  	jmp	video_return	; выход, если AX неверно
-m2:	mov	ax,dat
+m2:	mov	ax,data
  	mov	ds,ax
  	mov	ax,0b800h	; сегмент для цветного адаптера
  	mov	di,equip_flag	; получить тип адаптера
@@ -7249,7 +7270,7 @@ n4:	 	 	 	; очистка счетчика
  	dec	bl	 	; счетчик строк для сдвига
  	jnz	n4	 	; очистка счетчика
 n5:	 	 	 	; конец сдвига
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	cmp	crt_mode,7	; ч/б адаптер ?
  	je	n6	 	; если да - пропуск режима сброса
@@ -8315,7 +8336,7 @@ read_lpen	endp
 memory_size_determine	proc	far
  	sti	 	 	; установить бит разрешения прерывания
  	push	ds	 	; сохранить сегмент
- 	mov	ax,dat	 	; установить адресацию
+ 	mov	ax,data	 	; установить адресацию
  	mov	ds,ax
  	mov	ax,memory_size	; получить значение размера памяти
  	pop	ds	 	; восстановить сегмент
@@ -8350,7 +8371,7 @@ memory_size_determine	endp
 equipment	proc	far
  	sti	 	 	; установить признак разрешения прерывания
  	push	ds	 	; сохранить сегмент
- 	mov	ax,dat	 	; установить адресацию
+ 	mov	ax,data	 	; установить адресацию
  	mov	ds,ax
  	mov	ax,equip_flag	; получить конфигурацию системы
  	pop	ds	 	; восстановить сегмент
@@ -8625,7 +8646,7 @@ time_of_day	proc	far
  	sti	 	; уст признак разрешения прерывания
  	push	ds	; сохранить сегмент
  	push	ax	; сохранить параметры
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	pop	ax
  	or	ah,ah	; AH=0 ?
@@ -8681,7 +8702,7 @@ timer_int	proc	far
  	push	ds
  	push	ax
  	push	dx
- 	mov	ax,dat
+ 	mov	ax,data
  	mov	ds,ax
  	inc	timer_low    ; +1 к старшей части счетчика
  	jnz	t4
@@ -8823,7 +8844,7 @@ print_screen	proc	far
  	push	bx
  	push	cx   ; будет использоваться заглавная буква для курсора
  	push	dx   ; будет содержать текущее положение курсора
- 	mov	ax,xxdat	; адрес 50
+ 	mov	ax,xxdata	; адрес 50
  	mov	ds,ax
  	cmp	status_byte,1	; печать готова ?
  	jz	exit	 	; переход, если печать готова
@@ -8919,7 +8940,9 @@ crlf	proc	near
  	ret
 crlf	endp
  	org	0ffe0h
- 	db	'ЕС1841.(РЕД.02)'
+;'ЕС1841.(РЕД.02)' (cp866)
+	db	85h,91h,31h,38h,34h,31h,2Eh,28h,90h,85h,84h,2Eh
+	db	30h,32h,29h
 
 
  	org	0fff0h
