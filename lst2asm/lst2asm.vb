@@ -3,6 +3,10 @@ Option Explicit
 'преобразование файла листинга MASM 3.0 в файл .asm
 'написано в рамках переделки BIOS ЕС1841
 'Л.Ядренников 21,25.04.2020
+'05.04.2021 - изменения для обработки листинга без нумерации строк (необходимо переключить переменную isPageNumbersInFile);
+'             также сделана обработка обрезаемых строк, оказавшихся на границе страниц
+'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
+'ЕЩЕ НЕ РЕАЛИЗОВАНО: проверка на затирание выходных файлов ASM
 
 Sub InPath()  'процедура основная, выбор файлов
 Dim flname As Variant           'это потому что по-другому не обрабатываются collection
@@ -34,6 +38,32 @@ Dim newpageCnt As Integer
 Dim asmString As String
 Dim codeSection As String
 
+'константы формата листинга
+Dim isPageNumbersInFile As Boolean  'начинается ли строка листинга с номера строки или нет
+Dim AsmFileDataBegin As Integer     'позиция начала данных, переносимых из asm-файла
+Dim LstAddrBegin As Integer         'позиция начала адреса
+Dim LstMachCodeBegin As Integer     'позиция начала машкода
+Dim LstMachCodeEnd As Integer       'позиция конца машкода
+
+'=====================================================================
+isPageNumbersInFile = False
+'=====================================================================
+
+If isPageNumbersInFile = True Then
+        'это параметры листинга ЕС-1841, распространенного в интернете на различных площадках
+    AsmFileDataBegin = 41
+    LstAddrBegin = 10
+    LstMachCodeBegin = 16
+    LstMachCodeEnd = 32
+Else
+        'если листинг без номеров страниц, позиции становятся на 8 (одну позицию tab) меньше. Это листинг, генерируемый на моем компе
+    AsmFileDataBegin = 33
+    LstAddrBegin = 2
+    LstMachCodeBegin = 8
+    LstMachCodeEnd = 26    'это не на 8 меньше, а посмотрел по реальному файлу до link-овки, только после ассемблера
+End If
+    
+
 'инициализация динамических массивов
 ReDim LongLineArray(1 To 1): LongLineArray(1) = 0
 ReDim NewpageArray(1 To 1): NewpageArray(1) = 0
@@ -56,7 +86,13 @@ Do While Not EOF(1)
         If FirstCharCode = 9 And newpageCnt > 1 Then
         'не считаем три пустые строки после перевода страницы
             If lstcnt - NewpageArray(newpageCnt - 1) > 3 Then
-                LongLineArray(longlineCnt) = lstcnt - 1 'предыдущая строка!
+                'если строка, следующая сразу за автоматически вставленными с началом страницы, является перенесенной
+                If lstcnt - NewpageArray(newpageCnt - 1) = 4 Then
+                        'то маркируем начало строки, оставшееся на предыдущей странице
+                        LongLineArray(longlineCnt) = lstcnt - 5
+                    Else
+                        LongLineArray(longlineCnt) = lstcnt - 1 'иначе маркируем просто предыдущую строку
+                    End If
                 longlineCnt = longlineCnt + 1
                 ReDim Preserve LongLineArray(1 To longlineCnt)
             End If
@@ -76,10 +112,11 @@ If stoplisting = 0 Then stoplisting = lstcnt + 1
 lstcnt = 0
 longlineCnt = 1
 newpageCnt = 1
+prevline = ""
 
 Open flname For Input As #1
 Open Left(flname, Len(flname) - 3) + "asm" For Output As #2
-    'файл с укороченными строками для ассмблера
+    'файл с укороченными строками для ассемблера
 Open Left(flname, Len(flname) - 4) + "_clean" + Right(flname, 4) For Output As #3
     'файл листинга без разбивки на страницы и переполненных строк
     
@@ -96,47 +133,51 @@ Do While Not EOF(1)
         newpageCnt = newpageCnt + 1
     End If
     
-    If lstcnt = LongLineArray(longlineCnt) Then
-    'если в листинге случился перенос на новую строку,
-    'она будет начинаться с пробела (а не с номера).
-    'Перенос нужно ликвидировать. Для этого необходимо
-    'обратиться к предыдущей строке и слить ее с текущей
-        If lstcnt < stoplisting Then    'только для классического листинга
-        
-            'сейчас мы оказались на предыдущей строке
-            prevline = lstline
-            Line Input #1, lstline  'теперь в lstline перенесенная часть строки
-            lstcnt = lstcnt + 1
-            'по FAR-редактору, перенесенная строка в начале содержит 7 символов
+    'выполним слитие с перенесенной строкой, если она была ранее считана
+    If Not isStringEmpty(prevline) Then
+           'по FAR-редактору, перенесенная строка в начале содержит 7 символов
             '0x09 0x20 0x09 0x20 0x09 0x20 0x09
             lstline = Right(lstline, Len(lstline) - 7) 'обрезанная строка
             lstline = prevline + lstline
             longlineCnt = longlineCnt + 1
+            prevline = ""
+    End If
+    
+    If lstcnt = LongLineArray(longlineCnt) Then
+    'если в листинге случился перенос на новую строку,
+    'она будет начинаться с пробела (а не с номера).
+    'Перенос нужно ликвидировать. Для этого необходимо
+    'запомнить строку (в данном проходе) и слить ее со следующей,
+    'имея в виду возможную прокрутку на границе страниц
+        If lstcnt < stoplisting Then    'только для классического листинга
+        
+            'запоминаем подстроку - первую часть переносимой строки
+            prevline = lstline
         End If
     End If
-    'теперь в lstline строка из листинга
-    'формат листинга:
-    'с позиции 41 начинается ассемблерный код
-    'поз. 10 - адрес
-    'поз.16 - машкод
-    'поз.32 - последний символ машкода
-    '
-    'Простая обрезка по 41-й колонке листинга оставит в asm-файле лишние пустые строки.
-    'они возникают, когда одна asm-строка генерирует много машкода, не умещающегося в поз.16-32.
+    
+    'теперь в lstline строка из листинга, либо часть строки (тогда prevline непусто и вывода не будет)
+    'формат листинга см. выше в заголовке
+    
+    'Простая обрезка по колонке номер AsmFileDataBegin листинга оставит в asm-файле лишние пустые строки.
+    'они возникают, когда одна asm-строка генерирует много машкода, не умещающегося в поз.LstMachCodeBegin...LstMachCodeEnd.
     'происходит перенос на новую строку. Пример - при использовании DUP  в DB,DW.
-    'Такие строки определяются по условию: asm-секция(41 кол.и дальше) пуста,
+    'Такие строки определяются по условию: asm-секция(начиная с AsmFileDataBegin и дальше) пуста,
     'а секция кода - нет. И такие строки не включаются в asm-файл
     '
-    If lstcnt < stoplisting Then
-        codeSection = ViewPosMid(lstline, 16, 32)
-        asmString = ViewPosMid(lstline, 41)
-        If isStringEmpty(asmString) Then
-            If isStringEmpty(codeSection) Then Print #2, asmString
-        Else
-            Print #2, asmString
+    If Len(prevline) = 0 Then 'блокировка вывода в файлы части переносимой строки
+        If lstcnt < stoplisting Then
+    
+            codeSection = ViewPosMid(lstline, LstMachCodeBegin, LstMachCodeEnd)
+            asmString = ViewPosMid(lstline, AsmFileDataBegin)
+            If isStringEmpty(asmString) Then
+                If isStringEmpty(codeSection) Then Print #2, asmString
+            Else
+                Print #2, asmString
+            End If
         End If
+        Print #3, lstline
     End If
-    Print #3, lstline
 Loop
 Close #1
 Close #2
