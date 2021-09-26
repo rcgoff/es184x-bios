@@ -5,7 +5,8 @@ Option Explicit
 'Л.Ядренников 21,25.04.2020
 '05.04.2021 - изменения для обработки листинга без нумерации строк (необходимо переключить переменную isPageNumbersInFile);
 '             также сделана обработка обрезаемых строк, оказавшихся на границе страниц
-'26.09.2021 - проверка на затирание выходных файлов, если они уже есть
+'26.09.2021 - удаление лишней пустой строки, добавляемой ассемблером в листинг в конце dup-последовательностей;
+'             проверка на затирание выходных файлов, если они уже есть
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 
 Sub InPath()  'процедура основная, выбор файлов
@@ -45,6 +46,7 @@ Dim LstAddrBegin As Integer         'позиция начала адреса
 Dim LstMachCodeBegin As Integer     'позиция начала машкода
 Dim LstMachCodeEnd As Integer       'позиция конца машкода
 
+Dim PrevLineEndDup As Boolean       'предыдущая строка - последняя в DUP (закр. квадр. скобка)
 Dim FileExsistAnswer As Integer     'ответ пользователя, если файл существует
 
 '=====================================================================
@@ -72,6 +74,7 @@ ReDim NewpageArray(1 To 1): NewpageArray(1) = 0
 longlineCnt = 1
 newpageCnt = 1
 stoplisting = 0
+PrevLineEndDup = False
 FileExsistAnswer = 0
 
 'первый проход - заполнение массивов
@@ -191,9 +194,20 @@ Do While Not EOF(1)
             codeSection = ViewPosMid(lstline, LstMachCodeBegin, LstMachCodeEnd)
             asmString = ViewPosMid(lstline, AsmFileDataBegin)
             If isStringEmpty(asmString) Then
-                If isStringEmpty(codeSection) Then Print #2, asmString
+                If isStringEmpty(codeSection) Then
+                    If Not (PrevLineEndDup) Then Print #2, asmString
+                End If
             Else
                 Print #2, asmString
+            End If
+            
+            'отловим ложную пустую строку, возникающую в конце dup-последовательностей,
+            'если после dup в строке кода ничего не было
+            If Mid(codeSection, Len(codeSection) - 3, 1) = "]" Then         'была ли текущая строка третьей в DUP-последовательности?
+                                                                            '(работать с ней будем на следующем проходе)
+                PrevLineEndDup = True
+            Else
+                PrevLineEndDup = False
             End If
         End If
         Print #3, lstline
