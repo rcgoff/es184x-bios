@@ -5,8 +5,8 @@ Option Explicit
 'Л.Ядренников 21,25.04.2020
 '05.04.2021 - изменения для обработки листинга без нумерации строк (необходимо переключить переменную isPageNumbersInFile);
 '             также сделана обработка обрезаемых строк, оказавшихся на границе страниц
+'26.09.2021 - проверка на затирание выходных файлов, если они уже есть
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
-'ЕЩЕ НЕ РЕАЛИЗОВАНО: проверка на затирание выходных файлов ASM
 
 Sub InPath()  'процедура основная, выбор файлов
 Dim flname As Variant           'это потому что по-другому не обрабатываются collection
@@ -45,6 +45,8 @@ Dim LstAddrBegin As Integer         'позиция начала адреса
 Dim LstMachCodeBegin As Integer     'позиция начала машкода
 Dim LstMachCodeEnd As Integer       'позиция конца машкода
 
+Dim FileExsistAnswer As Integer     'ответ пользователя, если файл существует
+
 '=====================================================================
 isPageNumbersInFile = False
 '=====================================================================
@@ -70,6 +72,7 @@ ReDim NewpageArray(1 To 1): NewpageArray(1) = 0
 longlineCnt = 1
 newpageCnt = 1
 stoplisting = 0
+FileExsistAnswer = 0
 
 'первый проход - заполнение массивов
 Open flname For Input As #1
@@ -115,10 +118,27 @@ newpageCnt = 1
 prevline = ""
 
 Open flname For Input As #1
+
+'файл с укороченными строками для ассемблера
+If Dir(Left(flname, Len(flname) - 3) + "asm") <> "" Then
+    FileExsistAnswer = MsgBox(Left(flname, Len(flname) - 3) + "asm" & _
+        ": ASM file already exist and will be erased, proceed anyway?", _
+        vbQuestion + vbYesNo + vbDefaultButton2, "ASM file exists")
+    If FileExsistAnswer = vbNo Then GoTo EndProgram
+    FileExsistAnswer = 0
+End If
 Open Left(flname, Len(flname) - 3) + "asm" For Output As #2
-    'файл с укороченными строками для ассемблера
+    
+'файл листинга без разбивки на страницы и переполненных строк
+If Dir(Left(flname, Len(flname) - 4) + "_clean" + Right(flname, 4)) <> "" Then
+    FileExsistAnswer = MsgBox(Left(flname, Len(flname) - 4) + "_clean" + Right(flname, 4) & _
+        ": Cleaned LST file already exist and will be erased, proceed anyway?", _
+        vbQuestion + vbYesNo + vbDefaultButton2, "_clean.LST file exists")
+    If FileExsistAnswer = vbNo Then GoTo EndProgram
+    FileExsistAnswer = 0
+End If
 Open Left(flname, Len(flname) - 4) + "_clean" + Right(flname, 4) For Output As #3
-    'файл листинга без разбивки на страницы и переполненных строк
+    
     
 Do While Not EOF(1)
     Line Input #1, lstline
@@ -179,6 +199,7 @@ Do While Not EOF(1)
         Print #3, lstline
     End If
 Loop
+EndProgram:
 Close #1
 Close #2
 Close #3
