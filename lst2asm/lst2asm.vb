@@ -203,11 +203,13 @@ Do While Not EOF(1)
             
             'отловим ложную пустую строку, возникающую в конце dup-последовательностей,
             'если после dup в строке кода ничего не было
-            If Mid(codeSection, Len(codeSection) - 3, 1) = "]" Then         'была ли текущая строка третьей в DUP-последовательности?
-                                                                            '(работать с ней будем на следующем проходе)
-                PrevLineEndDup = True
-            Else
-                PrevLineEndDup = False
+            If Len(codeSection) > 3 Then
+                If Mid(codeSection, Len(codeSection) - 3, 1) = "]" Then         'была ли текущая строка третьей в DUP-последовательности?
+                                                                                '(работать с ней будем на следующем проходе)
+                    PrevLineEndDup = True
+                Else
+                    PrevLineEndDup = False
+                End If
             End If
         End If
         Print #3, lstline
