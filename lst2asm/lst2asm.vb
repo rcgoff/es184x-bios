@@ -157,7 +157,7 @@ Do While Not EOF(1)
     End If
     
     'выполним слитие с перенесенной строкой, если она была ранее считана
-    If Not isStringEmpty(prevline) Then
+    If Len(prevline) <> 0 Then
            'по FAR-редактору, перенесенная строка в начале содержит 7 символов
             '0x09 0x20 0x09 0x20 0x09 0x20 0x09
             lstline = Right(lstline, Len(lstline) - 7) 'обрезанная строка
