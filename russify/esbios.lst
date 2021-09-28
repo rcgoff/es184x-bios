@@ -1,10 +1,11 @@
+ = 0000	 	 	 	cp866	equ	0	;1 - альтернативная кодировка, 0 - основная
+ 	 	 	 	
  	 	 	 	;ASM-файл создан из листинга удалением разбивки на страницы,
  	 	 	 	;удалением пустых строк в начале страниц,
  	 	 	 	;исправлением строк, разбитых в листинге надвое,
  	 	 	 	;удалением пустых строк, оставшихся 
  	 	 	 	;от слишком длинных DB-последовательностей.
  	 	 	 	;Л.Ядренников (RCgoff) 25.04.2020
- 	 	 	 	
  	 	 	 	
  	 	 	 	;ESBIOS1 - заданы адреса сегментов (AT address).
  	 	 	 	;в исходном файле сегменты при трансляции включались
@@ -16,6 +17,13 @@
  	 	 	 	;Теперь оставлена константа только для кодового сегмента.
  	 	 	 	;Остальные убраны,в тексте расставлены ссылки на имена сегментов.
  	 	 	 	;Смещение по DEBUG.exe будет совпадать с реальным.
+ 	 	 	 	;26.04.20 (19.04.21 - изменения для UTF-8)
+ 	 	 	 	
+ 	 	 	 	;ESSBIOS2 - условное ассемблирование.
+ 	 	 	 	;5 имеющися в BIOS текстовых фрагментов транслирутся
+ 	 	 	 	;в основной (cp866=0) либо альтернативной кодировке.
+ 	 	 	 	;Транслированный с cp866=0 файл можно шить в ПЗУ,
+ 	 	 	 	;но он не совпадает с версией 2 (моя реальная машина)
  	 	 	 	;26.04.20 (19.04.21 - изменения для UTF-8)
  	 	 	 	
  	 	 	 	
@@ -462,13 +470,16 @@
  C003	 	 	 	disk_setup	proc	near
  C003  EB 1E	 	 	 	jmp	short	l3
  	 	 	 	
- 	 	 	 	;' БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА ' (cp866)
- C005  20 81 80 87 8E 82	 	db	20h,81h,80h,87h,8Eh,82h,80h,9Fh,20h,91h,88h,91h 
-       80 9F 20 91 88 91	
- C011  92 85 8C 80 20 82	 	db	92h,85h,8Ch,80h,20h,82h,82h,8Eh,84h,80h,2Fh,82h
-       82 8E 84 80 2F 82	
- C01D  9B 82 8E 84 80 20	 	db	9Bh,82h,8Eh,84h,80h,20h	
- 	 	 	 	
+ 	 	 	 	;RCgoff
+ 	 	 	 	else
+ 	 	 	 	;' БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА ' (iso)	
+ C005  20 B1 B0 B7 BE B2	 	db	020h,0B1h,0B0h,0B7h,0BEh,0B2h,0B0h,0CFh,020h,0C1h,0B8h,0C1h	
+       B0 CF 20 C1 B8 C1	
+ C011  C2 B5 BC B0 20 B2	 	db	0C2h,0B5h,0BCh,0B0h,020h,0B2h,0B2h,0BEh,0B4h,0B0h,02Fh,0B2h	
+       B2 BE B4 B0 2F B2	
+ C01D  CB B2 BE B4 B0 20	 	db	0CBh,0B2h,0BEh,0B4h,0B0h,020h	
+ 	 	 	 	endif
+ 	 	 	 	;RCgoff end
  	 	 	 	
  C023	 	 	 	l3:
  	 	 	 	 	assume	ds:abs0
@@ -3205,19 +3216,23 @@
  D1B8  CD 10	 	 	 	int	10h
  D1BA  C3	 	 	 	ret
  D1BB	 	 	 	prt_hex endp
- 	 	 	 	;'  Kb ОБЪЁМ ПАМЯТИ (С)',0dh  (cp866)
- D1BB  20 20 4B 62 20 8E	e300	db	20h,20h,4Bh,62h,20h,8Eh,81h,9Ah,0F0h,8Ch,20h,8Fh
-       81 9A F0 8C 20 8F	
- D1C7  80 8C 9F 92 88 20	 	db	80h,8Ch,9Fh,92h,88h,20h,28h,91h,29h,0Dh
-       28 91 29 0D	 	
+ 	 	 	 	;RCgoff заменил Е на Ё для cp866
+ 	 	 	 	else
+ 	 	 	 	;'  Kb ОБЪЁМ ПАМЯТИ (С)',0dh  (iso)
+ D1BB  20 20 4B 62 20 BE	e300	db	020h,020h,04Bh,062h,020h,0BEh,0B1h,0CAh,0B5h,0BCh,020h,0BFh	
+       B1 CA B5 BC 20 BF	
+ D1C7  B0 BC CF C2 B8 20	 	db	0B0h,0BCh,0CFh,0C2h,0B8h,020h,028h,0C1h,029h,00Dh	 	
+       28 C1 29 0D	 	
  	 	 	 	
- 	 	 	 	;'  ОШИБКА  ( НАЖМИ КЛАВИШУ "Ф1" )' (cp866) 	
- D1D1  20 20 8E 98 88 81	f39	db	20h,20h,8Eh,98h,88h,81h,8Ah,80h,20h,20h,28h,20h 
-       8A 80 20 20 28 20	
- D1DD  8D 80 86 8C 88 20	 	db	8Dh,80h,86h,8Ch,88h,20h,8Ah,8Bh,80h,82h,88h,98h
-       8A 8B 80 82 88 98	
- D1E9  93 20 22 94 31 22	 	db      93h,20h,22h,94h,31h,22h,20h,29h	 	 	
+ 	 	 	 	;'  ОШИБКА  ( НАЖМИ КЛАВИШУ "Ф1" )' (iso) 	
+ D1D1  20 20 BE C8 B8 B1	f39	db	020h,020h,0BEh,0C8h,0B8h,0B1h,0BAh,0B0h,020h,020h,028h,020h	
+       BA B0 20 20 28 20	
+ D1DD  BD B0 B6 BC B8 20	 	db	0BDh,0B0h,0B6h,0BCh,0B8h,020h,0BAh,0BBh,0B0h,0B2h,0B8h,0C8h	
+       BA BB B0 B2 B8 C8	
+ D1E9  C3 20 22 C4 31 22	 	db	0C3h,020h,022h,0C4h,031h,022h,020h,029h	 	 	
        20 29	 	 	
+ 	 	 	 	endif
+ 	 	 	 	;RCgoff end
  	 	 	 	
  	 	 	 	
  	 	 	 	;-------int 15--------------------------
@@ -4678,11 +4693,15 @@
  	 	 	 	;______________________
  	 	 	 	 	assume	cs:code,es:abs0
  	 	 	 	
- 	 	 	 	;' СБОЙ  ПАРИТЕТА ПАМЯТИ'  (cp866)
- E18E  20 91 81 8E 89 20	d1	db	20h,91h,81h,8Eh,89h,20h,20h,8Fh,80h,90h,88h,92h	
-       20 8F 80 90 88 92	
- E19A  85 92 80 20 8F 80	 	db	85h,92h,80h,20h,8Fh,80h,8Ch,9Fh,92h,88h	 	
-       8C 9F 92 88	 	
+ 	 	 	 	;RCgoff
+ 	 	 	 	else
+ 	 	 	 	;' СБОЙ  ПАРИТЕТА ПАМЯТИ'  (iso)
+ E18E  20 C1 B1 BE B9 20	d1	db	020h,0C1h,0B1h,0BEh,0B9h,020h,020h,0BFh,0B0h,0C0h,0B8h,0C2h	
+       20 BF B0 C0 B8 C2	
+ E19A  B5 C2 B0 20 BF B0	 	db	0B5h,0C2h,0B0h,020h,0BFh,0B0h,0BCh,0CFh,0C2h,0B8h	 	
+       BC CF C2 B8	 	
+ 	 	 	 	endif
+ 	 	 	 	;RCgoff end
  = 0016	 	 	 	d1l	equ	22
  E1A4  70 61 72 69 74 79	d2	db	'parity check 1'
        20 63 68 65 63 6B	
@@ -9700,10 +9719,14 @@
  FFD9  C3	 	 	 	ret
  FFDA	 	 	 	crlf	endp
  FFE0	 	 	 	 	org	0ffe0h
- 	 	 	 	;'ЕС1841.(РЕД.02)' (cp866)
- FFE0  85 91 31 38 34 31	 	db	85h,91h,31h,38h,34h,31h,2Eh,28h,90h,85h,84h,2Eh
-       2E 28 90 85 84 2E	
- FFEC  30 32 29	 	 	 	db	30h,32h,29h
+ 	 	 	 	;RCgoff
+ 	 	 	 	else
+ 	 	 	 	;'ЕС1841.(РЕД.02)' (iso)
+ FFE0  B5 C1 31 38 34 31	 	db	0B5h,0C1h,031h,038h,034h,031h,02Eh,028h,0C0h,0B5h,0B4h,02Eh	
+       2E 28 C0 B5 B4 2E	
+ FFEC  30 32 29	 	 	 	db	030h,032h,029h	 	 	
+ 	 	 	 	endif
+ 	 	 	 	;RCgoff end
  	 	 	 	
  	 	 	 	
  FFF0	 	 	 	 	org	0fff0h
@@ -9867,6 +9890,7 @@ CNTLR_DIAG_CMD . . . . . . . . .	Number	00E4
 COD. . . . . . . . . . . . . . .	Number	F000	
 COMMAND. . . . . . . . . . . . .	N PROC	C562	CODE	Length =003A
 CONTROL_BYTE . . . . . . . . . .	L BYTE 	0076	DATA
+CP866. . . . . . . . . . . . . .	Number	0000	
 CRLF . . . . . . . . . . . . . .	N PROC	FFCB	CODE	Length =000F
 CRT_CHAR_GEN . . . . . . . . . .	L BYTE 	FA6E	CODE
 CRT_CHAR_IBM . . . . . . . . . .	L BYTE 	DC00	CODE
@@ -10645,7 +10669,7 @@ ZN . . . . . . . . . . . . . . .	L NEAR 	CB89	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-13178 Bytes free   
+13138 Bytes free   
 
 Warning Severe
 Errors	Errors 
