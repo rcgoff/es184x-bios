@@ -59,6 +59,13 @@
  	 	 	 	;30.04.20 (28.04.21 - изменения для UTF-8)
  	 	 	 	
  	 	 	 	
+ 	 	 	 	;ESBIOS6 - новый обработчик capslock 01.05.2020
+ 	 	 	 	;сделан с проверками - получился длиннее на 15 байт
+ 	 	 	 	;съехала dummm_return, но за ней все равно большая дыра
+ 	 	 	 	;16.08.20 исправлены ошибки
+ 	 	 	 	;(28.04.21 - изменения для UTF-8)
+ 	 	 	 	
+ 	 	 	 	
  	 	 	 	;Microsoft MACRO Assembler  Version 3.00
  	 	 	 	;09-15-88    
  	 	 	 	;___________________	 	 	  	
@@ -7486,7 +7493,7 @@
  F047  F1E5 R	 	 	 	dw	offset	set_ctype
  F049  F206 R	 	 	 	dw	offset	set_cpos
  F04B  F230 R	 	 	 	dw	offset	read_cursor
- F04D  F93F R	 	 	 	dw	offset	read_lpen1
+ F04D  F94E R	 	 	 	dw	offset	read_lpen1
  F04F  F247 R	 	 	 	dw	offset	act_disp_page
  F051  F2B4 R	 	 	 	dw	offset	scroll_up
  F053  F359 R	 	 	 	dw	offset	scroll_down
@@ -9184,47 +9191,65 @@
  F903  31 32	 	 	 	db	49,50
  	 	 	 	
  	 	 	 	;---
+ 	 	 	 	;RCgoff
  	 	 	 	;обработчик CapsLock для русских букв
- F905  F6 06 0017 R 03	 	k89:	test	kb_flag,left_shift+right_shift
- F90A  74 11	 	 	 	jz	k80
- F90C  3C F0	 	 	 	cmp	al,0f0h	 	 	;shift был нажат - перевод загл->стр
- F90E  74 23	 	 	 	je	k89a   	 	 	;Ё->ё
+ 	 	 	 	if	newzagrcw	and cp866
+ 	 	 	 	 	
+ F905  3C 80	 	 	k89:	cmp	al,80h
+ F907  72 3B	 	 	 	jb	k81	 	 	;только для верхней половины ASCII
+ F909  F6 06 0017 R 03	 	 	test	kb_flag,left_shift+right_shift
+ F90E  74 17	 	 	 	jz	k80
  	 	 	 	
- F910  3C B0	 	 	 	cmp	al,0b0h
- F912  72 06	 	 	 	jb	k81
- F914  3C CF	 	 	 	cmp	al,0cfh
- F916  77 02	 	 	 	ja	k81
- F918  04 20	 	 	 	add	al,20h                  ;собственно перекодировка
- F91A  E9 E756 R	 	k81:	jmp	k61                     ;возврат (для условных команд)
- 	 	 	 	
- F91D  3C F1	 	 	k80:	cmp	al,0f1h	 	 	;shift не был нажат - перевод стр->загл
- F91F  74 0D	 	 	 	je	k89b                    ;ё->Ё
- 	 	 	 	
- F921  3C D0	 	 	 	cmp	al,0d0h
- F923  72 F5	 	 	 	jb	k81
- F925  3C FE	 	 	 	cmp	al,0feh	 	 	;ошибка, должно быть 0efh! 
- 	 	 	 	 	 	 	 	 	 	;Однако эти символы все равно не ввести с клавы
- F927  77 F1	 	 	 	ja	k81
- F929  2C 20	 	 	 	sub	al,20h
- F92B  E9 E756 R	 	 	jmp	k61
- 	 	 	 	
- F92E  2C 01	 	 	k89b:	sub	al,01h 	 	 	;обработка Ёё	
- F930  E9 E756 R	 	 	jmp	k61
- F933  04 01	 	 	k89a:	add	al,01h
- F935  E9 E756 R	 	 	jmp	k61
+ 	 	 	 	        ;shift был нажат - перевод загл->стр
+ F910  3C F0	 	 	 	cmp	al,0f0h                 
+ F912  74 10	 	 	 	je	k89a	 	 	;Ё->ё	
+ F914  3C 90	 	 	 	cmp	al,90h
+ F916  72 08	 	 	 	jb	cap_low
+ F918  3C 9F	 	 	 	cmp	al,09fh
+ F91A  77 28	 	 	 	ja	k81	 	 	;выход за границу заглавных
+ F91C  04 50	 	 	 	add	al,50h   	 	;перекодировка верхней части заглавных
+ F91E  EB 24	 	 	 	jmp 	short k81
+ F920  04 20	 	 	cap_low:add	al,20h	 	 	;перекодировка нижней части заглавных	
+ F922  EB 20	 	 	 	jmp	short k81	 	 	 	 	
+ F924  40	 	 	k89a:	inc	ax	 	 	;Ё->ё
+ F925  EB 1D	 	 	 	jmp	short k81
  	 	 	 	
  	 	 	 	
+ 	 	 	 	 	;shift не был нажат - перевод стр->загл
+ F927  3C F1	 	 	k80:	cmp	al,0f1h         	
+ F929  74 18	 	 	 	je	k89b	 	 	;ё->Ё
+ F92B  3C B0	 	 	 	cmp	al,0b0h
+ F92D  72 0C	 	 	 	jb	sml_low
+ F92F  3C E0	 	 	 	cmp	al,0e0h
+ F931  72 11	 	 	 	jb	k81	 	 	;выход за границу строчных (попали в псевдографику)
+ F933  3C EF	 	 	 	cmp	al,0efh
+ F935  77 0D	 	 	 	ja	k81	 	 	;выход за границу строчных (больше большего)
+ F937  2C 50	 	 	 	sub	al,50h	 	 	;перекодировка верхней части строчных
+ F939  EB 09	 	 	 	jmp	short k81
+ F93B  3C A0	 	 	sml_low:cmp	al,0a0h
+ F93D  72 05	 	 	 	jb	k81	 	 	;выход за границу строчных (меньше меньшего)
+ F93F  2C 20	 	 	 	sub	al,20h	 	 	;перекодировка нижней части строчных
+ F941  EB 01	 	 	 	jmp	short k81
+ F943  48	 	 	k89b:	dec	ax 	 	 	;ё->Ё
+ F944  E9 E756 R	 	k81:	jmp	k61	 	 	;играет роль общего возврата 
+ 	 	 	 	
+ 	 	 	 	
+ 	 	 	 	;-------------------------------------------------------------
+ 	 	 	 	endif
+ 	 	 	 	
+ 	 	 	 	
+ 	 	 	 	;RCgoff end
  	 	 	 	
  	 	 	 	;	Временный обработчик прерываний стыка С2
  	 	 	 	;
  	 	 	 	;
- F938  50	 	 	dummm_return:	push	ax
- F939  B0 20	 	 	 	 	mov	al,20h
- F93B  E6 20	 	 	 	 	out	20h,al
- F93D  58	 	 	 	 	pop	ax
- F93E  CF	 	 	 	 	iret
- F93F  5D	 	 	read_lpen1:	pop	bp
- F940  E9 F7B6 R	 	 	 	 	jmp	read_lpen
+ F947  50	 	 	dummm_return:	push	ax
+ F948  B0 20	 	 	 	 	mov	al,20h
+ F94A  E6 20	 	 	 	 	out	20h,al
+ F94C  58	 	 	 	 	pop	ax
+ F94D  CF	 	 	 	 	iret
+ F94E  5D	 	 	read_lpen1:	pop	bp
+ F94F  E9 F7B6 R	 	 	 	 	jmp	read_lpen
  	 	 	 	
  	 	 	 	
  	 	 	 	;**************************************
@@ -9633,9 +9658,9 @@
  	 	 	 	
  FEFB  FF53 R	 	 	 	dw	offset dummy_return	; прерывание А
  FEFD  F000	 	 	 	dw	cod
- FEFF  F938 R	 	 	 	dw	offset dummm_return	; прерывание B
+ FEFF  F947 R	 	 	 	dw	offset dummm_return	; прерывание B
  FF01  F000	 	 	 	dw	cod
- FF03  F938 R	 	 	 	dw	offset dummm_return	; прерывание C
+ FF03  F947 R	 	 	 	dw	offset dummm_return	; прерывание C
  FF05  F000	 	 	 	dw	cod
  FF07  FF53 R	 	 	 	dw	offset dummy_return	; прерывание D
  FF09  F000	 	 	 	dw	cod
@@ -9973,6 +9998,7 @@ CA9. . . . . . . . . . . . . . .	L NEAR 	D037	CODE
 CAPS_KEY . . . . . . . . . . . .	Number	0056	
 CAPS_SHIFT . . . . . . . . . . .	Number	0040	
 CAPS_STATE . . . . . . . . . . .	Number	0040	
+CAP_LOW. . . . . . . . . . . . .	L NEAR 	F920	CODE
 CAW. . . . . . . . . . . . . . .	L WORD 	E018	CODE
 CHK_DRV. . . . . . . . . . . . .	N PROC	C52A	CODE	Length =0007
 CHK_DRV_CMD. . . . . . . . . . .	Number	00E3	
@@ -10059,7 +10085,7 @@ DMA_SETUPT . . . . . . . . . . .	N PROC	C69F	CODE	Length =0069
 DMA_WRITE. . . . . . . . . . . .	Number	004B	
 DR1. . . . . . . . . . . . . . .	L NEAR 	C34A	CODE
 DSBL . . . . . . . . . . . . . .	N PROC	C20C	CODE	Length =004A
-DUMMM_RETURN . . . . . . . . . .	L NEAR 	F938	CODE
+DUMMM_RETURN . . . . . . . . . .	L NEAR 	F947	CODE
 DUMMY_RETURN . . . . . . . . . .	L NEAR 	FF53	CODE
 E1 . . . . . . . . . . . . . . .	L BYTE 	E295	CODE
 E10. . . . . . . . . . . . . . .	L NEAR 	E32C	CODE
@@ -10358,12 +10384,12 @@ K67. . . . . . . . . . . . . . .	L NEAR 	E6F8	CODE
 K6L. . . . . . . . . . . . . . .	Number	000C	
 K7 . . . . . . . . . . . . . . .	L BYTE 	E881	CODE
 K8 . . . . . . . . . . . . . . .	L BYTE 	E889	CODE
-K80. . . . . . . . . . . . . . .	L NEAR 	F91D	CODE
-K81. . . . . . . . . . . . . . .	L NEAR 	F91A	CODE
+K80. . . . . . . . . . . . . . .	L NEAR 	F927	CODE
+K81. . . . . . . . . . . . . . .	L NEAR 	F944	CODE
 K88. . . . . . . . . . . . . . .	L NEAR 	E735	CODE
 K89. . . . . . . . . . . . . . .	L NEAR 	F905	CODE
-K89A . . . . . . . . . . . . . .	L NEAR 	F933	CODE
-K89B . . . . . . . . . . . . . .	L NEAR 	F92E	CODE
+K89A . . . . . . . . . . . . . .	L NEAR 	F924	CODE
+K89B . . . . . . . . . . . . . .	L NEAR 	F943	CODE
 K9 . . . . . . . . . . . . . . .	L BYTE 	E8C3	CODE
 K98. . . . . . . . . . . . . . .	L NEAR 	EC13	CODE
 K99. . . . . . . . . . . . . . .	L NEAR 	E76E	CODE
@@ -10558,7 +10584,7 @@ READ_CMD . . . . . . . . . . . .	Number	0008
 READ_CURSOR. . . . . . . . . . .	N PROC	F230	CODE	Length =0017
 READ_DOT . . . . . . . . . . . .	N PROC	F43F	CODE	Length =0011
 READ_LPEN. . . . . . . . . . . .	N PROC	F7B6	CODE	Length =0098
-READ_LPEN1 . . . . . . . . . . .	L NEAR 	F93F	CODE
+READ_LPEN1 . . . . . . . . . . .	L NEAR 	F94E	CODE
 RECAL_CMD. . . . . . . . . . . .	Number	0001	
 RECORD_NOT_FND . . . . . . . . .	Number	0004	
 REGEN. . . . . . . . . . . . . .	L BYTE 	0000	VIDEO_RAM
@@ -10632,6 +10658,7 @@ SET_COLOR. . . . . . . . . . . .	N PROC	F26B	CODE	Length =0026
 SET_CPOS . . . . . . . . . . . .	N PROC	F206	CODE	Length =0019
 SET_CTYPE. . . . . . . . . . . .	N PROC	F1E5	CODE	Length =0021
 SET_MODE . . . . . . . . . . . .	N PROC	F111	CODE	Length =00D4
+SML_LOW. . . . . . . . . . . . .	L NEAR 	F93B	CODE
 SP_TEST. . . . . . . . . . . . .	L NEAR 	E5F8	CODE
 START. . . . . . . . . . . . . .	L NEAR 	E05B	CODE
 STATUS_BYTE. . . . . . . . . . .	L BYTE 	0000	XXDATA
@@ -10767,7 +10794,7 @@ ZGR. . . . . . . . . . . . . . .	L NEAR 	CB07	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-13036 Bytes free   
+12948 Bytes free   
 
 Warning Severe
 Errors	Errors 
