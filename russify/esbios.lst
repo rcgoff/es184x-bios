@@ -1,4 +1,5 @@
- = 0001	 	 	 	cp866	equ	1	;1 - альтернативная кодировка, 0 - основная
+ = 0001	 	 	 	cp866	 	equ	1	;1 - альтернативная кодировка, 0 - основная
+ = 0001	 	 	 	newzagrcw	equ	1	;0 - старый zagrcw, 1 - новый
  	 	 	 	
  	 	 	 	;ASM-файл создан из листинга удалением разбивки на страницы,
  	 	 	 	;удалением пустых строк в начале страниц,
@@ -48,9 +49,14 @@
  	 	 	 	;	1.Заменена таблица crt_char_rus
  	 	 	 	;	  (загружается из внешнего файла CHR866CP.asm)
  	 	 	 	;	2.В таблицах драйвера клавиатуры rust и rust2
- 	 	 	 	;	  перекодированы коды русских букв 
+ 	 	 	 	;	  перекодированы коды русских букв
  	 	 	 	;26.04.20 (28.04.21 - изменения для UTF-8
  	 	 	 	;и в комментах к rust2 сделана таблица для нового caps)
+ 	 	 	 	 
+ 	 	 	 	
+ 	 	 	 	;ESBIOS5 - переделана zagrcw для освобождения места.
+ 	 	 	 	;Прокомментирован старый обработчик capslock.
+ 	 	 	 	;30.04.20 (28.04.21 - изменения для UTF-8)
  	 	 	 	
  	 	 	 	
  	 	 	 	;Microsoft MACRO Assembler  Version 3.00
@@ -2685,43 +2691,33 @@
  	 	 	 	;
  	 	 	 	;__________________________________
  	 	 	 	;
- CB63  B8 B800	 	 	zagrcw: mov	ax,0b800h
- CB66  8E C0	 	 	 	mov	es,ax
- CB68  B0 01	 	 	 	mov	al,1
- CB6A  BA 03DF	 	 	 	mov	dx,3dfh
- CB6D  EE	 	 	 	out	dx,al	   ; порт 3DF = 1
- CB6E  BA 03D8	 	 	 	mov	dx,3d8h
- CB71  EC	 	 	 	in	al,dx
- CB72  8A D8	 	 	 	mov	bl,al	   ; сохранить значение порта 3D8
- CB74  B0 00	 	 	 	mov	al,0
- CB76  EE	 	 	 	out	dx,al	   ; порт 3D8 = 0
- CB77  33 FF	 	 	 	xor	di,di
- CB79  B9 0400	 	 	 	mov	cx,400h
- CB7C  33 C0	 	 	 	xor	ax,ax
- CB7E  FC	 	 	 	cld
- CB7F  F3/ AB	 	 	 	rep	stosw
- CB81  BE FA6E R	 	 	mov	si,offset crt_char_gen
- CB84  B9 0400	 	 	 	mov	cx,400h
- CB87  33 FF	 	 	 	xor	di,di
- CB89  2E: 8A 04	 	zn:	mov	al,cs:[si]
- CB8C  26: 88 05	 	 	mov	byte ptr es:[di],al
- CB8F  46	 	 	 	inc	si
- CB90  47	 	 	 	inc	di
- CB91  E2 F6	 	 	 	loop	zn
- CB93  B9 0400	 	 	 	mov	cx,400h    ; счетчик для 128 символов русского алфавита
- CB96  BE CBB2 R	 	 	mov	si,offset crt_char_rus
- CB99  2E: 8A 04	 	trus:	mov	al,cs:[si]
- CB9C  26: 88 05	 	 	mov	byte ptr es:[di],al
- CB9F  46	 	 	 	inc	si
- CBA0  47	 	 	 	inc	di
- CBA1  E2 F6	 	 	 	loop	trus
- CBA3  B0 00	 	 	 	mov	al,0
- CBA5  BA 03DF	 	 	 	mov	dx,3dfh
- CBA8  EE	 	 	 	out	dx,al	   ; порт 3DF = 0
- CBA9  BA 03D8	 	 	 	mov	dx,3d8h
- CBAC  8A C3	 	 	 	mov	al,bl
- CBAE  EE	 	 	 	out	dx,al	   ; восстановить значение порта 3D8
- CBAF  E9 F8A6 R	 	 	jmp	kzagr
+ CB63	 	 	 	zagrcw:
+ 	 	 	 	if newzagrcw
+ 	 	 	 	;RCgoff новая программа основана на int10,ah11
+ CB63  55	 	 	 	push	bp	 	;bp используется как хранитель ошибок POST,
+ 	 	 	 	 	 	 	 	;не надо его портить (хотя раньше этой он не используется)
+ CB64  B8 1103	 	 	 	mov	ax,1103h	;функция загрузки верхней половины знакогенератора
+ CB67  BB 0800	 	 	 	mov	bx,0800h	;8 байт/символ, русская таблица
+ CB6A  CD 10	 	 	 	int	10h
+ 	 	 	 	 	 	 	 	;после возврата в AL=0, в AH - 08h
+ 	 	 	 	 	 	 	 	;из анализа кода int10 при возврате в BH - 0,в BL - crt_mode
+ 	 	 	 	 	           	 	;теперь нижний знакогенератор
+ CB6C  8C CB	 	 	 	mov	bx,cs
+ CB6E  8E C3	 	 	 	mov	es,bx
+ CB70  BD FA6E R	 	 	mov	bp,offset crt_char_gen
+ 	 	 	 	 	 	 	 	;ES:BP указывают на знакогенер 128 нижних ASCII	
+ 	 	 	 	 	 	
+ CB73  B9 0080	 	 	 	mov	cx,80h	 	;128 cимволов
+ CB76  33 D2	 	 	 	xor	dx,dx           ;начальный код 0, id таблицы 0
+ CB78  B7 08	 	 	 	mov 	bh,08h	 	;8 байт/символ
+ CB7A  B4 11	 	 	 	mov	ah,11h	 	;функция 11,подфункция 0 - загрузка знакогенератора
+ 	 	 	 	 	 	 	 	;0 сохранился в AL после первого вызова int10, экономим 1 байт
+ CB7C  CD 10	 	 	 	int	10h
+ CB7E  5D	 	 	        pop 	bp
+ 	 	 	 	endif
+ CB7F  E9 F8A6 R	 	 	jmp	kzagr
+ CBB2	 	 	 	org	0cbb2h	 	   ;чтобы не съезжали последующие программы
+ 	 	 	 	;RCgoff end
  	 	 	 	;
  	 	 	 	;
  	 	 	 	;*************************************************
@@ -5156,7 +5152,7 @@
  	 	 	 	;   произошла ошибка данных
  	 	 	 	;RCgoff
  	 	 	 	;	org	0e367h
- E385	 	 	 	 	org	0e385h	 	;смещение выставлено по анализу 
+ E385	 	 	 	 	org	0e385h	 	;смещение выставлено по анализу
  	 	 	 	 	 	 	 	;перехода в прошивке реальной машины
  	 	 	 	;RCgoff end
  	 	 	 	
@@ -9188,25 +9184,31 @@
  F903  31 32	 	 	 	db	49,50
  	 	 	 	
  	 	 	 	;---
+ 	 	 	 	;обработчик CapsLock для русских букв
  F905  F6 06 0017 R 03	 	k89:	test	kb_flag,left_shift+right_shift
  F90A  74 11	 	 	 	jz	k80
- F90C  3C F0	 	 	 	cmp	al,0f0h
- F90E  74 23	 	 	 	je	k89a
+ F90C  3C F0	 	 	 	cmp	al,0f0h	 	 	;shift был нажат - перевод загл->стр
+ F90E  74 23	 	 	 	je	k89a   	 	 	;Ё->ё
+ 	 	 	 	
  F910  3C B0	 	 	 	cmp	al,0b0h
  F912  72 06	 	 	 	jb	k81
  F914  3C CF	 	 	 	cmp	al,0cfh
  F916  77 02	 	 	 	ja	k81
- F918  04 20	 	 	 	add	al,20h
- F91A  E9 E756 R	 	k81:	jmp	k61
- F91D  3C F1	 	 	k80:	cmp	al,0f1h
- F91F  74 0D	 	 	 	je	k89b
+ F918  04 20	 	 	 	add	al,20h                  ;собственно перекодировка
+ F91A  E9 E756 R	 	k81:	jmp	k61                     ;возврат (для условных команд)
+ 	 	 	 	
+ F91D  3C F1	 	 	k80:	cmp	al,0f1h	 	 	;shift не был нажат - перевод стр->загл
+ F91F  74 0D	 	 	 	je	k89b                    ;ё->Ё
+ 	 	 	 	
  F921  3C D0	 	 	 	cmp	al,0d0h
  F923  72 F5	 	 	 	jb	k81
- F925  3C FE	 	 	 	cmp	al,0feh
+ F925  3C FE	 	 	 	cmp	al,0feh	 	 	;ошибка, должно быть 0efh! 
+ 	 	 	 	 	 	 	 	 	 	;Однако эти символы все равно не ввести с клавы
  F927  77 F1	 	 	 	ja	k81
  F929  2C 20	 	 	 	sub	al,20h
  F92B  E9 E756 R	 	 	jmp	k61
- F92E  2C 01	 	 	k89b:	sub	al,01h
+ 	 	 	 	
+ F92E  2C 01	 	 	k89b:	sub	al,01h 	 	 	;обработка Ёё	
  F930  E9 E756 R	 	 	jmp	k61
  F933  04 01	 	 	k89a:	add	al,01h
  F935  E9 E756 R	 	 	jmp	k61
@@ -10457,6 +10459,7 @@ NEC_OP . . . . . . . . . . . . .	L NEAR 	EE64	CODE
 NEC_OUTPUT . . . . . . . . . . .	N PROC	E6A5	CODE	Length =002C
 NEC_STATUS . . . . . . . . . . .	L BYTE 	0042	DATA	Length =0007
 NEPOCL . . . . . . . . . . . . .	L NEAR 	C8D4	CODE
+NEWZAGRCW. . . . . . . . . . . .	Number	0001	
 NEXT_ROM . . . . . . . . . . . .	L NEAR 	E461	CODE
 NMI_INT. . . . . . . . . . . . .	N PROC	E270	CODE	Length =0025
 NMI_PTR. . . . . . . . . . . . .	L WORD 	0008	ABS0
@@ -10660,7 +10663,6 @@ TIME_OUT . . . . . . . . . . . .	Number	0080
 TIM_CTL. . . . . . . . . . . . .	Number	0043	
 TMINT. . . . . . . . . . . . . .	Number	0001	
 TOS. . . . . . . . . . . . . . .	L WORD 	0100	STACK
-TRUS . . . . . . . . . . . . . .	L NEAR 	CB99	CODE
 TST12. . . . . . . . . . . . . .	L NEAR 	E3F0	CODE
 TST6 . . . . . . . . . . . . . .	L NEAR 	E1E2	CODE
 TST8 . . . . . . . . . . . . . .	L NEAR 	E2A1	CODE
@@ -10762,11 +10764,10 @@ ZAPBY. . . . . . . . . . . . . .	L NEAR 	CB16	CODE
 ZAPTEL . . . . . . . . . . . . .	L NEAR 	C8B7	CODE
 ZB . . . . . . . . . . . . . . .	L BYTE 	0000	ABS0
 ZGR. . . . . . . . . . . . . . .	L NEAR 	CB07	CODE
-ZN . . . . . . . . . . . . . . .	L NEAR 	CB89	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-12998 Bytes free   
+13036 Bytes free   
 
 Warning Severe
 Errors	Errors 
