@@ -2742,7 +2742,7 @@ zn:	mov	al,cs:[si]
  	inc	di
  	loop	zn
  	mov	cx,400h    ; счетчик для 128 символов русского алфавита
- 	mov	si,offset crt_char_rus
+ 	mov	si,offset crt_char_866
 trus:	mov	al,cs:[si]
  	mov	byte ptr es:[di],al
  	inc	si
@@ -2788,7 +2788,7 @@ vector_table	label	word	; таблица векторов прерываний
  	dw	dummy_return	; прерывание 1C - прерывание таймера
  	dw	video_parms	; прерывание 1D - параметры видео
  	dw	offset	disk_base   ;прерывание 1EH - параметры НГМД
- 	dw	offset crt_char_rus	; 1FH - адрес таблицы пользовательского дополнительного знакогенератора
+ 	dw	offset crt_char_866	; 1FH - адрес таблицы пользовательского дополнительного знакогенератора
 
 org	0cbb2h		   ;чтобы не съезжали последующие программы
 ;RCgoff end
@@ -3768,7 +3768,7 @@ ah12:
  	mov	cx,80h
  	mov	dx,80h
  	pop	bx
- 	mov	bp,offset crt_char_rus
+ 	mov	bp,offset crt_char_866
  	cmp	bl,0
  	mov	bx,0800h
  	jz	rav
@@ -3987,6 +3987,14 @@ j31:
 j32:	 	 	 	; ошибка позиционирования
  	ret	 	; возврат к программе, вызвавшей прерывание
 seek	endp
+;RCgoff end
+
+;RCgoff
+if cp866
+	org	0D800h
+crt_char_866	label byte
+include chr866cp.asm
+endif
 ;RCgoff end
 
  	org	0DC00h
@@ -8739,7 +8747,7 @@ bct2:	mov	al,cs:[si]
  	jmp	zagrcw
 pr128:	cmp	cx,128
  	jne	bct1
- 	mov	si,offset crt_char_rus
+ 	mov	si,offset crt_char_866
  	jmp	bct1
 kzagr:	ret
 bct	endp
