@@ -65,6 +65,17 @@
  	 	 	 	;16.08.20 исправлены ошибки
  	 	 	 	;(28.04.21 - изменения для UTF-8)
  	 	 	 	
+ 	 	 	 	;ESBIOS7 - новый обработчик capslock 01.05.20
+ 	 	 	 	;с убранными проверками выхода за границу диапазона
+ 	 	 	 	;букв - уместился на место старого
+ 	 	 	 	;16.05.20 исправлена ошибка в комменте
+ 	 	 	 	;(29.04.21 - изменения для UTF-8)
+ 	 	 	 	
+ 	 	 	 	
+ 	 	 	 	;ESBIOS8a - Комментарии в обработчике клавиатуры,
+ 	 	 	 	;реконфигураторе памяти ca0 и тесте памяти e190. 
+ 	 	 	 	;21.09.2020 (01.05.21 - изменения для UTF-8)
+ 	 	 	 	
  	 	 	 	
  	 	 	 	;Microsoft MACRO Assembler  Version 3.00
  	 	 	 	;09-15-88    
@@ -2737,13 +2748,19 @@
  	 	 	 	if cp866
                              C	include chr866cp.asm
                              C	;╨Т╨╡╤А╤Е╨╜╨╕╨╡ 128 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨▓ ╨║╨╛╨┤╨╕╤А╨╛╨▓╨║╨╡ DOS (cp866)
+                             C	;╨а╨░╤Б╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╨┐╨╛╨╗╨╜╨╛╤Б╤В╤М╤О ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╨╡╤В ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ 866.
+                             C	;
                              C	;╨в╨░╨▒╨╗╨╕╤Ж╨░ ╨┐╨╛╨╗╤Г╤З╨╡╨╜╨░ ╨╕╨╖ ╤В╨░╨▒╨╗╨╕╤Ж╤Л crt_char_rus ╨╕╨╖ ╨╗╨╕╤Б╤В╨╕╨╜╨│╨░
                              C	;BIOS ╨Х╨б1841 ╨┐╤Г╤В╨╡╨╝ ╨┐╨╡╤А╨╡╤В╨░╤Б╨╛╨▓╨║╨╕ 8-╨▒╨░╨╣╤В╨╛╨▓╤Л╤Е ╨┐╨╛╤Б╨╗╨╡╨┤╨╛╨▓╨░╤В╨╡╨╗╤М╨╜╨╛╤Б╤В╨╡╨╣,
-                             C	;╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╤О╤Й╨╕╤Е ╤Б╨╕╨╝╨▓╨╛╨╗╨░╨╝. 
-                             C	;╤В╨░╨║╨╕╨╝ ╨╛╨▒╤А╨░╨╖╨╛╨╝, ╨║╨╛╨╜╤В╤А╨╛╨╗╤М╨╜╨░╤П ╤Б╤Г╨╝╨╝╨░ ╨╖╨░╨▓╨╡╨┤╨╛╨╝╨╛ ╨╜╨╡ ╨╕╨╖╨╝╨╡╨╜╨╕╨╗╨░╤Б╤М
-                             C	;╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ ╨▒╨╛╨╗╤М╤И╨╡ 0xE0 ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╤Л ╨╜╨╡╨╕╨╖╨╝╨╡╨╜╨╜╤Л╨╝╨╕
+                             C	;╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╤О╤Й╨╕╤Е ╤Б╨╕╨╝╨▓╨╛╨╗╨░╨╝, ╨╖╨░ ╨╕╤Б╨║╨╗╤О╤З╨╡╨╜╨╕╨╡╨╝: 
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ 0xE0..0xF1 ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╤Л ╨╜╨╡╨╕╨╖╨╝╨╡╨╜╨╜╤Л╨╝╨╕
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ 0xF2..0xFB, 0xFD...0xFF ╨▓╨╖╤П╤В╤Л ╨╕╨╖ ╤Д╨░╨╣╨╗╨░ ega.cpi
+                             C	;	 (8x8, ╨║╨╛╨┤╨╛╨▓╨░╤П ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ 866) Windows 7
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗ ╨╜╨╛╨╝╨╡╤А╨░ ╤Б ╨║╨╛╨┤╨╛╨╝ 0xFC ╨▓╨╖╤П╤В ╨╕╨╖ ╤И╤А╨╕╤Д╤В╨░ ╨▓ ╨║╨╜╨╕╨│╨╡ ╨д╤А╨╛╨╗╨╛╨▓╤Л╤Е
+                             C	;	 "╨Я╤А╨╛╨│╤А╨░╨╝╨╝╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨▓╨╕╨┤╨╡╨╛╨░╨┤╨░╨┐╤В╨╡╤А╨╛╨▓ CGA/EGA/VGA", ╤В.╨║. ╨║╤А╨░╤Б╨╕╨▓╤Л╨╣
                              C	;
-                             C	;╨Ы.╨п╨┤╤А╨╡╨╜╨╜╨╕╨║╨╛╨▓ (RCgoff),17.04.2020 (28.04.21 - UTF8)
+                             C	;
+                             C	;╨Ы.╨п╨┤╤А╨╡╨╜╨╜╨╕╨║╨╛╨▓ (RCgoff),17.04.20, 13.08.20 (29.04.21 - ╨╕╨╖╨╝. ╨┤╨╗╤П UTF-8)
                              C	
  CBB2  1E 36 66 66 7E 66     C	 	db	01eh,036h,066h,066h,07eh,066h,066h,000h
        66 00                 C	
@@ -2975,222 +2992,269 @@
        7E 00                 C	
  CF3A  00 66 3C 66 7E 60     C	 	db 000h,066h,03ch,066h,07eh,060h,03ch,000h
        3C 00                 C	
- CF42  00 00 00 00 03 06     C	 	db 000h,000h,000h,000h,003h,006h,00ch,018h
-       0C 18                 C	
- CF4A  00 00 00 00 C0 60     C	 	db 000h,000h,000h,000h,0c0h,060h,030h,018h
-       30 18                 C	
- CF52  18 30 60 C0 00 00     C	 	db 018h,030h,060h,0c0h,000h,000h,000h,000h
-       00 00                 C	
- CF5A  18 0C 06 03 00 00     C	 	db 018h,00ch,006h,003h,000h,000h,000h,000h
-       00 00                 C	
- CF62  00 00 18 0C 7E 0C     C	 	db 000h,000h,018h,00ch,07eh,00ch,018h,000h
-       18 00                 C	
- CF6A  00 00 18 30 7E 30     C	 	db 000h,000h,018h,030h,07eh,030h,018h,000h
-       18 00                 C	
- CF72  18 3C 7E 18 18 18     C	 	db 018h,03ch,07eh,018h,018h,018h,018h,000h
-       18 00                 C	
- CF7A  18 18 18 18 7E 3C     C	 	db 018h,018h,018h,018h,07eh,03ch,018h,000h
-       18 00                 C	
- CF82  18 18 00 7E 00 18     C	 	db 018h,018h,000h,07eh,000h,018h,018h,000h
-       18 00                 C	
- CF8A  18 18 7E 18 18 00     C	 	db 018h,018h,07eh,018h,018h,000h,07ch,000h
+                             C	
+                             C	;╨Ш╨╖ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л 866 ╤Д╨░╨╣╨╗╨░ ega.cpi Windows 7
+                             C	
+ CF42  3C 66 C0 F8 C0 66     C	 	cp866_code_0f2h	db	03Ch, 066h, 0C0h, 0F8h, 0C0h, 066h, 03Ch, 000h	
+ 	 	 	 	 	;╤Г╨║╤А ╨н ╨Ю╨С╨а╨Р╨в╨Э╨Ю╨Х
+       3C 00                 C	
+ CF4A  00 00 3E 63 78 63     C	        cp866_code_0f3h	db	000h, 000h, 03Eh, 063h, 078h, 063h, 03Eh, 000h          ;╤Г╨║╤А ╤Н ╨╛╨▒╤А╨░╤В╨╜╨╛╨╡
+       3E 00                 C	
+ CF52  48 78 30 30 30 30     C	        cp866_code_0f4h	db	048h, 078h, 030h, 030h, 030h, 030h, 078h, 000h          ;╤Г╨║╤А ╨Ш ╨б ╨Ф╨Т╨г╨Ь╨п ╨в╨Ю╨з╨Ъ╨Р╨Ь╨Ш
+       78 00                 C	
+ CF5A  CC 00 30 30 30 30     C	        cp866_code_0f5h	db	0CCh, 000h, 030h, 030h, 030h, 030h, 078h, 000h          ;╤Г╨║╤А ╨╕ ╤Б ╨┤╨▓╤Г╨╝╤П ╤В╨╛╤З╨║╨░╨╝╨╕
+       78 00                 C	
+ CF62  38 C6 C6 7E 06 C6     C	 	cp866_code_0f6h	db	038h, 0C6h, 0C6h, 07Eh, 006h, 0C6h, 07Ch, 000h          ;╨▒╨╡╨╗ ╨г ╨б ╨Ф╨Т╨г╨Ь╨п ╨в╨Ю╨з╨Ъ╨Р╨Ь╨Ш
        7C 00                 C	
- CF92  CF CC EF FC DC CC     C	 	db 0cfh,0cch,0efh,0fch,0dch,0cch,0cch,000h
-       CC 00                 C	
- CF9A  00 66 3C 66 66 3C     C	 	db 000h,066h,03ch,066h,066h,03ch,066h,000h
-       66 00                 C	
- CFA2  00 00 00 1C 1C 00     C	 	db 000h,000h,000h,01ch,01ch,000h,000h,000h
+ CF6A  6C 38 C6 C6 C6 7E     C	 	cp866_code_0f7h	db	06Ch, 038h, 0C6h, 0C6h, 0C6h, 07Eh, 006h, 07Ch          ;╨▒╨╡╨╗ ╤Г ╤Б ╨┤╨▓╤Г╨╝╤П ╤В╨╛╤З╨║╨░╨╝╨╕
+       06 7C                 C	
+ CF72  38 6C 6C 38 00 00     C	 	cp866_code_0f8h	db	038h, 06Ch, 06Ch, 038h, 000h, 000h, 000h, 000h          ;╨│╤А╨░╨┤╤Г╤Б
        00 00                 C	
- CFAA  00 00 00 00 00 00     C	 	db 000h,000h,000h,000h,000h,000h,000h,000h
+ CF7A  00 00 00 18 18 00     C	 	cp866_code_0f9h	db	000h, 000h, 000h, 018h, 018h, 000h, 000h, 000h	 	;╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║	
        00 00                 C	
+ CF82  00 00 00 00 18 00     C	 	cp866_code_0fah	db      000h, 000h, 000h, 000h, 018h, 000h, 000h, 000h          ;╨╝╨░╨╗╨╡╨╜╤М╨║╨╕╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║
+       00 00                 C	
+ CF8A  0E 0C 0C 0C 6C 3C     C	        cp866_code_0fbh	db	00Eh, 00Ch, 00Ch, 00Ch, 06Ch, 03Ch, 01Ch, 000h          ;╨║╨╛╤А╨╡╨╜╤М
+       1C 00                 C	
+                             C	
+                             C	;╨╕╨╖ ╨║╨╜╨╕╨│╨╕ ╨▒╤А╨░╤В╤М╨╡╨▓ ╨д╤А╨╛╨╗╨╛╨▓╤Л╤Е
+                             C	
+ CF92  06 08 CB 6B 68 5B     C	 	frol_252_fc   DB   006h,008h,0CBh,06Bh,068h,05Bh,058h,08Ch      ;╨╜╨╛╨╝╨╡╤А (╨║╤А╨░╤Б╨╕╨▓╤Л╨╣!=cp866)
+       58 8C                 C	
+                             C	
+                             C	;╨Ш╨╖ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л 866 ╤Д╨░╨╣╨╗╨░ ega.cpi Windows 7
+                             C	
+ CF9A  00 C6 7C C6 C6 7C     C	 	cp866_code_0fdh	db	000h, 0C6h, 07Ch, 0C6h, 0C6h, 07Ch, 0C6h, 000h          ;╨╛╤В╨▒╨╕╨▓╨║╨░
+       C6 00                 C	
+ CFA2  00 00 3C 3C 3C 3C     C	 	cp866_code_0feh	db	000h, 000h, 03Ch, 03Ch, 03Ch, 03Ch, 000h, 000h          ;╤Б╨╛╨▓╤Б╨╡╨╝ ╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║
+       00 00                 C	
+ CFAA  00 00 00 00 00 00     C	 	cp866_code_0ffh	db	000h, 000h, 000h, 000h, 000h, 000h, 000h, 000h
+       00 00                 C	
+                             C	
  	 	 	 	endif
  	 	 	 	;RCgoff end
  	 	 	 	
- 	 	 	 	
+ 	 	 	 	;rc программа реконфигурации памяти и определения кол-ва памяти во всех подключенных платах памяти типа 1841
+ 	 	 	 	;rc выполняется тест записью нулей и считывание (без проверки четности). В случае ошибки
+ 	 	 	 	;rc происходит реконфигурация. В случае ошибки в первых 16k платы 2b0 или отсутствия порта система
+ 	 	 	 	;rc останавливается. По итогам проверки в обл данных BIOS заполняется таблица tabl1 в формате:
+ 	 	 	 	;rc номер порта платы (2 байта), число исправных килобайт на плате (кратно 16k) (2 байта)
+ 	 	 	 	;rc число исправных килобайт на плате 2b0 заносится также в mem_siz в области данных BIOS.
+ 	 	 	 	;rc этим значением воспользуется ОС. 
+ 	 	 	 	;rc Интервал 512..640 разделяется всеми платами, т.е. если 2 платы по 512 типа 1841 и одна плата 128 типа 1840,
+ 	 	 	 	;rc то в tabl1 будет стоять 640k у обоих плат.
+ 	 	 	 	;rc реконфигурация включается для ошибок в адресах 0..384k.
  	 	 	 	 	assume	ds:abs0
- CFB2	 	 	 	ca0:
+ CFB2	 	 	 	ca0:                	 	 
  CFB2  E4 61	 	 	 	in	al,port_b
- CFB4  24 CF	 	 	 	and	al,0cfh
+ CFB4  24 CF	 	 	 	and	al,0cfh	 	;rc 0b1100.1111	clear bit5 i/o ch err en, bit4 ram err en
  CFB6  E6 61	 	 	 	out	port_b,al
  CFB8  33 C0	 	 	 	xor	ax,ax
  CFBA  8E D8	 	 	 	mov	ds,ax
  CFBC  8E C0	 	 	 	mov	es,ax
  CFBE  BA 0213	 	 	 	mov	dx,213h
  CFC1  B0 01	 	 	 	mov	al,01
- CFC3  EE	 	 	 	out	dx,al	   ; активизировать плату расширения
+ CFC3  EE	 	 	 	out	dx,al	   ; активизировать плату расширения rc установить сигнал EXT
  CFC4  BB 0000	 	 	 	mov	bx,0
  CFC7  BA 02B0	 	 	 	mov	dx,2b0h
- CFCA  EC	 	 	 	in	al,dx
+ CFCA  EC	 	 	 	in	al,dx      	;rc читать главную плату 2b0
  CFCB  24 0C	 	 	 	and	al,0ch
- CFCD  3C 0C	 	 	 	cmp	al,0ch
- CFCF  74 04	 	 	 	jz	ca1
+ CFCD  3C 0C	 	 	 	cmp	al,0ch          ;rc все 1?
+ CFCF  74 04	 	 	 	jz	ca1      
  CFD1  8B 1E 0472 R	 	 	mov	bx,res_fl
  CFD5  B0 0A	 	 	ca1:	mov	al,0ah
- CFD7  EE	 	 	 	out	dx,al
- CFD8  EC	 	 	 	in	al,dx
- CFD9  24 0F	 	 	 	and	al,0fh
- CFDB  3C 0A	 	 	 	cmp	al,0ah
- CFDD  75 31	 	 	 	jnz	oshp	   ; нет платы 2B0
+ CFD7  EE	 	 	 	out	dx,al           ;rc 0b0000.1010 разрешить запись, конф банк 01
+ CFD8  EC	 	 	 	in	al,dx           ;rc читать порт обратно
+ CFD9  24 0F	 	 	 	and	al,0fh          ;rc 0b0000.1111 только младшая тетрада
+ CFDB  3C 0A	 	 	 	cmp	al,0ah          ;rc сравниваем с записаным
+ CFDD  75 31	 	 	 	jnz	oshp	   ; нет платы 2B0 rc если не совпало (случай модуля ЕС1840, не только отсутствия 2b0!)
  CFDF  B0 0C	 	 	 	mov	al,0ch
- CFE1  EE	 	 	 	out	dx,al
- CFE2  32 C0	 	 	 	xor	al,al  ; сброс активности остальных плат памяти
- CFE4  42	 	 	ca2:	inc	dx
+ CFE1  EE	 	 	 	out	dx,al           ;rc 0b0000.1100 разрешить запись и чтение
+ CFE2  32 C0	 	 	 	xor	al,al  ; сброс активности остальных плат памяти rc в цикле пишется 00 (выкл зп/чт)...
+ CFE4  42	 	 	ca2:	inc	dx               
  CFE5  EE	 	 	 	out	dx,al
- CFE6  80 FA B3	 	 	 	cmp	dl,0b3h
- CFE9  75 F9	 	 	 	jnz	ca2
+ CFE6  80 FA B3	 	 	 	cmp	dl,0b3h         ;rc ...в порты 2b1...2b3.
+ CFE9  75 F9	 	 	 	jnz	ca2             ;rc конец цикла
  CFEB  8B 1E 0472 R	 	ca22:	mov	bx,res_fl
- CFEF  B9 2000	 	 	 	mov	cx,2000h
- CFF2  81 FB 1234	 	 	cmp	bx,1234h
+ CFEF  B9 2000	 	 	 	mov	cx,2000h        ;rc счетчик для проверки 8к слов - 16кб
+ CFF2  81 FB 1234	 	 	cmp	bx,1234h        ;rc есть признак горячей перезагрузки?
  CFF6  74 2F	 	 	 	jz	ca8
  CFF8  B8 F000	 	 	 	mov	ax,0f000h
- CFFB  8E D0	 	 	 	mov	ss,ax
- CFFD  BC E018 R	 	ca7a:	mov	sp,offset caw
- D000  E9 D460 R	 	ca7:	jmp	stgtst_cnt
+ CFFB  8E D0	 	 	 	mov	ss,ax           ;rc как бы стек в ПЗУ
+ CFFD  BC E018 R	 	ca7a:	mov	sp,offset caw   ;rc адрес возврата для stgtst_cnt будет ca3
+ D000  E9 D460 R	 	ca7:	jmp	stgtst_cnt      ;rc проверка 16кб и их очистка
  D003  B9 2000	 	 	ca3:	mov	cx,2000h
- D006  74 1F	 	 	 	je	ca8
+ D006  74 1F	 	 	 	je	ca8             ;rc нет ошибки?->ca8
  D008  BA 02B0	 	 	 	mov	dx,2b0h    ; сбой в первых 16К основной платы
  D00B  EC	 	 	 	in	al,dx	   ; памяти
- D00C  A8 03	 	 	 	test	al,03	   ; реконфигурация была?
- D00E  74 12	 	 	 	jz	ca6
+ D00C  A8 03	 	 	 	test	al,03	   ; реконфигурация была? rc0b0000.0011
+ D00E  74 12	 	 	 	jz	ca6        ;rc 00 в младших разрядах означает, что реконфига не было
+ 	 	 	 	
+ 	 	 	 	;--------------rc случай ошибки в первых 16k 2b0 - неустранимый
  D010	 	 	 	oshp:
- D010  8A D8	 	 	 	mov	bl,al	   ; была реконфигурация
- D012  B0 89	 	 	 	mov	al,89h
- D014  E6 63	 	 	 	out	63h,al
- D016  B0 04	 	 	 	mov	al,04
- D018  E6 60	 	 	ca5:	out	60h,al
+ D010  8A D8	 	 	 	mov	bl,al	   ; была реконфигурация  rc или вообще нет платы 2b0 или память 1840
+ D012  B0 89	 	 	 	mov	al,89h     ;rc 0b1000.1001
+ D014  E6 63	 	 	 	out	63h,al     ;rc out cmd_port,al
+ D016  B0 04	 	 	 	mov	al,04      ;rc 0b0000.0100
+ D018  E6 60	 	 	ca5:	out	60h,al     ;rc out port_a,al	//rc вывод в порт A
  D01A  33 C9	 	 	 	xor	cx,cx
- D01C  E2 FE	 	 	ca4:	loop	ca4
+ D01C  E2 FE	 	 	ca4:	loop	ca4	   ;rc бесконечный цикл с выводом в порт A 03h(сбой 16k) и 04h... 
+ 	 	 	 	 	 	 	   ;rc ...или прочтенного по 2b0(нет платы) и 04h
  D01E  86 D8	 	 	 	xchg	bl,al
  D020  EB F6	 	 	 	jmp	ca5
- D022  0C 03	 	 	ca6:	or	al,3
+ 	 	 	 	;--------------rc конец ошибки
+ 	 	 	 	
+ D022  0C 03	 	 	ca6:	or	al,3       ;rc реконфига не было и ошибка первых 16k: ставим отказ банка 0
  D024  EE	 	 	 	out	dx,al
- D025  EB D6	 	 	 	jmp	ca7a
+ D025  EB D6	 	 	 	jmp	ca7a       ;rc и возвращаемся на тест первых 16k
+ 	 	 	 	
+ 	 	 	 	 	 	 	;rc сюда после горячей перезагрузки или отсутствия ошибки первых 16k
+ 	 	 	 	 	 	 	;rc cx в обоих случаях содержит 2000h
  D027  33 C0	 	 	ca8:	xor	ax,ax
  D029  FC	 	 	 	cld
  D02A  33 F6	 	 	 	xor	si,si
  D02C  33 FF	 	 	 	xor	di,di
  D02E  BD 02B0	 	 	 	mov	bp,2b0h
- D031  F3/ AB	 	 	 	rep	stosw
+ D031  F3/ AB	 	 	 	rep	stosw       ;rc очистка первых 16k нулями
  D033  89 1E 0472 R	 	 	mov	res_fl,bx
- D037  BA 0400	 	 	ca9:	mov	dx,0400h
- D03A  BB 0010	 	 	 	mov	bx,16
- D03D  8E C2	 	 	ca10:	mov	es,dx
+ D037  BA 0400	 	 	ca9:	mov	dx,0400h    ;rc сегмент, следующий за первыми 16k
+ D03A  BB 0010	 	 	 	mov	bx,16       ;rc инициализировать счетчик исправных килобайт (будет писаться в tabl1 и mem_siz)
+ 	 	 	 	
+ 	 	 	 	 	 	 	;rc основной цикл-тест платы
+ D03D  8E C2	 	 	ca10:	mov	es,dx       ;rc очередной сегмент для stos
  D03F  33 FF	 	 	 	xor	di,di
  D041  B8 AA55	 	 	 	mov	ax,0aa55h
  D044  8B C8	 	 	 	mov	cx,ax
- D046  26: 89 05	 	 	mov	es:[di],ax  ; проверка наличия очередных 16К памяти
- D049  B0 0F	 	 	 	mov	al,0fh
- D04B  26: 8B 05	 	 	mov	ax,es:[di]
- D04E  33 C1	 	 	 	xor	ax,cx
- D050  75 1F	 	 	 	jnz	ca11
+ D046  26: 89 05	 	 	mov	es:[di],ax  ; проверка наличия очередных 16К памяти rc: пишем aa55...
+ D049  B0 0F	 	 	 	mov	al,0fh      ;rc зачем???? затрется же сразу
+ D04B  26: 8B 05	 	 	mov	ax,es:[di]  ;rc ...и сразу читаем
+ D04E  33 C1	 	 	 	xor	ax,cx       ;rc сравниваем с эталоном
+ D050  75 1F	 	 	 	jnz	ca11        ;rc разночтение->нет памяти->ca11
  D052  B9 2000	 	 	 	mov	cx,2000h
- D055  F3/ AB	 	 	 	rep	stosw
+ D055  F3/ AB	 	 	 	rep	stosw       ;rc есть память->затрем очередные 16k нулями (ax=00 будет при идентичности с эталоном)
  D057  B9 2000	 	 	 	mov	cx,2000h
  D05A  33 FF	 	 	 	xor	di,di
- D05C  F3/ AF	 	 	 	repz	scasw	   ; есть сбойные адреса в порции 16К?
- D05E  0B C8	 	 	 	or	cx,ax
+ D05C  F3/ AF	 	 	 	repz	scasw	   ; есть сбойные адреса в порции 16К? rc сканирование на отличные от нуля в затертом массиве
+ D05E  0B C8	 	 	 	or	cx,ax      ;rc определим факт сбоя, если его не было, cx=0. or, чтобы на флаги повлияло  
  D060  75 0F	 	 	 	jnz	ca11	   ; да
- D062  81 C2 0400	 	 	add	dx,0400h   ; нет
- D066  83 C3 10	 	 	 	add	bx,16
- D069  80 FE A0	 	 	 	cmp	dh,0a0h
- D06C  75 CF	 	 	 	jnz	ca10
- D06E  EB 24 90	 	 	 	jmp	ca12
- D071  80 FE 60	 	 	ca11:	cmp	dh,60h
- D074  73 1E	 	 	 	jnb	ca12
- D076  8B D5	 	 	 	mov	dx,bp	   ; адрес меньше 512К
- D078  EC	 	 	 	in	al,dx
- D079  A8 03	 	 	 	test	al,03
- D07B  75 17	 	 	 	jnz	ca12
- D07D  8C C2	 	 	 	mov	dx,es
- D07F  80 E6 60	 	 	 	and	dh,60h
- D082  80 F6 60	 	 	 	xor	dh,60h
+ D062  81 C2 0400	 	 	add	dx,0400h   ; нет rc следующий сегмент (след 16k массив)
+ D066  83 C3 10	 	 	 	add	bx,16      ;rc увеличим счетчик исправных килобайт на только что проверенные
+ D069  80 FE A0	 	 	 	cmp	dh,0a0h    ;rc достигнута граница 640k?
+ D06C  75 CF	 	 	 	jnz	ca10       ;rc нет - продолжить цикл-тест
+ D06E  EB 24 90	 	 	 	jmp	ca12       ;rc да
+ 	 	 	 	
+ 	 	 	 	 	 	 	;rc здесь мы в случае отсутствия очередных 16k или обнаружения сбоя в очередных 16k
+ D071  80 FE 60	 	 	ca11:	cmp	dh,60h     ;rc сравниваем адрес сегмента с 384K
+ D074  73 1E	 	 	 	jnb	ca12       ;rc адрес >=384 ->ca12
+ D076  8B D5	 	 	 	mov	dx,bp	   ; адрес меньше 512К  rc ошибка в комментарии!! должно было стоять меньше 384k
+ D078  EC	 	 	 	in	al,dx      ;rc читаем порт платы
+ D079  A8 03	 	 	 	test	al,03      ;rc была реконфигурация?
+ D07B  75 17	 	 	 	jnz	ca12       ;rc если реконфигурация была или порт отсутствует ->ca12
+ 	 	 	 	 	 	 	;rc если не было - надо реконфигурировать
+ D07D  8C C2	 	 	 	mov	dx,es      ;rc восстанавливаем сегмент в dx
+ D07F  80 E6 60	 	 	 	and	dh,60h     ;rc выделяем из него адрес банка
+ D082  80 F6 60	 	 	 	xor	dh,60h     ;rc инвертируем адрес банка
  D085  B1 05	 	 	 	mov	cl,5
- D087  D2 EE	 	 	 	shr	dh,cl
- D089  0A C6	 	 	 	or	al,dh
+ D087  D2 EE	 	 	 	shr	dh,cl      ;rc смещаем в младшие разряды - получили код реконфигурации
+ D089  0A C6	 	 	 	or	al,dh      ;rc сочетаем с кодами зп/чт модуля
  D08B  8B D5	 	 	 	mov	dx,bp
- D08D  EE	 	 	 	out	dx,al
+ D08D  EE	 	 	 	out	dx,al      ;rc записали в порт модуля
  D08E  33 D2	 	 	 	xor	dx,dx
  D090  33 DB	 	 	 	xor	bx,bx
- D092  EB A9	 	 	 	jmp	ca10
+ D092  EB A9	 	 	 	jmp	ca10       ;rc возвращаемся на тестирование модуля с самого начала
+ 	 	 	 	
+ 	 	 	 	 	 	 	;rc здесь мы если:
+ 	 	 	 	 	 	 	;rc а)ошибка возникла при первом проходе в 384k...640k
+ 	 	 	 	 	 	 	;rc б)ошибка возникла при втором проходе в 384k...512k - перенесенная старая 
+ 	 	 	 	 	 	 	;rc в)ошибка возникла в 16k..384k уже после реконфигурации
+ 	 	 	 	 	 	 	;rc во всех этих случаях, если мы на 2b0, память будет сокращена
+ 	 	 	 	 	 	 	;rc до последнего безошибочного 16-кб блока, т.е. до текущего bx.
+ 	 	 	 	 	 	 	;rc г)достигнута граница 640k без ошибок
+ 	 	 	 	 	 	 	;rc если текущая плата реально есть, текущий bx будет записан в tabl1.
+ 	 	 	 	
  D094	 	 	 	ca12:	 	 	   ; сброс активности текущего модуля памяти
  D094  8B D5	 	 	 	mov	dx,bp
  D096  EC	 	 	 	in	al,dx
- D097  24 F3	 	 	 	and	al,0f3h
+ D097  24 F3	 	 	 	and	al,0f3h    ;rc 0b1111.0011 - отключить чт/зп
  D099  EE	 	 	 	out	dx,al
- D09A  BA 02B0	 	 	 	mov	dx,2b0h    ; возврат на плату памяти 2B0
+ D09A  BA 02B0	 	 	 	mov	dx,2b0h    ; возврат на плату памяти 2B0 rc(т.к. таблица tabl1 находится в ней)
  D09D  EC	 	 	 	in	al,dx
- D09E  0C 0C	 	 	 	or	al,0ch
+ D09E  0C 0C	 	 	 	or	al,0ch     ;rc 0b0000.1100 - включаем чт/зп у 2b0
  D0A0  EE	 	 	 	out	dx,al
- D0A1  F7 C5 0003	 	 	test	bp,3
- D0A5  75 31	 	 	 	jnz	ca14
- D0A7  89 1E 0413 R	 	 	mov	mem_siz,bx
+ D0A1  F7 C5 0003	 	 	test	bp,3       ;rc текущая плата была 2b0?
+ D0A5  75 31	 	 	 	jnz	ca14       ;rc нет->проверить bx на 0 (была ли плата)
+ D0A7  89 1E 0413 R	 	 	mov	mem_siz,bx ;rc да - сокращаем память DOS до последнего безошибочного блока
  D0AB	 	 	 	ca15:
- D0AB  8B 36 04D0 R	 	 	mov	si,csi
- D0AF  89 AC 04E0 R	 	 	mov	tabl1[si],bp
- D0B3  89 9C 04E2 R	 	 	mov	tabl1[si+2],bx
- D0B7  45	 	 	 	inc	bp
- D0B8  83 06 04D0 R 04	 	 	add	csi,4
- D0BD  81 FD 02B4	 	ca16:	cmp	bp,2b4h
- D0C1  73 1D	 	 	 	jnb	ca13
- D0C3  BB 0000	 	 	 	mov	bx,0
+ D0AB  8B 36 04D0 R	 	 	mov	si,csi	   ;rc csi - указатель в tabl1, при первом проходе csi=0
+ D0AF  89 AC 04E0 R	 	 	mov	tabl1[si],bp     ;rc пишем в tabl1 номер порта текущей платы
+ D0B3  89 9C 04E2 R	 	 	mov	tabl1[si+2],bx   ;rc и число исправных кб
+ D0B7  45	 	 	 	inc	bp               ;rc следующая плата
+ D0B8  83 06 04D0 R 04	 	 	add	csi,4            ;rc указатель на следующий элемент в таблице tabl1
+ D0BD  81 FD 02B4	 	ca16:	cmp	bp,2b4h          ;rc все платы перебраны?
+ D0C1  73 1D	 	 	 	jnb	ca13             ;rc да->выход и продолжение POST
+ D0C3  BB 0000	 	 	 	mov	bx,0             ;rc иначе переход на тест след платы: обнулить счетчик кб,
  D0C6  B0 0C	 	 	 	mov	al,0ch
- D0C8  8B D5	 	 	 	mov	dx,bp
- D0CA  EE	 	 	 	out	dx,al
+ D0C8  8B D5	 	 	 	mov	dx,bp            
+ D0CA  EE	 	 	 	out	dx,al            ;rc вкл чт/зп и сбросить реконфиг след платы 
  D0CB  BA 02B0	 	 	 	mov	dx,2b0h 	; сброс активности 2b0
  D0CE  EC	 	 	 	in	al,dx
- D0CF  24 F3	 	 	 	and	al,0f3h
+ D0CF  24 F3	 	 	 	and	al,0f3h          ;rc т.е. откл чт/зп 2b0, реконфиг ост как есть
  D0D1  EE	 	 	 	out	dx,al
- D0D2  BA 0000	 	 	 	mov	dx,0
- D0D5  E9 D03D R	 	 	jmp	ca10
- D0D8  83 FB 00	 	 	ca14:	cmp	bx,0
- D0DB  75 CE	 	 	 	jnz	ca15
- D0DD  45	 	 	 	inc	bp
+ D0D2  BA 0000	 	 	 	mov	dx,0             ;rc начальный сегмент для новой платы
+ D0D5  E9 D03D R	 	 	jmp	ca10             ;rc переход на тест новой платы
+ 	 	 	 	
+ D0D8  83 FB 00	 	 	ca14:	cmp	bx,0             ;rc платы 2b1..2b3 не было или сбой в первых 16k?
+ D0DB  75 CE	 	 	 	jnz	ca15             ;rc нет ->пишем в таблицу, как обычно
+ D0DD  45	 	 	 	inc	bp               ;rc иначе новая плата сразу
  D0DE  EB DD	 	 	 	jmp	ca16
- D0E0	 	 	 	ca13:
- D0E0  B8 ---- R	 	 	mov	ax,data
- D0E3  8E D8	 	 	 	mov	ds,ax
+ D0E0	 	 	 	ca13:                            ;rc мероприятия по выходу
+ D0E0  B8 ---- R	 	 	mov	ax,data          
+ D0E3  8E D8	 	 	 	mov	ds,ax            ;rc восст ds на обл данных BIOS
  D0E5  BD 0000	 	 	 	mov	bp,0
- D0E8  E9 E15C R	 	 	jmp	c21
+ D0E8  E9 E15C R	 	 	jmp	c21              ;продолжение теста
  	 	 	 	;
+ 	 	 	 	;
+ 	 	 	 	;-------rc программа ниже частично основана на IBM-ской e19, причем от XTBIOS.ASM (с печатью)
+ 	 	 	 	;	взял оттуда комментарии
  	 	 	 	;
  	 	 	 	 	assume cs:code,ds:data
  D0EB  1E	 	 	e190:	push	ds
  D0EC  B8 0010	 	 	 	mov	ax,16
  D0EF  81 3E 0072 R 1234	 	cmp	reset_flag,1234h
  D0F5  75 03	 	 	 	jnz	e20a
- D0F7  E9 E3C2 R	 	 	jmp	e22
- D0FA  B8 0010	 	 	e20a:	mov	ax,16
- D0FD  EB 25	 	 	 	jmp	short prt_siz
- D0FF  8B 1E 0013 R	 	e20b:	mov	bx,memory_size
- D103  83 EB 10	 	 	 	sub	bx,16
+ D0F7  E9 E3C2 R	 	 	jmp	e22	 	 	;rc при перезарузке просто выход
+ D0FA  B8 0010	 	 	e20a:	mov	ax,16                   ; STARTING AMT. OF MEMORY OK   
+ D0FD  EB 25	 	 	 	jmp	short prt_siz           ; POST MESSAGE                 
+ D0FF  8B 1E 0013 R	 	e20b:	mov	bx,memory_size          ; GET MEM. SIZE WORD    
+ D103  83 EB 10	 	 	 	sub	bx,16                   ; 1ST 16K ALREADY DONE  
  D106  B1 04	 	 	 	mov	cl,4
- D108  D3 EB	 	 	 	shr	bx,cl
- D10A  8B CB	 	 	 	mov	cx,bx
- D10C  BB 0400	 	 	 	mov	bx,0400h
- D10F  8E DB	 	 	e20c:	mov	ds,bx
- D111  8E C3	 	 	 	mov	es,bx
- D113  81 C3 0400	 	 	add	bx,0400h
- D117  52	 	 	 	push	dx
- D118  51	 	 	 	push	cx
+ D108  D3 EB	 	 	 	shr	bx,cl                   ; DIVIDE BY 16                
+ D10A  8B CB	 	 	 	mov	cx,bx                   ; SAVE COUNT OF 16K BLOCKS    
+ D10C  BB 0400	 	 	 	mov	bx,0400h                ; SET PTR. TO RAM SEGMENT>16K 
+ D10F  8E DB	 	 	e20c:	mov	ds,bx                   ; SET SEG. REG      
+ D111  8E C3	 	 	 	mov	es,bx                                       
+ D113  81 C3 0400	 	 	add	bx,0400h                ; POINT TO NEXT 16K 
+ D117  52	 	 	 	push	dx                                          
+ D118  51	 	 	 	push	cx                      ; SAVE WORK REGS    
  D119  53	 	 	 	push	bx
  D11A  50	 	 	 	push	ax
  D11B  E8 D45D R	 	 	call	stgtst
- D11E  75 41	 	 	 	jnz	e21a
- D120  58	 	 	 	pop	ax
+ D11E  75 41	 	 	 	jnz	e21a                    ; GO PRINT ERROR           
+ D120  58	 	 	 	pop	ax                      ; RECOVER TESTED MEM NUMBER
  D121  05 0010	 	 	 	add	ax,16
  D124	 	 	 	prt_siz:
  D124  50	 	 	 	push	ax
- D125  BB 000A	 	 	 	mov	bx,10
- D128  B9 0003	 	 	 	mov	cx,3
+ D125  BB 000A	 	 	 	mov	bx,10                   ; SET UP FOR DECIMAL CONVERT    
+ D128  B9 0003	 	 	 	mov	cx,3                    ; OF 3 NIBBLES                  
  D12B	 	 	 	decimal_loop:
  D12B  33 D2	 	 	 	xor	dx,dx
- D12D  F7 F3	 	 	 	div	bx
- D12F  80 CA 30	 	 	 	or	dl,30h
- D132  52	 	 	 	push	dx
+ D12D  F7 F3	 	 	 	div	bx                      ; DIVIDE BY 10   
+ D12F  80 CA 30	 	 	 	or	dl,30h                  ; MAKE INTO ASCII
+ D132  52	 	 	 	push	dx                      ; SAVE           
  D133  E2 F6	 	 	 	loop	decimal_loop
  D135  B9 0003	 	 	 	mov	cx,3
  D138	 	 	 	prt_dec_loop:
- D138  58	 	 	 	pop	ax
+ D138  58	 	 	 	pop	ax                      ; RECOVER A NUMBER
  D139  E8 D1B4 R	 	 	call	prt_hex
  D13C  E2 FA	 	 	 	loop	prt_dec_loop
  D13E  B9 0016	 	 	 	mov	cx,22
@@ -3198,19 +3262,19 @@
  D144  2E: 8A 04	 	kb_ok:	mov	al,byte ptr cs:[si]
  D147  46	 	 	 	inc	si
  D148  E8 D1B4 R	 	 	call	prt_hex
- D14B  E2 F7	 	 	 	loop	kb_ok
- D14D  58	 	 	 	pop	ax
- D14E  3D 0010	 	 	 	cmp	ax,16
- D151  74 AC	 	 	 	je	e20b
- D153  5B	 	 	 	pop	bx
- D154  59	 	 	 	pop	cx
- D155  5A	 	 	 	pop	dx
- D156  E2 B7	 	 	 	loop	e20c
+ D14B  E2 F7	 	 	 	loop	kb_ok	 	 	;rc вывод строки e300 (kb объем памяти) - 22 символа, посимвольно
+ D14D  58	 	 	 	pop	ax                      ; RECOVER WORK REGS   
+ D14E  3D 0010	 	 	 	cmp	ax,16                   ; FIRST PASS?         
+ D151  74 AC	 	 	 	je	e20b                    
+ D153  5B	 	 	 	pop	bx                      ; RESTORE REGS              
+ D154  59	 	 	 	pop	cx                                                  
+ D155  5A	 	 	 	pop	dx                                                  
+ D156  E2 B7	 	 	 	loop	e20c                    ; LOOP TILL ALL MEM. CHECKED -----rc в XT e21
  D158  B0 0A	 	 	 	mov	al,10
- D15A  E8 D1B4 R	 	 	call	prt_hex
+ D15A  E8 D1B4 R	 	 	call	prt_hex                 ; LINE FEED 
  D15D  1F	 	 	 	pop	ds
- D15E  E9 E3C2 R	 	 	jmp	e22
- D161	 	 	 	e21a:
+ D15E  E9 E3C2 R	 	 	jmp	e22  	 	 	;rc это выход
+ D161	 	 	 	e21a:                                   ;rc ошибка при stgtst
  D161  5B	 	 	 	pop	bx
  D162  83 C4 06	 	 	 	add	sp,6
  D165  8C DA	 	 	 	mov	dx,ds
@@ -3219,36 +3283,37 @@
  D169  53	 	 	 	push	bx
  D16A  8B DA	 	 	 	mov	bx,dx
  D16C  50	 	 	 	push	ax
- D16D  80 FE 60	 	 	 	cmp	dh,60h
- D170  73 2C	 	 	 	jnb	ea1
+ D16D  80 FE 60	 	 	 	cmp	dh,60h	 	 	;rc ошибка в 512k-640k?
+ D170  73 2C	 	 	 	jnb	ea1                     ;rc да->ea1 (неустранимая ошибка)
  D172  BA 02B0	 	 	 	mov	dx,2b0h
  D175  EC	 	 	 	in	al,dx
- D176  A8 03	 	 	 	test	al,3
- D178  75 24	 	 	 	jnz	ea1
- D17A  50	 	 	 	push	ax
+ D176  A8 03	 	 	 	test	al,3	 	 	;rc была реконфигурация платы 2b0?
+ D178  75 24	 	 	 	jnz	ea1                     ;rc да->ea1 (неустранимая ошибка)
+ D17A  50	 	 	 	push	ax                      ;rc иначе инициализируем экран,
  D17B  A0 0049 R	 	 	mov	al,crt_mode
  D17E  B4 00	 	 	 	mov	ah,0
  D180  CD 10	 	 	 	int	10h
  D182  58	 	 	 	pop	ax
- D183  8B D3	 	 	 	mov	dx,bx
+ D183  8B D3	 	 	 	mov	dx,bx                   ;rc получаем из текущего адреса код реконфигурации,
  D185  80 E6 60	 	 	 	and	dh,60h
  D188  80 F6 60	 	 	 	xor	dh,60h
  D18B  B1 05	 	 	 	mov	cl,5
  D18D  D2 EE	 	 	 	shr	dh,cl
  D18F  0A C6	 	 	 	or	al,dh
- D191  BA 02B0	 	 	 	mov	dx,2b0h
- D194  EE	 	 	 	out	dx,al
+ D191  BA 02B0	 	 	 	mov	dx,2b0h 	 	 
+ D194  EE	 	 	 	out	dx,al                   ;rc устраиваем реконфигурацию...
  D195  33 C0	 	 	 	xor	ax,ax
  D197  8E C0	 	 	 	mov	es,ax
  D199  8E D8	 	 	 	mov	ds,ax
- D19B  E9 CFEB R	 	 	jmp	ca22
- D19E  58	 	 	ea1:	pop	ax
+ D19B  E9 CFEB R	 	 	jmp	ca22	 	 	;rc ...и возвращаемся в тело ca0 на начало проверки
+ 	 	 	 	
+ D19E  58	 	 	ea1:	pop	ax      	 	;rc случай неустранимой ошибки
  D19F  8B D3	 	 	 	mov	dx,bx
  D1A1  5B	 	 	 	pop	bx
- D1A2  89 1E 00E2 R	 	 	mov	tabl+2,bx
- D1A6  89 1E 0013 R	 	 	mov	memory_size,bx
+ D1A2  89 1E 00E2 R	 	 	mov	tabl+2,bx	 	;rc записываем адрес сбоя в таблицу tabl
+ D1A6  89 1E 0013 R	 	 	mov	memory_size,bx	 	;rc сокращаем память, доступную ОС
  D1AA  50	 	 	 	push	ax
- D1AB  B0 0A	 	 	 	mov	al,10
+ D1AB  B0 0A	 	 	 	mov	al,10 	 	 	;rc печатаем перевод строки
  D1AD  E8 D1B4 R	 	 	call	prt_hex
  D1B0  58	 	 	 	pop	ax
  D1B1  E9 E385 R	 	 	jmp	osh
@@ -3796,6 +3861,23 @@
  D457  E9 F1DC R	 	 	jmp	video_return
  D45A	 	 	 	ah121:
  D45A  E9 CAE3 R	 	 	jmp	znak
+ 	 	 	 	
+ 	 	 	 	;rc- коммент взят из PCBIOSv1, но версия отличается: тест памяти идет СЛОВАМИ, а не байтами
+ 	 	 	 	;rc поэтому число в CX - кол-во слов, а не байт, и оно вдвое меньше, чем в РС и в 1840
+ 	 	 	 	;rc программа соответственно вдвое быстрее
+ 	 	 	 	;--------------------------------------------
+ 	 	 	 	;	THIS SUBROUTINE PERFORMS A READ/WRITE STORAGE TEST ON A 16K BLOCK
+ 	 	 	 	;	OF STORAGE.
+ 	 	 	 	;ENTRY REQUIREMENTS:
+ 	 	 	 	;	ES = ADDRESS OF STORAGE SEGMENT BEING TESTED
+ 	 	 	 	;	DS = ADDRESS OF STORAGE SEGMENT BEING TESTED
+ 	 	 	 	;	WHEN ENTERING AT STGTST_CNT, CX MUST BE LOADED WITH THE BYTE COUNT.
+ 	 	 	 	;EXIT PARAMETERS:
+ 	 	 	 	;	ZERO FLAG = 0 IF STORAGE ERROR (DATA COMPARE OR PARITY CHECK.  AL=0
+ 	 	 	 	;	 	    DENOTES A PARITY CHECK. ELSE AL=XOR'ED BIT PATTERN OF THE
+ 	 	 	 	;	 	    EXPECTED DATA PATTERN VS THE ACTUAL DATA READ.
+ 	 	 	 	;	AX,BX,CX,DX,DI, AND SI ARE ALL DESTROYED.
+ 	 	 	 	;--------------------------------------------
  D45D	 	 	 	stgtst:
  D45D  B9 2000	 	 	 	 	mov	cx,2000h
  	 	 	 	
@@ -5823,7 +5905,7 @@
  	 	 	 	
  	 	 	 	;---
  	 	 	 	
- E704	 	 	 	k54:
+ E704	 	 	 	k54:	 	 	 	 	;rc обычный нижний регистр
  E704  3C 3B	 	 	 	cmp	al,59
  E706  72 05	 	 	 	jb	k55
  E708  B0 00	 	 	 	mov	al,0
@@ -5831,7 +5913,7 @@
  	 	 	 	
  E70D  BB E8DC R	 	k55:	mov	bx,offset k10
  E710  F6 06 0018 R 02	 	 	test	kb_flag_1,lat
- E715  74 57	 	 	 	jz	k99
+ E715  74 57	 	 	 	jz	k99	 	 	;rc переход по отсутствию флага ЛАТ
  	 	 	 	
  	 	 	 	;---
  	 	 	 	
@@ -5889,7 +5971,7 @@
  E765  89 04	 	 	 	mov	word ptr [si],ax
  E767  89 1E 001C R	 	 	mov	buffer_tail,bx
  E76B  E9 EAEB R	 	 	jmp	k26
- E76E  BB F8A7 R	 	k99:	mov	bx,offset rust
+ E76E  BB F8A7 R	 	k99:	mov	bx,offset rust	 	 	;rc маленькие рус буквы (kb_flag_1.lat=0)
  E771  EB A4	 	 	 	jmp k56
  	 	 	 	
  	 	 	 	;---
@@ -6138,41 +6220,48 @@
  E9BB  8A C4	 	 	 	mov	al,ah	 	; запомнить код сканирования
  E9BD  74 1A	 	 	 	je	k17	 	; переход по совпадению
  E9BF  E9 EACC R	 	 	jmp	k25	 	; переход по несовпадению
- E9C2	 	 	 	k406:
+ E9C2	 	 	 	k406:           	 	 	;rc это обработчик клавиши Ё
  E9C2  F6 06 0018 R 02	 	 	test	kb_flag_1,lat
- E9C7  75 7F	 	 	 	jnz	k26a
+ E9C7  75 7F	 	 	 	jnz	k26a                    ;rc в ЛАТ-режиме клавиша не генерирует ничего, выход
  E9C9  F6 06 0017 R 03	 	 	test	kb_flag,left_shift+right_shift
- E9CE  B8 5CF1	 	 	 	mov	ax,5cf1h
+ E9CE  B8 5CF1	 	 	 	mov	ax,5cf1h	 	;rc ё
  E9D1  74 03	 	 	 	jz	k407
- E9D3  B8 5CF0	 	 	 	mov	ax,5cf0h
+ E9D3  B8 5CF0	 	 	 	mov	ax,5cf0h                ;rc Ё
+ E9D6	 	 	 	k407:	 	 	 	 	;rc передвинул сюда, двумя строками выше  (это ж не получение маски)
+ E9D6  E9 E71B R	 	 	jmp	k57
  	 	 	 	
  	 	 	 	;   Получение маски нажатой управляющей клавиши
  	 	 	 	
- E9D6	 	 	 	k407:
- E9D6  E9 E71B R	 	 	jmp	k57
  	 	 	 	
- E9D9  81 EF E876 R	 	k17:	sub	di,offset k6+1
+ E9D9  81 EF E876 R	 	k17:	sub	di,offset k6+1	 	;rc получить индекс упр клавиши в табл k6, начиная с 0
  E9DD  83 FF 08	 	 	 	cmp	di,8
- E9E0  72 3B	 	 	 	jb	k300
- E9E2  B4 06	 	 	 	mov	ah,6
+ E9E0  72 3B	 	 	 	jb	k300                    ;rc меньше 8 (это совместимые клавиши) обрабатываются как в IBM
+ E9E2  B4 06	 	 	 	mov	ah,6                    ;rc маска 0b00000110 для руслат  (inv_shift + lat)
  E9E4  83 FF 0A	 	 	 	cmp	di,0ah
- E9E7  72 39	 	 	 	jb	k301
- E9E9  A8 80	 	 	 	test	al,80h
- E9EB  74 5B	 	 	 	jz	k26a
- E9ED  80 26 0018 R FC	 	 	and	kb_flag_1,not lat+lat_shift
+ E9E7  72 39	 	 	 	jb	k301                    ;rc если inv_key (Р/Л)
+ E9E9  A8 80	 	 	 	test	al,80h                  
+ E9EB  74 5B	 	 	 	jz	k26a                    ;rc если не отпускание РУС или ЛАТ -> вых (борьба с автоповтором?)
+ 	 	 	 	
+ 	 	 	 	 	 	 	 	;rc здесь мы после отпускания РУС или ЛАТ
+ E9ED  80 26 0018 R FC	 	 	and	kb_flag_1,not lat+lat_shift   ;rc not действует на оба, сбрасываем lat и "светодиодный" lat
  E9F2  83 FF 0B	 	 	 	cmp	di,0bh
- E9F5  74 17	 	 	 	je	k401
+ E9F5  74 17	 	 	 	je	k401                    ;rc переход, если РУС
+ 	 	 	 	 	 	 	 	;rc если ЛАТ:
  E9F7  F6 06 0018 R 04	 	 	test	kb_flag_1,inv_shift
- E9FC  74 08	 	 	 	jz	k400
- E9FE  80 0E 0018 R 01	 	 	or	kb_flag_1,lat_shift
+ E9FC  74 08	 	 	 	jz	k400                    ;rc переход по ненажатию Р/Л
+ E9FE  80 0E 0018 R 01	 	 	or	kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
  EA03  EB 43 90	 	 	 	jmp	k26a
- EA06  80 0E 0018 R 03	 	k400:	or	kb_flag_1,lat+lat_shift
+ EA06  80 0E 0018 R 03	 	k400:	or	kb_flag_1,lat+lat_shift ;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
  EA0B  EB 3B 90	 	 	 	jmp	k26a
+ 	 	 	 	
+ 	 	 	 	 	 	 	 	;РУС:
  EA0E  F6 06 0018 R 04	 	k401:	test	kb_flag_1,inv_shift
- EA13  74 33	 	 	 	jz	k26a
- EA15  80 0E 0018 R 02	 	 	or	kb_flag_1,lat
+ EA13  74 33	 	 	 	jz	k26a                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
+ EA15  80 0E 0018 R 02	 	 	or	kb_flag_1,lat           ;rc нажата Р/Л и отпущена РУС: включить lat ///???
  EA1A  EB 2C 90	 	 	 	jmp	k26a
- EA1D  2E: 8A A5 E881 R	 	k300:	mov	ah,cs:k7[di]
+ 	 	 	 	
+ 	 	 	 	 	 	 	 	;rc далее IBM-ский код	 	 	 	
+ EA1D  2E: 8A A5 E881 R	 	k300:	mov	ah,cs:k7[di]            ;rc аналогично IBM считыаем маску из k7 для совместимых упр клавиш
  EA22	 	 	 	k301:
  EA22  A8 80	 	 	 	test	al,80h	 	; клавиша отжата ?
  EA24  75 79	 	 	 	jnz	k23	; переход, если клавиша отжата
@@ -6184,16 +6273,17 @@
  EA29  73 20	 	 	 	jae	k18	 	; переход, если да
  	 	 	 	
  	 	 	 	;---
- EA2B  80 FC 06	 	 	 	cmp	ah,6
- EA2E  74 07	 	 	 	je	k302
+ EA2B  80 FC 06	 	 	 	cmp	ah,6            
+ EA2E  74 07	 	 	 	je	k302            ; rc нажата Р/Л
  	 	 	 	
  EA30  08 26 0017 R	 	 	or	kb_flag,ah	; установка масок управляющих клавиш
  	 	 	 	 	 	 	 	; без запоминания
  EA34  E9 EAEB R	 	 	jmp	k26	 	; к выходу из прерывания
- EA37  80 0E 0018 R 06	 	k302:	or	kb_flag_1,inv_shift+lat
- EA3C  F6 06 0018 R 01	 	 	test	kb_flag_1,lat_shift
- EA41  74 05	 	 	 	jz	k26a
- EA43  80 26 0018 R FD	 	 	and	kb_flag_1,not lat
+ 	 	 	 	
+ EA37  80 0E 0018 R 06	 	k302:	or	kb_flag_1,inv_shift+lat ;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
+ EA3C  F6 06 0018 R 01	 	 	test	kb_flag_1,lat_shift	;rc светодиодный ЛАТ есть?
+ EA41  74 05	 	 	 	jz	k26a                    ;rc нет -> выходим
+ EA43  80 26 0018 R FD	 	 	and	kb_flag_1,not lat       ;rc есть -> сбрасываем латиницу
  EA48	 	 	 	k26a:
  EA48  E9 EAEB R	 	 	jmp	k26
  	 	 	 	
@@ -6230,22 +6320,22 @@
  EA8D  B8 5200	 	 	 	mov	ax,ins_key*256
  EA90  E9 E71B R	 	 	jmp	k57
  	 	 	 	
- EA93	 	 	 	k303:
- EA93  80 26 0018 R FB	 	 	and	kb_flag_1,not inv_shift
- EA98  80 36 0018 R 02	 	 	xor	kb_flag_1,lat
+ EA93	 	 	 	k303:	 	 	 	 	 	;rc отжатие Р/Л
+ EA93  80 26 0018 R FB	 	 	and	kb_flag_1,not inv_shift         ;rc сброс флажка нажатия Р/Л
+ EA98  80 36 0018 R 02	 	 	xor	kb_flag_1,lat                   ;rc переключение раскладки
  EA9D  EB 10	 	 	 	jmp	short k304
  	 	 	 	
  	 	 	 	;   Управляющая клавиша отжата
- 	 	 	 	
+ 	 	 	 	 	 	 	;rc если сюда попали при нажатии ЕС-клавиши Р/Л, то ah=6
  EA9F	 	 	 	k23:
  	 	 	 	
  EA9F  80 FC 10	 	 	 	cmp	ah,scroll_shift
- EAA2  73 1F	 	 	 	jae	k24
- EAA4  F6 D4	 	 	 	not	ah
- EAA6  80 FC F9	 	 	 	cmp	ah,0f9h
- EAA9  74 E8	 	 	 	je	k303
- EAAB  20 26 0017 R	 	 	and	kb_flag,ah
- EAAF	 	 	 	k304:
+ EAA2  73 1F	 	 	 	jae	k24	 	 	 	;rc это были переключатели с фиксацией?
+ EAA4  F6 D4	 	 	 	not	ah                              ;rc да - переходим к ним
+ EAA6  80 FC F9	 	 	 	cmp	ah,0f9h	 	 	 	;rc было ah=6? Р/Л?
+ EAA9  74 E8	 	 	 	je	k303                            ;rc да->обрабатываем
+ EAAB  20 26 0017 R	 	 	and	kb_flag,ah                      ;rc это и далее - продолжение IBM-ского кода
+ EAAF	 	 	 	k304:	 	 	 	 	 	
  EAAF  3C B8	 	 	 	cmp	al,alt_key+80h
  EAB1  75 38	 	 	 	jne	k26
  	 	 	 	
@@ -6264,15 +6354,17 @@
  EAC9  EB 20 90	 	 	 	jmp	 k26
  	 	 	 	;---
  	 	 	 	
- EACC	 	 	 	k25:
+ EACC	 	 	 	k25:	 	 	 	 	 	;rc как и в IBM, здесь мы, если не управляющая клавиша
+ 	 	 	 	 	 	 	 	 	 	;rc (т.е. ее код не в k6) или если мы нажали ins-num-caps-scroll,
+ 	 	 	 	 	 	 	 	 	 	;rc когда ранее была зажата ctrl или alt 
  EACC  3C 80	 	 	 	cmp	al,80h
  EACE  73 1B	 	 	 	jae	k26
  EAD0  3C 59	 	 	 	cmp	al,inf_key
- EAD2  74 25	 	 	 	je	k307
+ EAD2  74 25	 	 	 	je	k307  	 	 	 	;rc обработчик клавиши ИНФ (выдает 0a00h расшир код)
  EAD4  3C 5C	 	 	 	cmp	al,92
  EAD6  75 03	 	 	 	jne	k406b
- EAD8  E9 E9C2 R	 	 	jmp	k406
- EADB	 	 	 	k406b:
+ EAD8  E9 E9C2 R	 	 	jmp	k406	 	 	 	;rc обработчик клавиши Ё (выдает ASCII F0h/F1h в режиме РУС)
+ EADB	 	 	 	k406b:                                          ;rc далее как в IBM
  EADB  F6 06 0018 R 08	 	 	test	kb_flag_1,hold_state
  EAE0  74 1D	 	 	 	jz	k28
  EAE2  3C 45	 	 	 	cmp	al,num_key
@@ -6294,7 +6386,7 @@
  EAF7  58	 	 	 	pop	ax
  EAF8  CF	 	 	 	iret
  	 	 	 	
- EAF9  B8 A000	 	 	k307:	mov	ax,0a000h
+ EAF9  B8 A000	 	 	k307:	mov	ax,0a000h	 	 	;rc клавиша ИНФ
  EAFC  E9 E71B R	 	 	jmp	k57
  	 	 	 	
  	 	 	 	
@@ -10015,6 +10107,19 @@ COD. . . . . . . . . . . . . . .	Number	F000
 COMMAND. . . . . . . . . . . . .	N PROC	C562	CODE	Length =003A
 CONTROL_BYTE . . . . . . . . . .	L BYTE 	0076	DATA
 CP866. . . . . . . . . . . . . .	Number	0001	
+CP866_CODE_0F2H. . . . . . . . .	L BYTE 	CF42	CODE
+CP866_CODE_0F3H. . . . . . . . .	L BYTE 	CF4A	CODE
+CP866_CODE_0F4H. . . . . . . . .	L BYTE 	CF52	CODE
+CP866_CODE_0F5H. . . . . . . . .	L BYTE 	CF5A	CODE
+CP866_CODE_0F6H. . . . . . . . .	L BYTE 	CF62	CODE
+CP866_CODE_0F7H. . . . . . . . .	L BYTE 	CF6A	CODE
+CP866_CODE_0F8H. . . . . . . . .	L BYTE 	CF72	CODE
+CP866_CODE_0F9H. . . . . . . . .	L BYTE 	CF7A	CODE
+CP866_CODE_0FAH. . . . . . . . .	L BYTE 	CF82	CODE
+CP866_CODE_0FBH. . . . . . . . .	L BYTE 	CF8A	CODE
+CP866_CODE_0FDH. . . . . . . . .	L BYTE 	CF9A	CODE
+CP866_CODE_0FEH. . . . . . . . .	L BYTE 	CFA2	CODE
+CP866_CODE_0FFH. . . . . . . . .	L BYTE 	CFAA	CODE
 CRLF . . . . . . . . . . . . . .	N PROC	FFCB	CODE	Length =000F
 CRT_CHAR_GEN . . . . . . . . . .	L BYTE 	FA6E	CODE
 CRT_CHAR_IBM . . . . . . . . . .	L BYTE 	DC00	CODE
@@ -10174,6 +10279,7 @@ FMT_BAD. . . . . . . . . . . . .	N PROC	C379	CODE	Length =0007
 FMT_CONT . . . . . . . . . . . .	L NEAR 	C385	CODE
 FMT_DRV. . . . . . . . . . . . .	N PROC	C380	CODE	Length =0005
 FMT_TRK. . . . . . . . . . . . .	N PROC	C372	CODE	Length =0007
+FROL_252_FC. . . . . . . . . . .	L BYTE 	CF92	CODE
 G1 . . . . . . . . . . . . . . .	L NEAR 	E5AC	CODE
 G10. . . . . . . . . . . . . . .	L NEAR 	E60C	CODE
 G11. . . . . . . . . . . . . . .	L NEAR 	C55E	CODE
@@ -10794,7 +10900,7 @@ ZGR. . . . . . . . . . . . . . .	L NEAR 	CB07	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-12948 Bytes free   
+12216 Bytes free   
 
 Warning Severe
 Errors	Errors 
