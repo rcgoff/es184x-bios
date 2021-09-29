@@ -65,6 +65,17 @@ newzagrcw	equ	1	;0 - старый zagrcw, 1 - новый
 ;16.08.20 исправлены ошибки
 ;(28.04.21 - изменения для UTF-8)
 
+;ESBIOS7 - новый обработчик capslock 01.05.20
+;с убранными проверками выхода за границу диапазона
+;букв - уместился на место старого
+;16.05.20 исправлена ошибка в комменте
+;(29.04.21 - изменения для UTF-8)
+
+
+;ESBIOS8a - Комментарии в обработчике клавиатуры,
+;реконфигураторе памяти ca0 и тесте памяти e190. 
+;21.09.2020 (01.05.21 - изменения для UTF-8)
+
 
 ;Microsoft MACRO Assembler  Version 3.00
 ;09-15-88    
@@ -2888,191 +2899,227 @@ else
 endif
 ;RCgoff end
 
-
+;rc программа реконфигурации памяти и определения кол-ва памяти во всех подключенных платах памяти типа 1841
+;rc выполняется тест записью нулей и считывание (без проверки четности). В случае ошибки
+;rc происходит реконфигурация. В случае ошибки в первых 16k платы 2b0 или отсутствия порта система
+;rc останавливается. По итогам проверки в обл данных BIOS заполняется таблица tabl1 в формате:
+;rc номер порта платы (2 байта), число исправных килобайт на плате (кратно 16k) (2 байта)
+;rc число исправных килобайт на плате 2b0 заносится также в mem_siz в области данных BIOS.
+;rc этим значением воспользуется ОС. 
+;rc Интервал 512..640 разделяется всеми платами, т.е. если 2 платы по 512 типа 1841 и одна плата 128 типа 1840,
+;rc то в tabl1 будет стоять 640k у обоих плат.
+;rc реконфигурация включается для ошибок в адресах 0..384k.
  	assume	ds:abs0
-ca0:
+ca0:                		 
  	in	al,port_b
- 	and	al,0cfh
+ 	and	al,0cfh		;rc 0b1100.1111	clear bit5 i/o ch err en, bit4 ram err en
  	out	port_b,al
  	xor	ax,ax
  	mov	ds,ax
  	mov	es,ax
  	mov	dx,213h
  	mov	al,01
- 	out	dx,al	   ; активизировать плату расширения
+ 	out	dx,al	   ; активизировать плату расширения rc установить сигнал EXT
  	mov	bx,0
  	mov	dx,2b0h
- 	in	al,dx
+ 	in	al,dx      	;rc читать главную плату 2b0
  	and	al,0ch
- 	cmp	al,0ch
- 	jz	ca1
+ 	cmp	al,0ch          ;rc все 1?
+ 	jz	ca1      
  	mov	bx,res_fl
 ca1:	mov	al,0ah
- 	out	dx,al
- 	in	al,dx
- 	and	al,0fh
- 	cmp	al,0ah
- 	jnz	oshp	   ; нет платы 2B0
+ 	out	dx,al           ;rc 0b0000.1010 разрешить запись, конф банк 01
+ 	in	al,dx           ;rc читать порт обратно
+ 	and	al,0fh          ;rc 0b0000.1111 только младшая тетрада
+ 	cmp	al,0ah          ;rc сравниваем с записаным
+ 	jnz	oshp	   ; нет платы 2B0 rc если не совпало (случай модуля ЕС1840, не только отсутствия 2b0!)
  	mov	al,0ch
+ 	out	dx,al           ;rc 0b0000.1100 разрешить запись и чтение
+ 	xor	al,al  ; сброс активности остальных плат памяти rc в цикле пишется 00 (выкл зп/чт)...
+ca2:	inc	dx               
  	out	dx,al
- 	xor	al,al  ; сброс активности остальных плат памяти
-ca2:	inc	dx
- 	out	dx,al
- 	cmp	dl,0b3h
- 	jnz	ca2
+ 	cmp	dl,0b3h         ;rc ...в порты 2b1...2b3.
+ 	jnz	ca2             ;rc конец цикла
 ca22:	mov	bx,res_fl
- 	mov	cx,2000h
- 	cmp	bx,1234h
+ 	mov	cx,2000h        ;rc счетчик для проверки 8к слов - 16кб
+ 	cmp	bx,1234h        ;rc есть признак горячей перезагрузки?
  	jz	ca8
  	mov	ax,0f000h
- 	mov	ss,ax
-ca7a:	mov	sp,offset caw
-ca7:	jmp	stgtst_cnt
+ 	mov	ss,ax           ;rc как бы стек в ПЗУ
+ca7a:	mov	sp,offset caw   ;rc адрес возврата для stgtst_cnt будет ca3
+ca7:	jmp	stgtst_cnt      ;rc проверка 16кб и их очистка
 ca3:	mov	cx,2000h
- 	je	ca8
+ 	je	ca8             ;rc нет ошибки?->ca8
  	mov	dx,2b0h    ; сбой в первых 16К основной платы
  	in	al,dx	   ; памяти
- 	test	al,03	   ; реконфигурация была?
- 	jz	ca6
+ 	test	al,03	   ; реконфигурация была? rc0b0000.0011
+ 	jz	ca6        ;rc 00 в младших разрядах означает, что реконфига не было
+
+;--------------rc случай ошибки в первых 16k 2b0 - неустранимый
 oshp:
- 	mov	bl,al	   ; была реконфигурация
- 	mov	al,89h
- 	out	63h,al
- 	mov	al,04
-ca5:	out	60h,al
+ 	mov	bl,al	   ; была реконфигурация  rc или вообще нет платы 2b0 или память 1840
+ 	mov	al,89h     ;rc 0b1000.1001
+ 	out	63h,al     ;rc out cmd_port,al
+ 	mov	al,04      ;rc 0b0000.0100
+ca5:	out	60h,al     ;rc out port_a,al	//rc вывод в порт A
  	xor	cx,cx
-ca4:	loop	ca4
+ca4:	loop	ca4	   ;rc бесконечный цикл с выводом в порт A 03h(сбой 16k) и 04h... 
+			   ;rc ...или прочтенного по 2b0(нет платы) и 04h
  	xchg	bl,al
  	jmp	ca5
-ca6:	or	al,3
+;--------------rc конец ошибки
+
+ca6:	or	al,3       ;rc реконфига не было и ошибка первых 16k: ставим отказ банка 0
  	out	dx,al
- 	jmp	ca7a
+ 	jmp	ca7a       ;rc и возвращаемся на тест первых 16k
+
+			;rc сюда после горячей перезагрузки или отсутствия ошибки первых 16k
+			;rc cx в обоих случаях содержит 2000h
 ca8:	xor	ax,ax
  	cld
  	xor	si,si
  	xor	di,di
  	mov	bp,2b0h
- 	rep	stosw
+ 	rep	stosw       ;rc очистка первых 16k нулями
  	mov	res_fl,bx
-ca9:	mov	dx,0400h
- 	mov	bx,16
-ca10:	mov	es,dx
+ca9:	mov	dx,0400h    ;rc сегмент, следующий за первыми 16k
+ 	mov	bx,16       ;rc инициализировать счетчик исправных килобайт (будет писаться в tabl1 и mem_siz)
+
+			;rc основной цикл-тест платы
+ca10:	mov	es,dx       ;rc очередной сегмент для stos
  	xor	di,di
  	mov	ax,0aa55h
  	mov	cx,ax
- 	mov	es:[di],ax  ; проверка наличия очередных 16К памяти
- 	mov	al,0fh
- 	mov	ax,es:[di]
- 	xor	ax,cx
- 	jnz	ca11
+ 	mov	es:[di],ax  ; проверка наличия очередных 16К памяти rc: пишем aa55...
+ 	mov	al,0fh      ;rc зачем???? затрется же сразу
+ 	mov	ax,es:[di]  ;rc ...и сразу читаем
+ 	xor	ax,cx       ;rc сравниваем с эталоном
+ 	jnz	ca11        ;rc разночтение->нет памяти->ca11
  	mov	cx,2000h
- 	rep	stosw
+ 	rep	stosw       ;rc есть память->затрем очередные 16k нулями (ax=00 будет при идентичности с эталоном)
  	mov	cx,2000h
  	xor	di,di
- 	repz	scasw	   ; есть сбойные адреса в порции 16К?
- 	or	cx,ax
+ 	repz	scasw	   ; есть сбойные адреса в порции 16К? rc сканирование на отличные от нуля в затертом массиве
+ 	or	cx,ax      ;rc определим факт сбоя, если его не было, cx=0. or, чтобы на флаги повлияло  
  	jnz	ca11	   ; да
- 	add	dx,0400h   ; нет
- 	add	bx,16
- 	cmp	dh,0a0h
- 	jnz	ca10
- 	jmp	ca12
-ca11:	cmp	dh,60h
- 	jnb	ca12
- 	mov	dx,bp	   ; адрес меньше 512К
- 	in	al,dx
- 	test	al,03
- 	jnz	ca12
- 	mov	dx,es
- 	and	dh,60h
- 	xor	dh,60h
+ 	add	dx,0400h   ; нет rc следующий сегмент (след 16k массив)
+ 	add	bx,16      ;rc увеличим счетчик исправных килобайт на только что проверенные
+ 	cmp	dh,0a0h    ;rc достигнута граница 640k?
+ 	jnz	ca10       ;rc нет - продолжить цикл-тест
+ 	jmp	ca12       ;rc да
+
+			;rc здесь мы в случае отсутствия очередных 16k или обнаружения сбоя в очередных 16k
+ca11:	cmp	dh,60h     ;rc сравниваем адрес сегмента с 384K
+ 	jnb	ca12       ;rc адрес >=384 ->ca12
+ 	mov	dx,bp	   ; адрес меньше 512К  rc ошибка в комментарии!! должно было стоять меньше 384k
+ 	in	al,dx      ;rc читаем порт платы
+ 	test	al,03      ;rc была реконфигурация?
+ 	jnz	ca12       ;rc если реконфигурация была или порт отсутствует ->ca12
+			;rc если не было - надо реконфигурировать
+ 	mov	dx,es      ;rc восстанавливаем сегмент в dx
+ 	and	dh,60h     ;rc выделяем из него адрес банка
+ 	xor	dh,60h     ;rc инвертируем адрес банка
  	mov	cl,5
- 	shr	dh,cl
- 	or	al,dh
+ 	shr	dh,cl      ;rc смещаем в младшие разряды - получили код реконфигурации
+ 	or	al,dh      ;rc сочетаем с кодами зп/чт модуля
  	mov	dx,bp
- 	out	dx,al
+ 	out	dx,al      ;rc записали в порт модуля
  	xor	dx,dx
  	xor	bx,bx
- 	jmp	ca10
+ 	jmp	ca10       ;rc возвращаемся на тестирование модуля с самого начала
+
+			;rc здесь мы если:
+			;rc а)ошибка возникла при первом проходе в 384k...640k
+			;rc б)ошибка возникла при втором проходе в 384k...512k - перенесенная старая 
+			;rc в)ошибка возникла в 16k..384k уже после реконфигурации
+			;rc во всех этих случаях, если мы на 2b0, память будет сокращена
+			;rc до последнего безошибочного 16-кб блока, т.е. до текущего bx.
+			;rc г)достигнута граница 640k без ошибок
+			;rc если текущая плата реально есть, текущий bx будет записан в tabl1.
+
 ca12:	 	 	   ; сброс активности текущего модуля памяти
  	mov	dx,bp
  	in	al,dx
- 	and	al,0f3h
+ 	and	al,0f3h    ;rc 0b1111.0011 - отключить чт/зп
  	out	dx,al
- 	mov	dx,2b0h    ; возврат на плату памяти 2B0
+ 	mov	dx,2b0h    ; возврат на плату памяти 2B0 rc(т.к. таблица tabl1 находится в ней)
  	in	al,dx
- 	or	al,0ch
+ 	or	al,0ch     ;rc 0b0000.1100 - включаем чт/зп у 2b0
  	out	dx,al
- 	test	bp,3
- 	jnz	ca14
- 	mov	mem_siz,bx
+ 	test	bp,3       ;rc текущая плата была 2b0?
+ 	jnz	ca14       ;rc нет->проверить bx на 0 (была ли плата)
+ 	mov	mem_siz,bx ;rc да - сокращаем память DOS до последнего безошибочного блока
 ca15:
- 	mov	si,csi
- 	mov	tabl1[si],bp
- 	mov	tabl1[si+2],bx
- 	inc	bp
- 	add	csi,4
-ca16:	cmp	bp,2b4h
- 	jnb	ca13
- 	mov	bx,0
+ 	mov	si,csi	   ;rc csi - указатель в tabl1, при первом проходе csi=0
+ 	mov	tabl1[si],bp     ;rc пишем в tabl1 номер порта текущей платы
+ 	mov	tabl1[si+2],bx   ;rc и число исправных кб
+ 	inc	bp               ;rc следующая плата
+ 	add	csi,4            ;rc указатель на следующий элемент в таблице tabl1
+ca16:	cmp	bp,2b4h          ;rc все платы перебраны?
+ 	jnb	ca13             ;rc да->выход и продолжение POST
+ 	mov	bx,0             ;rc иначе переход на тест след платы: обнулить счетчик кб,
  	mov	al,0ch
- 	mov	dx,bp
- 	out	dx,al
+ 	mov	dx,bp            
+ 	out	dx,al            ;rc вкл чт/зп и сбросить реконфиг след платы 
  	mov	dx,2b0h 	; сброс активности 2b0
  	in	al,dx
- 	and	al,0f3h
+ 	and	al,0f3h          ;rc т.е. откл чт/зп 2b0, реконфиг ост как есть
  	out	dx,al
- 	mov	dx,0
- 	jmp	ca10
-ca14:	cmp	bx,0
- 	jnz	ca15
- 	inc	bp
+ 	mov	dx,0             ;rc начальный сегмент для новой платы
+ 	jmp	ca10             ;rc переход на тест новой платы
+
+ca14:	cmp	bx,0             ;rc платы 2b1..2b3 не было или сбой в первых 16k?
+ 	jnz	ca15             ;rc нет ->пишем в таблицу, как обычно
+ 	inc	bp               ;rc иначе новая плата сразу
  	jmp	ca16
-ca13:
- 	mov	ax,data
- 	mov	ds,ax
+ca13:                            ;rc мероприятия по выходу
+ 	mov	ax,data          
+ 	mov	ds,ax            ;rc восст ds на обл данных BIOS
  	mov	bp,0
- 	jmp	c21
+ 	jmp	c21              ;продолжение теста
 ;
+;
+;-------rc программа ниже частично основана на IBM-ской e19, причем от XTBIOS.ASM (с печатью)
+;	взял оттуда комментарии
 ;
  	assume cs:code,ds:data
 e190:	push	ds
  	mov	ax,16
  	cmp	reset_flag,1234h
  	jnz	e20a
- 	jmp	e22
-e20a:	mov	ax,16
- 	jmp	short prt_siz
-e20b:	mov	bx,memory_size
- 	sub	bx,16
+ 	jmp	e22			;rc при перезарузке просто выход
+e20a:	mov	ax,16                   ; STARTING AMT. OF MEMORY OK   
+ 	jmp	short prt_siz           ; POST MESSAGE                 
+e20b:	mov	bx,memory_size          ; GET MEM. SIZE WORD    
+ 	sub	bx,16                   ; 1ST 16K ALREADY DONE  
  	mov	cl,4
- 	shr	bx,cl
- 	mov	cx,bx
- 	mov	bx,0400h
-e20c:	mov	ds,bx
- 	mov	es,bx
- 	add	bx,0400h
- 	push	dx
- 	push	cx
+ 	shr	bx,cl                   ; DIVIDE BY 16                
+ 	mov	cx,bx                   ; SAVE COUNT OF 16K BLOCKS    
+ 	mov	bx,0400h                ; SET PTR. TO RAM SEGMENT>16K 
+e20c:	mov	ds,bx                   ; SET SEG. REG      
+ 	mov	es,bx                                       
+ 	add	bx,0400h                ; POINT TO NEXT 16K 
+ 	push	dx                                          
+ 	push	cx                      ; SAVE WORK REGS    
  	push	bx
  	push	ax
  	call	stgtst
- 	jnz	e21a
- 	pop	ax
+ 	jnz	e21a                    ; GO PRINT ERROR           
+ 	pop	ax                      ; RECOVER TESTED MEM NUMBER
  	add	ax,16
 prt_siz:
  	push	ax
- 	mov	bx,10
- 	mov	cx,3
+ 	mov	bx,10                   ; SET UP FOR DECIMAL CONVERT    
+ 	mov	cx,3                    ; OF 3 NIBBLES                  
 decimal_loop:
  	xor	dx,dx
- 	div	bx
- 	or	dl,30h
- 	push	dx
+ 	div	bx                      ; DIVIDE BY 10   
+ 	or	dl,30h                  ; MAKE INTO ASCII
+ 	push	dx                      ; SAVE           
  	loop	decimal_loop
  	mov	cx,3
 prt_dec_loop:
- 	pop	ax
+ 	pop	ax                      ; RECOVER A NUMBER
  	call	prt_hex
  	loop	prt_dec_loop
  	mov	cx,22
@@ -3080,19 +3127,19 @@ prt_dec_loop:
 kb_ok:	mov	al,byte ptr cs:[si]
  	inc	si
  	call	prt_hex
- 	loop	kb_ok
- 	pop	ax
- 	cmp	ax,16
- 	je	e20b
- 	pop	bx
- 	pop	cx
- 	pop	dx
- 	loop	e20c
+ 	loop	kb_ok			;rc вывод строки e300 (kb объем памяти) - 22 символа, посимвольно
+ 	pop	ax                      ; RECOVER WORK REGS   
+ 	cmp	ax,16                   ; FIRST PASS?         
+ 	je	e20b                    
+ 	pop	bx                      ; RESTORE REGS              
+ 	pop	cx                                                  
+ 	pop	dx                                                  
+ 	loop	e20c                    ; LOOP TILL ALL MEM. CHECKED -----rc в XT e21
  	mov	al,10
- 	call	prt_hex
+ 	call	prt_hex                 ; LINE FEED 
  	pop	ds
- 	jmp	e22
-e21a:
+ 	jmp	e22  			;rc это выход
+e21a:                                   ;rc ошибка при stgtst
  	pop	bx
  	add	sp,6
  	mov	dx,ds
@@ -3101,36 +3148,37 @@ e21a:
  	push	bx
  	mov	bx,dx
  	push	ax
- 	cmp	dh,60h
- 	jnb	ea1
+ 	cmp	dh,60h			;rc ошибка в 512k-640k?
+ 	jnb	ea1                     ;rc да->ea1 (неустранимая ошибка)
  	mov	dx,2b0h
  	in	al,dx
- 	test	al,3
- 	jnz	ea1
- 	push	ax
+ 	test	al,3			;rc была реконфигурация платы 2b0?
+ 	jnz	ea1                     ;rc да->ea1 (неустранимая ошибка)
+ 	push	ax                      ;rc иначе инициализируем экран,
  	mov	al,crt_mode
  	mov	ah,0
  	int	10h
  	pop	ax
- 	mov	dx,bx
+ 	mov	dx,bx                   ;rc получаем из текущего адреса код реконфигурации,
  	and	dh,60h
  	xor	dh,60h
  	mov	cl,5
  	shr	dh,cl
  	or	al,dh
- 	mov	dx,2b0h
- 	out	dx,al
+ 	mov	dx,2b0h 		 
+ 	out	dx,al                   ;rc устраиваем реконфигурацию...
  	xor	ax,ax
  	mov	es,ax
  	mov	ds,ax
- 	jmp	ca22
-ea1:	pop	ax
+ 	jmp	ca22			;rc ...и возвращаемся в тело ca0 на начало проверки
+
+ea1:	pop	ax      		;rc случай неустранимой ошибки
  	mov	dx,bx
  	pop	bx
- 	mov	tabl+2,bx
- 	mov	memory_size,bx
+ 	mov	tabl+2,bx		;rc записываем адрес сбоя в таблицу tabl
+ 	mov	memory_size,bx		;rc сокращаем память, доступную ОС
  	push	ax
- 	mov	al,10
+ 	mov	al,10 			;rc печатаем перевод строки
  	call	prt_hex
  	pop	ax
  	jmp	osh
@@ -3682,6 +3730,23 @@ rav:
  	jmp	video_return
 ah121:
  	jmp	znak
+
+;rc- коммент взят из PCBIOSv1, но версия отличается: тест памяти идет СЛОВАМИ, а не байтами
+;rc поэтому число в CX - кол-во слов, а не байт, и оно вдвое меньше, чем в РС и в 1840
+;rc программа соответственно вдвое быстрее
+;--------------------------------------------
+;	THIS SUBROUTINE PERFORMS A READ/WRITE STORAGE TEST ON A 16K BLOCK
+;	OF STORAGE.
+;ENTRY REQUIREMENTS:
+;	ES = ADDRESS OF STORAGE SEGMENT BEING TESTED
+;	DS = ADDRESS OF STORAGE SEGMENT BEING TESTED
+;	WHEN ENTERING AT STGTST_CNT, CX MUST BE LOADED WITH THE BYTE COUNT.
+;EXIT PARAMETERS:
+;	ZERO FLAG = 0 IF STORAGE ERROR (DATA COMPARE OR PARITY CHECK.  AL=0
+;		    DENOTES A PARITY CHECK. ELSE AL=XOR'ED BIT PATTERN OF THE
+;		    EXPECTED DATA PATTERN VS THE ACTUAL DATA READ.
+;	AX,BX,CX,DX,DI, AND SI ARE ALL DESTROYED.
+;--------------------------------------------
 stgtst:
  	 	mov	cx,2000h
 
@@ -5296,7 +5361,7 @@ error_beep	endp
 
 ;---
 
-k54:
+k54:					;rc обычный нижний регистр
  	cmp	al,59
  	jb	k55
  	mov	al,0
@@ -5304,7 +5369,7 @@ k54:
 
 k55:	mov	bx,offset k10
  	test	kb_flag_1,lat
- 	jz	k99
+ 	jz	k99			;rc переход по отсутствию флага ЛАТ
 
 ;---
 
@@ -5362,7 +5427,7 @@ k61:
  	mov	word ptr [si],ax
  	mov	buffer_tail,bx
  	jmp	k26
-k99:	mov	bx,offset rust
+k99:	mov	bx,offset rust			;rc маленькие рус буквы (kb_flag_1.lat=0)
  	jmp k56
 
 ;---
@@ -5583,41 +5648,48 @@ k16:
  	mov	al,ah	 	; запомнить код сканирования
  	je	k17	 	; переход по совпадению
  	jmp	k25	 	; переход по несовпадению
-k406:
+k406:           			;rc это обработчик клавиши Ё
  	test	kb_flag_1,lat
- 	jnz	k26a
+ 	jnz	k26a                    ;rc в ЛАТ-режиме клавиша не генерирует ничего, выход
  	test	kb_flag,left_shift+right_shift
- 	mov	ax,5cf1h
+ 	mov	ax,5cf1h		;rc ё
  	jz	k407
- 	mov	ax,5cf0h
+ 	mov	ax,5cf0h                ;rc Ё
+k407:					;rc передвинул сюда, двумя строками выше  (это ж не получение маски)
+ 	jmp	k57
 
 ;   Получение маски нажатой управляющей клавиши
 
-k407:
- 	jmp	k57
 
-k17:	sub	di,offset k6+1
+k17:	sub	di,offset k6+1		;rc получить индекс упр клавиши в табл k6, начиная с 0
  	cmp	di,8
- 	jb	k300
- 	mov	ah,6
+ 	jb	k300                    ;rc меньше 8 (это совместимые клавиши) обрабатываются как в IBM
+ 	mov	ah,6                    ;rc маска 0b00000110 для руслат  (inv_shift + lat)
  	cmp	di,0ah
- 	jb	k301
- 	test	al,80h
- 	jz	k26a
- 	and	kb_flag_1,not lat+lat_shift
+ 	jb	k301                    ;rc если inv_key (Р/Л)
+ 	test	al,80h                  
+ 	jz	k26a                    ;rc если не отпускание РУС или ЛАТ -> вых (борьба с автоповтором?)
+
+				;rc здесь мы после отпускания РУС или ЛАТ
+ 	and	kb_flag_1,not lat+lat_shift   ;rc not действует на оба, сбрасываем lat и "светодиодный" lat
  	cmp	di,0bh
- 	je	k401
+ 	je	k401                    ;rc переход, если РУС
+				;rc если ЛАТ:
  	test	kb_flag_1,inv_shift
- 	jz	k400
- 	or	kb_flag_1,lat_shift
+ 	jz	k400                    ;rc переход по ненажатию Р/Л
+ 	or	kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
  	jmp	k26a
-k400:	or	kb_flag_1,lat+lat_shift
+k400:	or	kb_flag_1,lat+lat_shift ;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
  	jmp	k26a
+
+				;РУС:
 k401:	test	kb_flag_1,inv_shift
- 	jz	k26a
- 	or	kb_flag_1,lat
+ 	jz	k26a                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
+ 	or	kb_flag_1,lat           ;rc нажата Р/Л и отпущена РУС: включить lat ///???
  	jmp	k26a
-k300:	mov	ah,cs:k7[di]
+
+				;rc далее IBM-ский код				
+k300:	mov	ah,cs:k7[di]            ;rc аналогично IBM считыаем маску из k7 для совместимых упр клавиш
 k301:
  	test	al,80h	 	; клавиша отжата ?
  	jnz	k23	; переход, если клавиша отжата
@@ -5629,16 +5701,17 @@ k301:
  	jae	k18	 	; переход, если да
 
 ;---
- 	cmp	ah,6
- 	je	k302
+ 	cmp	ah,6            
+ 	je	k302            ; rc нажата Р/Л
 
  	or	kb_flag,ah	; установка масок управляющих клавиш
  	 	 	 	; без запоминания
  	jmp	k26	 	; к выходу из прерывания
-k302:	or	kb_flag_1,inv_shift+lat
- 	test	kb_flag_1,lat_shift
- 	jz	k26a
- 	and	kb_flag_1,not lat
+
+k302:	or	kb_flag_1,inv_shift+lat ;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
+ 	test	kb_flag_1,lat_shift	;rc светодиодный ЛАТ есть?
+ 	jz	k26a                    ;rc нет -> выходим
+ 	and	kb_flag_1,not lat       ;rc есть -> сбрасываем латиницу
 k26a:
  	jmp	k26
 
@@ -5675,22 +5748,22 @@ k22:
  	mov	ax,ins_key*256
  	jmp	k57
 
-k303:
- 	and	kb_flag_1,not inv_shift
- 	xor	kb_flag_1,lat
+k303:						;rc отжатие Р/Л
+ 	and	kb_flag_1,not inv_shift         ;rc сброс флажка нажатия Р/Л
+ 	xor	kb_flag_1,lat                   ;rc переключение раскладки
  	jmp	short k304
 
 ;   Управляющая клавиша отжата
-
+			;rc если сюда попали при нажатии ЕС-клавиши Р/Л, то ah=6
 k23:
 
  	cmp	ah,scroll_shift
- 	jae	k24
- 	not	ah
- 	cmp	ah,0f9h
- 	je	k303
- 	and	kb_flag,ah
-k304:
+ 	jae	k24				;rc это были переключатели с фиксацией?
+ 	not	ah                              ;rc да - переходим к ним
+ 	cmp	ah,0f9h				;rc было ah=6? Р/Л?
+ 	je	k303                            ;rc да->обрабатываем
+ 	and	kb_flag,ah                      ;rc это и далее - продолжение IBM-ского кода
+k304:						
  	cmp	al,alt_key+80h
  	jne	k26
 
@@ -5709,15 +5782,17 @@ k24:
  	jmp	 k26
 ;---
 
-k25:
+k25:						;rc как и в IBM, здесь мы, если не управляющая клавиша
+						;rc (т.е. ее код не в k6) или если мы нажали ins-num-caps-scroll,
+						;rc когда ранее была зажата ctrl или alt 
  	cmp	al,80h
  	jae	k26
  	cmp	al,inf_key
- 	je	k307
+ 	je	k307  				;rc обработчик клавиши ИНФ (выдает 0a00h расшир код)
  	cmp	al,92
  	jne	k406b
- 	jmp	k406
-k406b:
+ 	jmp	k406				;rc обработчик клавиши Ё (выдает ASCII F0h/F1h в режиме РУС)
+k406b:                                          ;rc далее как в IBM
  	test	kb_flag_1,hold_state
  	jz	k28
  	cmp	al,num_key
@@ -5739,7 +5814,7 @@ k27:
  	pop	ax
  	iret
 
-k307:	mov	ax,0a000h
+k307:	mov	ax,0a000h			;rc клавиша ИНФ
  	jmp	k57
 
 
