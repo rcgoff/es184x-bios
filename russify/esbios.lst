@@ -83,8 +83,10 @@
  	 	 	 	;21.09.2020 (01.05.21 - изменения для UTF-8)
  	 	 	 	
  	 	 	 	
- 	 	 	 	;ESBIOS9a - улучшены комментарии в реконфигураторе памяти
- 	 	 	 	;29.09.2020 (22.09.21 - изменения для UTF-8)
+ 	 	 	 	;ESBIOS9b - улучшены комментарии в реконфигураторе памяти, 
+ 	 	 	 	;улучшен обработчик int10,ax1103
+ 	 	 	 	; - в idnpol пишется идентификатор таблицы (содержимое BL) 
+ 	 	 	 	;29.09.2020 (24.09.21 - изменения для UTF-8)
  	 	 	 	
  	 	 	 	
  	 	 	 	;Microsoft MACRO Assembler  Version 3.00
@@ -2624,10 +2626,14 @@
  	 	 	 	;	 	  AL=3	 -  загрузить вторую половину знакогенератора:
  	 	 	 	;	 	 	    BL=0 - загрузить вторую половину знакогене-
  	 	 	 	;	 	 	    ратора из ПЗУ кодовой таблицы с русским
- 	 	 	 	;	 	 	    алфавитом,
+ 	 	 	 	;	 	 	    алфавитом (ISO),
  	 	 	 	;	 	 	    BL=1 - загрузить вторую половину знакогене-
  	 	 	 	;	 	 	    ратора из ПЗУ стандартной кодовой таблицей
- 	 	 	 	;	 	 	    ASCII (USA)
+ 	 	 	 	;	 	 	    ASCII (USA),
+ 	 	 	 	;	 	 	    BL=2 - загрузить вторую половину знакогене-
+ 	 	 	 	;	 	 	    ратора из ПЗУ кодовой таблицы с русским
+ 	 	 	 	;	 	 	    алфавитом (CP866)
+ 	 	 	 	;	 	 	    (id таблиц 0,1,2 сохраняется в idnpol)
  	 	 	 	;
  	 	 	 	;   На выходе:
  	 	 	 	;
@@ -2725,9 +2731,9 @@
  CB63  55	 	 	 	push	bp	 	;bp используется как хранитель ошибок POST,
  	 	 	 	 	 	 	 	;не надо его портить (хотя раньше этой он не используется)
  CB64  B8 1103	 	 	 	mov	ax,1103h	;функция загрузки верхней половины знакогенератора
- CB67  BB 0800	 	 	 	mov	bx,0800h	;8 байт/символ, русская таблица
+ CB67  BB 0800	 	 	 	mov	bx,0800h	;8 байт/символ, русская таблица 866
  CB6A  CD 10	 	 	 	int	10h
- 	 	 	 	 	 	 	 	;после возврата в AL=0, в AH - 08h
+ 	 	 	 	 	 	 	 	;после возврата в AL=0(id таблицы), в AH - 08h
  	 	 	 	 	 	 	 	;из анализа кода int10 при возврате в BH - 0,в BL - crt_mode
  	 	 	 	 	           	 	;теперь нижний знакогенератор
  CB6C  8C CB	 	 	 	mov	bx,cs
@@ -3873,28 +3879,27 @@
  	 	 	 	
  D430	 	 	 	ah12:
  D430  3C 03	 	 	 	cmp	al,3
- D432  75 26	 	 	 	jnz	ah121
- D434  53	 	 	 	push	bx
- D435  8C C8	 	 	 	mov	ax,cs
- D437  8E C0	 	 	 	mov	es,ax
- D439  B9 0080	 	 	 	mov	cx,80h
- D43C  BA 0080	 	 	 	mov	dx,80h
- D43F  5B	 	 	 	pop	bx
- D440  BD D800 R	 	 	mov	bp,offset crt_char_866
- D443  80 FB 00	 	 	 	cmp	bl,0
- D446  BB 0800	 	 	 	mov	bx,0800h
- D449  74 03	 	 	 	jz	rav
- D44B  BD DC00 R	 	 	mov	bp,offset crt_char_ibm
- D44E	 	 	 	rav:
- D44E  B8 1100	 	 	 	mov	ax,1100h
- D451  50	 	 	 	push	ax
- D452  CD 10	 	 	 	int	10h
- D454  58	 	 	 	pop	ax
- D455  CD 10	 	 	 	int	10h
- D457  E9 F1DC R	 	 	jmp	video_return
- D45A	 	 	 	ah121:
- D45A  E9 CAE3 R	 	 	jmp	znak
+ D432  75 1C	 	 	 	jnz	ah121
+ D434  0E	 	 	 	push	cs              
+ D435  07	 	 	 	pop	es              ;rc указатель на знакогенератор д.б es:bp
+ D436  B9 0080	 	 	 	mov	cx,80h          ;rc загрузить 128 символов
+ D439  8B D1	 	 	 	mov	dx,cx	 	;rc начальный код символа 128
+ D43B  8A F3	 	 	 	mov	dh,bl	 	;rc переписали код таблицы в id пользователя
+ D43D  B7 00	 	 	 	mov	bh,0
+ D43F  D0 E3	 	 	 	shl	bl,1	 	;rc сформировали указатель на слово
+ D441  2E: 8B AF D453 R	 	 	mov	bp,cs:[bx+offset charpg]	;rc в bp - нужное смещение знакогенератора
+ D446  B7 08	 	 	 	mov	bh,08           ;rc 8 байт/символ             	
+ D448  B8 1100	 	 	 	mov	ax,1100h        ;rc команда загрузки произвольного знакогенератора
+ D44B  CD 10	 	 	 	int	10h
+ D44D  E9 F1DC R	 	 	jmp	video_return
+ D450	 	 	 	ah121:
+ D450  E9 CAE3 R	 	 	jmp	znak
+ D453  D800 R	 	 	charpg:	dw	crt_char_866
+ D455  DC00 R	 	 	 	dw	crt_char_ibm
+ D457  CBB2 R	 	 	 	dw	crt_char_iso
  	 	 	 	
+ 	 	 	 	
+ D45D	 	 	 	 	org	0d45dh
  	 	 	 	;rc- коммент взят из PCBIOSv1, но версия отличается: тест памяти идет СЛОВАМИ, а не байтами
  	 	 	 	;rc поэтому число в CX - кол-во слов, а не байт, и оно вдвое меньше, чем в РС и в 1840
  	 	 	 	;rc программа соответственно вдвое быстрее
@@ -10338,7 +10343,7 @@ ACT_DISP_PAGE. . . . . . . . . .	N PROC	F247	CODE	Length =0024
 ADD4 . . . . . . . . . . . . . .	L NEAR 	C6E9	CODE
 ADDR_6845. . . . . . . . . . . .	L WORD 	0063	DATA
 AH12 . . . . . . . . . . . . . .	L NEAR 	D430	CODE
-AH121. . . . . . . . . . . . . .	L NEAR 	D45A	CODE
+AH121. . . . . . . . . . . . . .	L NEAR 	D450	CODE
 AH13 . . . . . . . . . . . . . .	L NEAR 	C861	CODE
 ALT_INPUT. . . . . . . . . . . .	L BYTE 	0019	DATA
 ALT_KEY. . . . . . . . . . . . .	Number	0038	
@@ -10438,6 +10443,7 @@ CAPS_SHIFT . . . . . . . . . . .	Number	0040
 CAPS_STATE . . . . . . . . . . .	Number	0040	
 CAP_LOW. . . . . . . . . . . . .	L NEAR 	FF0E	CODE
 CAW. . . . . . . . . . . . . . .	L WORD 	E018	CODE
+CHARPG . . . . . . . . . . . . .	L NEAR 	D453	CODE
 CHK_DRV. . . . . . . . . . . . .	N PROC	C52A	CODE	Length =0007
 CHK_DRV_CMD. . . . . . . . . . .	Number	00E3	
 CHK_LONG . . . . . . . . . . . .	N PROC	C4EB	CODE	Length =0007
@@ -11027,7 +11033,6 @@ R8 . . . . . . . . . . . . . . .	L NEAR 	F4EC	CODE
 R9 . . . . . . . . . . . . . . .	L NEAR 	F4FB	CODE
 RAM_DIAG . . . . . . . . . . . .	N PROC	C523	CODE	Length =0007
 RAM_DIAG_CMD . . . . . . . . . .	Number	00E0	
-RAV. . . . . . . . . . . . . . .	L NEAR 	D44E	CODE
 RDCIMB . . . . . . . . . . . . .	L NEAR 	C87F	CODE
 RD_BUFF. . . . . . . . . . . . .	N PROC	C4F9	CODE	Length =000E
 RD_BUFF_CMD. . . . . . . . . . .	Number	000E	
@@ -11249,7 +11254,7 @@ ZGR. . . . . . . . . . . . . . .	L NEAR 	CB07	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-12090 Bytes free   
+12092 Bytes free   
 
 Warning Severe
 Errors	Errors 
