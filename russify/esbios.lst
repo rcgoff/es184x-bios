@@ -2776,8 +2776,7 @@
  CBAA  FF53 R	 	 	 	dw	dummy_return	; прерывание 1C - прерывание таймера
  CBAC  F0B9 R	 	 	 	dw	video_parms	; прерывание 1D - параметры видео
  CBAE  EFC7 R	 	 	 	dw	offset	disk_base   ;прерывание 1EH - параметры НГМД
- CBB0  0000 U	 	 	 	dw	offset crt_char_rus	; 1FH - адрес таблицы пользовательского дополнительного знакогенератора
- E r r o r   ---	9:Symbol not defined            
+ CBB0  D800 R	 	 	 	dw	offset crt_char_866	; 1FH - адрес таблицы пользовательского дополнительного знакогенератора
  	 	 	 	
  CBB2	 	 	 	org	0cbb2h	 	   ;чтобы не съезжали последующие программы
  	 	 	 	;RCgoff end
@@ -3881,8 +3880,7 @@
  D439  B9 0080	 	 	 	mov	cx,80h
  D43C  BA 0080	 	 	 	mov	dx,80h
  D43F  5B	 	 	 	pop	bx
- D440  BD 0000 U	 	 	mov	bp,offset crt_char_rus
- E r r o r   ---	9:Symbol not defined            
+ D440  BD D800 R	 	 	mov	bp,offset crt_char_866
  D443  80 FB 00	 	 	 	cmp	bl,0
  D446  BB 0800	 	 	 	mov	bx,0800h
  D449  74 03	 	 	 	jz	rav
@@ -4101,6 +4099,301 @@
  D558	 	 	 	j32:	 	 	 	; ошибка позиционирования
  D558  C3	 	 	 	ret	 	; возврат к программе, вызвавшей прерывание
  D559	 	 	 	seek	endp
+ 	 	 	 	;RCgoff end
+ 	 	 	 	
+ 	 	 	 	;RCgoff
+ 	 	 	 	if cp866
+ D800	 	 	 	 	org	0D800h
+ D800	 	 	 	crt_char_866	label byte
+                             C	include chr866cp.asm
+                             C	;╨Т╨╡╤А╤Е╨╜╨╕╨╡ 128 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨▓ ╨║╨╛╨┤╨╕╤А╨╛╨▓╨║╨╡ DOS (cp866)
+                             C	;╨а╨░╤Б╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╨┐╨╛╨╗╨╜╨╛╤Б╤В╤М╤О ╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╨╡╤В ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ 866.
+                             C	;
+                             C	;╨в╨░╨▒╨╗╨╕╤Ж╨░ ╨┐╨╛╨╗╤Г╤З╨╡╨╜╨░ ╨╕╨╖ ╤В╨░╨▒╨╗╨╕╤Ж╤Л crt_char_rus ╨╕╨╖ ╨╗╨╕╤Б╤В╨╕╨╜╨│╨░
+                             C	;BIOS ╨Х╨б1841 ╨┐╤Г╤В╨╡╨╝ ╨┐╨╡╤А╨╡╤В╨░╤Б╨╛╨▓╨║╨╕ 8-╨▒╨░╨╣╤В╨╛╨▓╤Л╤Е ╨┐╨╛╤Б╨╗╨╡╨┤╨╛╨▓╨░╤В╨╡╨╗╤М╨╜╨╛╤Б╤В╨╡╨╣,
+                             C	;╤Б╨╛╨╛╤В╨▓╨╡╤В╤Б╤В╨▓╤Г╤О╤Й╨╕╤Е ╤Б╨╕╨╝╨▓╨╛╨╗╨░╨╝, ╨╖╨░ ╨╕╤Б╨║╨╗╤О╤З╨╡╨╜╨╕╨╡╨╝: 
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ 0xE0..0xF1 ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╤Л ╨╜╨╡╨╕╨╖╨╝╨╡╨╜╨╜╤Л╨╝╨╕
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ 0xF2..0xFB, 0xFD...0xFF ╨▓╨╖╤П╤В╤Л ╨╕╨╖ ╤Д╨░╨╣╨╗╨░ ega.cpi
+                             C	;	 (8x8, ╨║╨╛╨┤╨╛╨▓╨░╤П ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ 866) Windows 7
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗ ╨╜╨╛╨╝╨╡╤А╨░ ╤Б ╨║╨╛╨┤╨╛╨╝ 0xFC ╨▓╨╖╤П╤В ╨╕╨╖ ╤И╤А╨╕╤Д╤В╨░ ╨▓ ╨║╨╜╨╕╨│╨╡ ╨д╤А╨╛╨╗╨╛╨▓╤Л╤Е
+                             C	;	 "╨Я╤А╨╛╨│╤А╨░╨╝╨╝╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨▓╨╕╨┤╨╡╨╛╨░╨┤╨░╨┐╤В╨╡╤А╨╛╨▓ CGA/EGA/VGA", ╤В.╨║. ╨║╤А╨░╤Б╨╕╨▓╤Л╨╣
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ 0xB0..0xB2 ╨▓╨╖╤П╤В╤Л ╨╕╨╖ ╤В╨░╨▒╨╗╨╕╤Ж╤Л crt_char_ibm,
+                             C	;	 ╤В.╨║. ╤В╨░╨╝ ╨╛╨╜╨╕ ╤Б╤Г╤Й╨╡╤Б╤В╨▓╨╡╨╜╨╜╨╛ ╨╗╤Г╤З╤И╨╡, ╤З╨╡╨╝ ╨▒╤Л╨╗╨╕ ╨▓ crt_char_rus
+                             C	;
+                             C	;
+                             C	;╨Ы.╨п╨┤╤А╨╡╨╜╨╜╨╕╨║╨╛╨▓ (RCgoff),17.04.20, 13.08.20,29.09.20 (03.05.21 - UTF-8)
+                             C	
+ D800  1E 36 66 66 7E 66     C	 	db	01eh,036h,066h,066h,07eh,066h,066h,000h    ;80
+       66 00                 C	
+ D808  7C 60 60 7C 66 66     C	 	db	07ch,060h,060h,07ch,066h,066h,07ch,000h    ;81
+       7C 00                 C	
+ D810  7C 66 66 7C 66 66     C	 	db	07ch,066h,066h,07ch,066h,066h,07ch,000h    ;82
+       7C 00                 C	
+ D818  7E 60 60 60 60 60     C	 	db	07eh,060h,060h,060h,060h,060h,060h,000h    ;83
+       60 00                 C	
+ D820  38 6C 6C 6C 6C 6C     C	 	db	038h,06ch,06ch,06ch,06ch,06ch,0feh,0c6h    ;84
+       FE C6                 C	
+ D828  7E 60 60 7C 60 60     C	 	db	07eh,060h,060h,07ch,060h,060h,07eh,000h    ;85
+       7E 00                 C	
+ D830  DB DB 7E 3C 7E DB     C	 	db	0dbh,0dbh,07eh,03ch,07eh,0dbh,0dbh,000h    ;86
+       DB 00                 C	
+ D838  3C 66 06 1C 06 66     C	 	db	03ch,066h,006h,01ch,006h,066h,03ch,000h    ;87
+       3C 00                 C	
+ D840  66 66 6E 7E 76 66     C	 	db	066h,066h,06eh,07eh,076h,066h,066h,000h    ;88
+       66 00                 C	
+ D848  3C 66 6E 7E 76 66     C	 	db	03ch,066h,06eh,07eh,076h,066h,066h,000h    ;89
+       66 00                 C	
+ D850  66 6C 78 70 78 6C     C	 	db	066h,06ch,078h,070h,078h,06ch,066h,000h    ;8a
+       66 00                 C	
+ D858  1E 36 66 66 66 66     C	 	db	01eh,036h,066h,066h,066h,066h,066h,000h    ;8b
+       66 00                 C	
+ D860  C6 EE FE FE D6 C6     C	 	db	0c6h,0eeh,0feh,0feh,0d6h,0c6h,0c6h,000h    ;8c
+       C6 00                 C	
+ D868  66 66 66 7E 66 66     C	 	db	066h,066h,066h,07eh,066h,066h,066h,000h    ;8d
+       66 00                 C	
+ D870  3C 66 66 66 66 66     C	 	db	03ch,066h,066h,066h,066h,066h,03ch,000h    ;8e
+       3C 00                 C	
+ D878  7E 66 66 66 66 66     C	 	db	07eh,066h,066h,066h,066h,066h,066h,000h    ;8f
+       66 00                 C	
+ D880  7C 66 66 66 7C 60     C	 	db	07ch,066h,066h,066h,07ch,060h,060h,000h    ;90
+       60 00                 C	
+ D888  3C 66 60 60 60 66     C	 	db	03ch,066h,060h,060h,060h,066h,03ch,000h    ;91
+       3C 00                 C	
+ D890  7E 18 18 18 18 18     C	 	db	07eh,018h,018h,018h,018h,018h,018h,000h    ;92
+       18 00                 C	
+ D898  66 66 66 3E 06 66     C	 	db	066h,066h,066h,03eh,006h,066h,03ch,000h    ;93
+       3C 00                 C	
+ D8A0  7E DB DB DB 7E 18     C	 	db	07eh,0dbh,0dbh,0dbh,07eh,018h,018h,000h    ;94
+       18 00                 C	
+ D8A8  66 66 3C 18 3C 66     C	 	db	066h,066h,03ch,018h,03ch,066h,066h,000h    ;95
+       66 00                 C	
+ D8B0  66 66 66 66 66 66     C	 	db	066h,066h,066h,066h,066h,066h,07fh,003h    ;96
+       7F 03                 C	
+ D8B8  66 66 66 3E 06 06     C	 	db	066h,066h,066h,03eh,006h,006h,006h,000h    ;97
+       06 00                 C	
+ D8C0  DB DB DB DB DB DB     C	 	db	0dbh,0dbh,0dbh,0dbh,0dbh,0dbh,0ffh,000h    ;98
+       FF 00                 C	
+ D8C8  DB DB DB DB DB DB     C	 	db	0dbh,0dbh,0dbh,0dbh,0dbh,0dbh,0ffh,003h    ;99
+       FF 03                 C	
+ D8D0  E0 60 60 7C 66 66     C	 	db	0e0h,060h,060h,07ch,066h,066h,07ch,000h    ;9a
+       7C 00                 C	
+ D8D8  C6 C6 C6 F6 DE DE     C	 	db	0c6h,0c6h,0c6h,0f6h,0deh,0deh,0f6h,000h    ;9b
+       F6 00                 C	
+ D8E0  60 60 60 7C 66 66     C	 	db	060h,060h,060h,07ch,066h,066h,07ch,000h    ;9c
+       7C 00                 C	
+ D8E8  78 0C 06 3E 06 0C     C	 	db	078h,00ch,006h,03eh,006h,00ch,078h,000h    ;9d
+       78 00                 C	
+ D8F0  CE DB DB FB DB DB     C	 	db	0ceh,0dbh,0dbh,0fbh,0dbh,0dbh,0ceh,000h    ;9e
+       CE 00                 C	
+ D8F8  3E 66 66 66 3E 36     C	 	db	03eh,066h,066h,066h,03eh,036h,066h,000h    ;9f
+       66 00                 C	
+ D900  00 00 78 0C 7C CC     C	 	db	000h,000h,078h,00ch,07ch,0cch,076h,000h    ;a0
+       76 00                 C	
+ D908  00 3C 60 3C 66 66     C	 	db	000h,03ch,060h,03ch,066h,066h,03ch,000h    ;a1
+       3C 00                 C	
+ D910  00 3C 66 7C 66 66     C	 	db	000h,03ch,066h,07ch,066h,066h,07ch,000h    ;a2
+       7C 00                 C	
+ D918  00 00 7E 60 60 60     C	 	db	000h,000h,07eh,060h,060h,060h,060h,000h    ;a3
+       60 00                 C	
+ D920  00 00 3C 6C 6C 6C     C	 	db	000h,000h,03ch,06ch,06ch,06ch,0feh,0c6h    ;a4
+       FE C6                 C	
+ D928  00 00 3C 66 7E 60     C	 	db	000h,000h,03ch,066h,07eh,060h,03ch,000h    ;a5
+       3C 00                 C	
+ D930  00 00 DB 7E 3C 7E     C	 	db	000h,000h,0dbh,07eh,03ch,07eh,0dbh,000h    ;a6
+       DB 00                 C	
+ D938  00 00 3C 66 0C 66     C	 	db	000h,000h,03ch,066h,00ch,066h,03ch,000h    ;a7
+       3C 00                 C	
+ D940  00 00 66 6E 7E 76     C	 	db	000h,000h,066h,06eh,07eh,076h,066h,000h    ;a8
+       66 00                 C	
+ D948  00 18 66 6E 7E 76     C	 	db	000h,018h,066h,06eh,07eh,076h,066h,000h    ;a9
+       66 00                 C	
+ D950  00 00 66 6C 78 6C     C	 	db	000h,000h,066h,06ch,078h,06ch,066h,000h    ;aa
+       66 00                 C	
+ D958  00 00 1E 36 66 66     C	 	db	000h,000h,01eh,036h,066h,066h,066h,000h    ;ab
+       66 00                 C	
+ D960  00 00 C6 FE FE D6     C	 	db	000h,000h,0c6h,0feh,0feh,0d6h,0c6h,000h    ;ac
+       C6 00                 C	
+ D968  00 00 66 66 7E 66     C	 	db	000h,000h,066h,066h,07eh,066h,066h,000h    ;ad
+       66 00                 C	
+ D970  00 00 3C 66 66 66     C	 	db	000h,000h,03ch,066h,066h,066h,03ch,000h    ;ae
+       3C 00                 C	
+ D978  00 00 7E 66 66 66     C	 	db	000h,000h,07eh,066h,066h,066h,066h,000h    ;af
+       66 00                 C	
+                             C	;	db	092h,000h,092h,000h,092h,000h,092h,000h    ;b0_es_old
+ D980  22 88 22 88 22 88     C	 	db	022H,088H,022H,088H,022H,088H,022H,088H    ;b0_ibm
+       22 88                 C	
+                             C	;	db	092h,049h,092h,049h,092h,049h,092h,000h    ;b1_es_old
+ D988  55 AA 55 AA 55 AA     C	 	db      055H,0AAH,055H,0AAH,055H,0AAH,055H,0AAH    ;b1_ibm
+       55 AA                 C	
+                             C	;	db	0aah,055h,0aah,055h,0aah,055h,0aah,000h    ;b2_es_old
+ D990  DB 77 DB EE DB 77     C	 	db	0DBH,077H,0DBH,0EEH,0DBH,077H,0DBH,0EEH    ;b2_ibm	
+       DB EE                 C	
+ D998  18 18 18 18 18 18     C	 	db	018h,018h,018h,018h,018h,018h,018h,018h    ;b3
+       18 18                 C	
+ D9A0  18 18 18 F8 18 18     C	 	db	018h,018h,018h,0f8h,018h,018h,018h,018h    ;b4
+       18 18                 C	
+ D9A8  18 18 F8 18 F8 18     C	 	db	018h,018h,0f8h,018h,0f8h,018h,018h,018h    ;b5
+       18 18                 C	
+ D9B0  6C 6C 6C EC 6C 6C     C	 	db	06ch,06ch,06ch,0ech,06ch,06ch,06ch,06ch    ;b6
+       6C 6C                 C	
+ D9B8  00 00 00 FC 6C 6C     C	 	db	000h,000h,000h,0fch,06ch,06ch,06ch,06ch    ;b7
+       6C 6C                 C	
+ D9C0  00 00 F8 18 F8 18     C	 	db	000h,000h,0f8h,018h,0f8h,018h,018h,018h    ;b8
+       18 18                 C	
+ D9C8  6C 6C EC 0C EC 6C     C	 	db	06ch,06ch,0ech,00ch,0ech,06ch,06ch,06ch    ;b9
+       6C 6C                 C	
+ D9D0  6C 6C 6C 6C 6C 6C     C	 	db	06ch,06ch,06ch,06ch,06ch,06ch,06ch,06ch    ;ba
+       6C 6C                 C	
+ D9D8  00 00 FC 0C EC 6C     C	 	db	000h,000h,0fch,00ch,0ech,06ch,06ch,06ch    ;bb
+       6C 6C                 C	
+ D9E0  6C 6C EC 0C FC 00     C	 	db	06ch,06ch,0ech,00ch,0fch,000h,000h,000h    ;bc
+       00 00                 C	
+ D9E8  6C 6C 6C FC 00 00     C	 	db	06ch,06ch,06ch,0fch,000h,000h,000h,000h    ;bd
+       00 00                 C	
+ D9F0  18 18 F8 18 F8 00     C	 	db	018h,018h,0f8h,018h,0f8h,000h,000h,000h    ;be
+       00 00                 C	
+ D9F8  00 00 00 F8 18 18     C	 	db	000h,000h,000h,0f8h,018h,018h,018h,018h    ;bf
+       18 18                 C	
+ DA00  18 18 18 1F 00 00     C	 	db	018h,018h,018h,01fh,000h,000h,000h,000h    ;c0
+       00 00                 C	
+ DA08  18 18 18 FF 00 00     C	 	db	018h,018h,018h,0ffh,000h,000h,000h,000h    ;c1
+       00 00                 C	
+ DA10  00 00 00 FF 18 18     C	 	db	000h,000h,000h,0ffh,018h,018h,018h,018h    ;c2
+       18 18                 C	
+ DA18  18 18 18 1F 18 18     C	 	db	018h,018h,018h,01fh,018h,018h,018h,018h    ;c3
+       18 18                 C	
+ DA20  00 00 00 FF 00 00     C	 	db	000h,000h,000h,0ffh,000h,000h,000h,000h    ;c4
+       00 00                 C	
+ DA28  18 18 18 FF 18 18     C	 	db	018h,018h,018h,0ffh,018h,018h,018h,018h    ;c5
+       18 18                 C	
+ DA30  18 18 1F 18 1F 18     C	 	db	018h,018h,01fh,018h,01fh,018h,018h,018h    ;c6
+       18 18                 C	
+ DA38  6C 6C 6C 6F 6C 6C     C	 	db	06ch,06ch,06ch,06fh,06ch,06ch,06ch,06ch    ;c7
+       6C 6C                 C	
+ DA40  6C 6C 6F 60 7F 00     C	 	db	06ch,06ch,06fh,060h,07fh,000h,000h,000h    ;c8
+       00 00                 C	
+ DA48  00 00 7F 60 6F 6C     C	 	db	000h,000h,07fh,060h,06fh,06ch,06ch,06ch    ;c9
+       6C 6C                 C	
+ DA50  6C 6C EF 00 FF 00     C	 	db	06ch,06ch,0efh,000h,0ffh,000h,000h,000h    ;ca
+       00 00                 C	
+ DA58  00 00 FF 00 EF 6C     C	 	db	000h,000h,0ffh,000h,0efh,06ch,06ch,06ch    ;cb
+       6C 6C                 C	
+ DA60  6C 6C 6F 60 6F 6C     C	 	db	06ch,06ch,06fh,060h,06fh,06ch,06ch,06ch    ;cc
+       6C 6C                 C	
+ DA68  00 00 FF 00 FF 00     C	 	db	000h,000h,0ffh,000h,0ffh,000h,000h,000h    ;cd
+       00 00                 C	
+ DA70  6C 6C EF 00 EF 6C     C	 	db	06ch,06ch,0efh,000h,0efh,06ch,06ch,06ch    ;ce
+       6C 6C                 C	
+ DA78  18 18 FF 00 FF 00     C	 	db	018h,018h,0ffh,000h,0ffh,000h,000h,000h    ;cf
+       00 00                 C	
+ DA80  6C 6C 6C FF 00 00     C	 	db	06ch,06ch,06ch,0ffh,000h,000h,000h,000h    ;d0
+       00 00                 C	
+ DA88  00 00 FF 00 FF 18     C	 	db	000h,000h,0ffh,000h,0ffh,018h,018h,018h    ;d1
+       18 18                 C	
+ DA90  00 00 00 FF 6C 6C     C	 	db	000h,000h,000h,0ffh,06ch,06ch,06ch,06ch    ;d2
+       6C 6C                 C	
+ DA98  6C 6C 6C 7F 00 00     C	 	db	06ch,06ch,06ch,07fh,000h,000h,000h,000h    ;d3
+       00 00                 C	
+ DAA0  18 18 1F 18 1F 00     C	 	db	018h,018h,01fh,018h,01fh,000h,000h,000h    ;d4
+       00 00                 C	
+ DAA8  00 00 1F 18 1F 18     C	 	db	000h,000h,01fh,018h,01fh,018h,018h,018h    ;d5
+       18 18                 C	
+ DAB0  00 00 00 7F 6C 6C     C	 	db	000h,000h,000h,07fh,06ch,06ch,06ch,06ch    ;d6
+       6C 6C                 C	
+ DAB8  6C 6C 6C EF 6C 6C     C	 	db	06ch,06ch,06ch,0efh,06ch,06ch,06ch,06ch    ;d7
+       6C 6C                 C	
+ DAC0  18 18 FF 00 FF 18     C	 	db	018h,018h,0ffh,000h,0ffh,018h,018h,018h    ;d8
+       18 18                 C	
+ DAC8  18 18 18 F8 00 00     C	 	db	018h,018h,018h,0f8h,000h,000h,000h,000h    ;d9
+       00 00                 C	
+ DAD0  00 00 00 1F 18 18     C	 	db	000h,000h,000h,01fh,018h,018h,018h,018h    ;da
+       18 18                 C	
+ DAD8  FF FF FF FF FF FF     C	 	db	0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh    ;db
+       FF FF                 C	
+ DAE0  00 00 00 00 FF FF     C	 	db	000h,000h,000h,000h,0ffh,0ffh,0ffh,0ffh    ;dc
+       FF FF                 C	
+ DAE8  F0 F0 F0 F0 F0 F0     C	 	db	0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h    ;dd
+       F0 F0                 C	
+ DAF0  0F 0F 0F 0F 0F 0F     C	 	db	00fh,00fh,00fh,00fh,00fh,00fh,00fh,00fh    ;de
+       0F 0F                 C	
+ DAF8  FF FF FF FF 00 00     C	 	db	0ffh,0ffh,0ffh,0ffh,000h,000h,000h,000h    ;df
+       00 00                 C	
+                             C	
+                             C	;╨Ф╨░╨╗╨╡╨╡ ╨╜╨╡╨╕╨╖╨╝╨╡╨╜╨╜╤Л╨╡ ╤Б╤В╨╛╨╗╨▒╤Ж╤Л E,F ╨╕╨╖ ╨Х╨б-╨╗╨╕╤Б╤В╨╕╨╜╨│╨░
+ DB00  00 00 7C 66 66 7C     C	 	db 000h,000h,07ch,066h,066h,07ch,060h,000h         ;e0
+       60 00                 C	
+ DB08  00 00 3C 66 60 66     C	 	db 000h,000h,03ch,066h,060h,066h,03ch,000h         ;e1
+       3C 00                 C	
+ DB10  00 00 7E 18 18 18     C	 	db 000h,000h,07eh,018h,018h,018h,018h,000h         ;e2
+       18 00                 C	
+ DB18  00 00 66 66 3E 06     C	 	db 000h,000h,066h,066h,03eh,006h,03ch,000h         ;e3
+       3C 00                 C	
+ DB20  00 00 7E DB DB 7E     C	 	db 000h,000h,07eh,0dbh,0dbh,07eh,018h,000h         ;e4
+       18 00                 C	
+ DB28  00 00 66 3C 18 3C     C	 	db 000h,000h,066h,03ch,018h,03ch,066h,000h         ;e5
+       66 00                 C	
+ DB30  00 00 66 66 66 66     C	 	db 000h,000h,066h,066h,066h,066h,07fh,003h         ;e6
+       7F 03                 C	
+ DB38  00 00 66 66 3E 06     C	 	db 000h,000h,066h,066h,03eh,006h,006h,000h         ;e7
+       06 00                 C	
+ DB40  00 00 DB DB DB DB     C	 	db 000h,000h,0dbh,0dbh,0dbh,0dbh,0ffh,000h         ;e8
+       FF 00                 C	
+ DB48  00 00 DB DB DB DB     C	 	db 000h,000h,0dbh,0dbh,0dbh,0dbh,0ffh,003h         ;e9
+       FF 03                 C	
+ DB50  00 00 E0 60 7C 66     C	 	db 000h,000h,0e0h,060h,07ch,066h,07ch,000h         ;ea
+       7C 00                 C	
+ DB58  00 00 C6 C6 F6 DE     C	 	db 000h,000h,0c6h,0c6h,0f6h,0deh,0f6h,000h         ;eb
+       F6 00                 C	
+ DB60  00 00 60 60 7C 66     C	 	db 000h,000h,060h,060h,07ch,066h,07ch,000h         ;ec
+       7C 00                 C	
+ DB68  00 00 7C 06 3E 06     C	 	db 000h,000h,07ch,006h,03eh,006h,07ch,000h         ;ed
+       7C 00                 C	
+ DB70  00 00 CE DB FB DB     C	 	db 000h,000h,0ceh,0dbh,0fbh,0dbh,0ceh,000h         ;ee
+       CE 00                 C	
+ DB78  00 00 3E 66 3E 36     C	 	db 000h,000h,03eh,066h,03eh,036h,066h,000h         ;ef
+       66 00                 C	
+ DB80  66 7E 60 7C 60 60     C	 	db 066h,07eh,060h,07ch,060h,060h,07eh,000h         ;f0
+       7E 00                 C	
+ DB88  00 66 3C 66 7E 60     C	 	db 000h,066h,03ch,066h,07eh,060h,03ch,000h         ;f1
+       3C 00                 C	
+                             C	
+                             C	;╨Ш╨╖ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л 866 ╤Д╨░╨╣╨╗╨░ ega.cpi Windows 7
+                             C	
+ DB90  3C 66 C0 F8 C0 66     C	 	cp866_code_0f2h	db	03Ch, 066h, 0C0h, 0F8h, 0C0h, 066h, 03Ch, 000h	  	;╤Г╨║╤А ╨н ╨Ю╨С╨а╨Р╨в╨Э╨Ю╨Х
+       3C 00                 C	
+ DB98  00 00 3E 63 78 63     C	        cp866_code_0f3h	db	000h, 000h, 03Eh, 063h, 078h, 063h, 03Eh, 000h          ;╤Г╨║╤А ╤Н ╨╛╨▒╤А╨░╤В╨╜╨╛╨╡
+       3E 00                 C	
+ DBA0  48 78 30 30 30 30     C	        cp866_code_0f4h	db	048h, 078h, 030h, 030h, 030h, 030h, 078h, 000h          ;╤Г╨║╤А ╨Ш ╨б ╨Ф╨Т╨г╨Ь╨п ╨в╨Ю╨з╨Ъ╨Р╨Ь╨Ш
+       78 00                 C	
+ DBA8  CC 00 30 30 30 30     C	        cp866_code_0f5h	db	0CCh, 000h, 030h, 030h, 030h, 030h, 078h, 000h          ;╤Г╨║╤А ╨╕ ╤Б ╨┤╨▓╤Г╨╝╤П ╤В╨╛╤З╨║╨░╨╝╨╕
+       78 00                 C	
+ DBB0  38 C6 C6 7E 06 C6     C	 	cp866_code_0f6h	db	038h, 0C6h, 0C6h, 07Eh, 006h, 0C6h, 07Ch, 000h          ;╨▒╨╡╨╗ ╨г ╨б ╨Ф╨Т╨г╨Ь╨п ╨в╨Ю╨з╨Ъ╨Р╨Ь╨Ш
+       7C 00                 C	
+ DBB8  6C 38 C6 C6 C6 7E     C	 	cp866_code_0f7h	db	06Ch, 038h, 0C6h, 0C6h, 0C6h, 07Eh, 006h, 07Ch          ;╨▒╨╡╨╗ ╤Г ╤Б ╨┤╨▓╤Г╨╝╤П ╤В╨╛╤З╨║╨░╨╝╨╕
+       06 7C                 C	
+ DBC0  38 6C 6C 38 00 00     C	 	cp866_code_0f8h	db	038h, 06Ch, 06Ch, 038h, 000h, 000h, 000h, 000h          ;╨│╤А╨░╨┤╤Г╤Б
+       00 00                 C	
+ DBC8  00 00 00 18 18 00     C	 	cp866_code_0f9h	db	000h, 000h, 000h, 018h, 018h, 000h, 000h, 000h	  	;╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║	
+       00 00                 C	
+ DBD0  00 00 00 00 18 00     C	 	cp866_code_0fah	db      000h, 000h, 000h, 000h, 018h, 000h, 000h, 000h          ;╨╝╨░╨╗╨╡╨╜╤М╨║╨╕╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║
+       00 00                 C	
+ DBD8  0E 0C 0C 0C 6C 3C     C	        cp866_code_0fbh	db	00Eh, 00Ch, 00Ch, 00Ch, 06Ch, 03Ch, 01Ch, 000h          ;╨║╨╛╤А╨╡╨╜╤М
+       1C 00                 C	
+                             C	
+                             C	;╨╕╨╖ ╨║╨╜╨╕╨│╨╕ ╨▒╤А╨░╤В╤М╨╡╨▓ ╨д╤А╨╛╨╗╨╛╨▓╤Л╤Е
+                             C	
+ DBE0  06 08 CB 6B 68 5B     C	 	frol_252_fc   DB   006h,008h,0CBh,06Bh,068h,05Bh,058h,08Ch      ;╨╜╨╛╨╝╨╡╤А (╨║╤А╨░╤Б╨╕╨▓╤Л╨╣!=cp866)
+       58 8C                 C	
+                             C	
+                             C	;╨Ш╨╖ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л 866 ╤Д╨░╨╣╨╗╨░ ega.cpi Windows 7
+                             C	
+ DBE8  00 C6 7C C6 C6 7C     C	 	cp866_code_0fdh	db	000h, 0C6h, 07Ch, 0C6h, 0C6h, 07Ch, 0C6h, 000h          ;╨╛╤В╨▒╨╕╨▓╨║╨░
+       C6 00                 C	
+ DBF0  00 00 3C 3C 3C 3C     C	 	cp866_code_0feh	db	000h, 000h, 03Ch, 03Ch, 03Ch, 03Ch, 000h, 000h          ;╤Б╨╛╨▓╤Б╨╡╨╝ ╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║
+       00 00                 C	
+ DBF8  00 00 00 00 00 00     C	 	cp866_code_0ffh	db	000h, 000h, 000h, 000h, 000h, 000h, 000h, 000h
+       00 00                 C	
+ 	 	 	 	endif
  	 	 	 	;RCgoff end
  	 	 	 	
  DC00	 	 	 	 	org	0DC00h
@@ -9301,8 +9594,7 @@
  F898  E9 CB63 R	 	 	jmp	zagrcw
  F89B  81 F9 0080	 	pr128:	cmp	cx,128
  F89F  75 E2	 	 	 	jne	bct1
- F8A1  BE 0000 U	 	 	mov	si,offset crt_char_rus
- E r r o r   ---	9:Symbol not defined            
+ F8A1  BE D800 R	 	 	mov	si,offset crt_char_866
  F8A4  EB DD	 	 	 	jmp	bct1
  F8A6  C3	 	 	kzagr:	ret
  F8A7	 	 	 	bct	endp
@@ -10161,7 +10453,21 @@ COD. . . . . . . . . . . . . . .	Number	F000
 COMMAND. . . . . . . . . . . . .	N PROC	C562	CODE	Length =003A
 CONTROL_BYTE . . . . . . . . . .	L BYTE 	0076	DATA
 CP866. . . . . . . . . . . . . .	Number	0001	
+CP866_CODE_0F2H. . . . . . . . .	L BYTE 	DB90	CODE
+CP866_CODE_0F3H. . . . . . . . .	L BYTE 	DB98	CODE
+CP866_CODE_0F4H. . . . . . . . .	L BYTE 	DBA0	CODE
+CP866_CODE_0F5H. . . . . . . . .	L BYTE 	DBA8	CODE
+CP866_CODE_0F6H. . . . . . . . .	L BYTE 	DBB0	CODE
+CP866_CODE_0F7H. . . . . . . . .	L BYTE 	DBB8	CODE
+CP866_CODE_0F8H. . . . . . . . .	L BYTE 	DBC0	CODE
+CP866_CODE_0F9H. . . . . . . . .	L BYTE 	DBC8	CODE
+CP866_CODE_0FAH. . . . . . . . .	L BYTE 	DBD0	CODE
+CP866_CODE_0FBH. . . . . . . . .	L BYTE 	DBD8	CODE
+CP866_CODE_0FDH. . . . . . . . .	L BYTE 	DBE8	CODE
+CP866_CODE_0FEH. . . . . . . . .	L BYTE 	DBF0	CODE
+CP866_CODE_0FFH. . . . . . . . .	L BYTE 	DBF8	CODE
 CRLF . . . . . . . . . . . . . .	N PROC	FFCB	CODE	Length =000F
+CRT_CHAR_866 . . . . . . . . . .	L BYTE 	D800	CODE
 CRT_CHAR_GEN . . . . . . . . . .	L BYTE 	FA6E	CODE
 CRT_CHAR_IBM . . . . . . . . . .	L BYTE 	DC00	CODE
 CRT_CHAR_ISO . . . . . . . . . .	L BYTE 	CBB2	CODE
@@ -10322,6 +10628,7 @@ FMT_BAD. . . . . . . . . . . . .	N PROC	C379	CODE	Length =0007
 FMT_CONT . . . . . . . . . . . .	L NEAR 	C385	CODE
 FMT_DRV. . . . . . . . . . . . .	N PROC	C380	CODE	Length =0005
 FMT_TRK. . . . . . . . . . . . .	N PROC	C372	CODE	Length =0007
+FROL_252_FC. . . . . . . . . . .	L BYTE 	DBE0	CODE
 G1 . . . . . . . . . . . . . . .	L NEAR 	E5AC	CODE
 G10. . . . . . . . . . . . . . .	L NEAR 	E60C	CODE
 G11. . . . . . . . . . . . . . .	L NEAR 	C55E	CODE
@@ -10942,8 +11249,8 @@ ZGR. . . . . . . . . . . . . . .	L NEAR 	CB07	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-12914 Bytes free   
+12090 Bytes free   
 
 Warning Severe
 Errors	Errors 
-0	3
+0	0
