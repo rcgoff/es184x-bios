@@ -83,6 +83,10 @@
  	 	 	 	;21.09.2020 (01.05.21 - изменения для UTF-8)
  	 	 	 	
  	 	 	 	
+ 	 	 	 	;2ESBIOS9a - улучшены комментарии в реконфигураторе памяти
+ 	 	 	 	;29.09.2020 (22.09.21 - изменения для UTF-8)
+ 	 	 	 	
+ 	 	 	 	
  	 	 	 	;Microsoft MACRO Assembler  Version 3.00
  	 	 	 	;09-15-88    
  	 	 	 	;___________________	 	 	  	
@@ -2798,245 +2802,249 @@
                              C	;	 (8x8, ╨║╨╛╨┤╨╛╨▓╨░╤П ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ 866) Windows 7
                              C	;	-╨б╨╕╨╝╨▓╨╛╨╗ ╨╜╨╛╨╝╨╡╤А╨░ ╤Б ╨║╨╛╨┤╨╛╨╝ 0xFC ╨▓╨╖╤П╤В ╨╕╨╖ ╤И╤А╨╕╤Д╤В╨░ ╨▓ ╨║╨╜╨╕╨│╨╡ ╨д╤А╨╛╨╗╨╛╨▓╤Л╤Е
                              C	;	 "╨Я╤А╨╛╨│╤А╨░╨╝╨╝╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨▓╨╕╨┤╨╡╨╛╨░╨┤╨░╨┐╤В╨╡╤А╨╛╨▓ CGA/EGA/VGA", ╤В.╨║. ╨║╤А╨░╤Б╨╕╨▓╤Л╨╣
+                             C	;	-╨б╨╕╨╝╨▓╨╛╨╗╤Л ╤Б ╨║╨╛╨┤╨░╨╝╨╕ 0xB0..0xB2 ╨▓╨╖╤П╤В╤Л ╨╕╨╖ ╤В╨░╨▒╨╗╨╕╤Ж╤Л crt_char_ibm,
+                             C	;	 ╤В.╨║. ╤В╨░╨╝ ╨╛╨╜╨╕ ╤Б╤Г╤Й╨╡╤Б╤В╨▓╨╡╨╜╨╜╨╛ ╨╗╤Г╤З╤И╨╡, ╤З╨╡╨╝ ╨▒╤Л╨╗╨╕ ╨▓ crt_char_rus
                              C	;
                              C	;
-                             C	;╨Ы.╨п╨┤╤А╨╡╨╜╨╜╨╕╨║╨╛╨▓ (RCgoff),17.04.20, 13.08.20 (29.04.21 - ╨╕╨╖╨╝. ╨┤╨╗╤П UTF-8)
+                             C	;╨Ы.╨п╨┤╤А╨╡╨╜╨╜╨╕╨║╨╛╨▓ (RCgoff),17.04.20, 13.08.20,29.09.20 (03.05.21 - UTF-8)
                              C	
- CBB2  1E 36 66 66 7E 66     C	 	db	01eh,036h,066h,066h,07eh,066h,066h,000h
+ CBB2  1E 36 66 66 7E 66     C	 	db	01eh,036h,066h,066h,07eh,066h,066h,000h    ;80
        66 00                 C	
- CBBA  7C 60 60 7C 66 66     C	 	db	07ch,060h,060h,07ch,066h,066h,07ch,000h
+ CBBA  7C 60 60 7C 66 66     C	 	db	07ch,060h,060h,07ch,066h,066h,07ch,000h    ;81
        7C 00                 C	
- CBC2  7C 66 66 7C 66 66     C	 	db	07ch,066h,066h,07ch,066h,066h,07ch,000h
+ CBC2  7C 66 66 7C 66 66     C	 	db	07ch,066h,066h,07ch,066h,066h,07ch,000h    ;82
        7C 00                 C	
- CBCA  7E 60 60 60 60 60     C	 	db	07eh,060h,060h,060h,060h,060h,060h,000h
+ CBCA  7E 60 60 60 60 60     C	 	db	07eh,060h,060h,060h,060h,060h,060h,000h    ;83
        60 00                 C	
- CBD2  38 6C 6C 6C 6C 6C     C	 	db	038h,06ch,06ch,06ch,06ch,06ch,0feh,0c6h
+ CBD2  38 6C 6C 6C 6C 6C     C	 	db	038h,06ch,06ch,06ch,06ch,06ch,0feh,0c6h    ;84
        FE C6                 C	
- CBDA  7E 60 60 7C 60 60     C	 	db	07eh,060h,060h,07ch,060h,060h,07eh,000h
+ CBDA  7E 60 60 7C 60 60     C	 	db	07eh,060h,060h,07ch,060h,060h,07eh,000h    ;85
        7E 00                 C	
- CBE2  DB DB 7E 3C 7E DB     C	 	db	0dbh,0dbh,07eh,03ch,07eh,0dbh,0dbh,000h
+ CBE2  DB DB 7E 3C 7E DB     C	 	db	0dbh,0dbh,07eh,03ch,07eh,0dbh,0dbh,000h    ;86
        DB 00                 C	
- CBEA  3C 66 06 1C 06 66     C	 	db	03ch,066h,006h,01ch,006h,066h,03ch,000h
+ CBEA  3C 66 06 1C 06 66     C	 	db	03ch,066h,006h,01ch,006h,066h,03ch,000h    ;87
        3C 00                 C	
- CBF2  66 66 6E 7E 76 66     C	 	db	066h,066h,06eh,07eh,076h,066h,066h,000h
+ CBF2  66 66 6E 7E 76 66     C	 	db	066h,066h,06eh,07eh,076h,066h,066h,000h    ;88
        66 00                 C	
- CBFA  3C 66 6E 7E 76 66     C	 	db	03ch,066h,06eh,07eh,076h,066h,066h,000h
+ CBFA  3C 66 6E 7E 76 66     C	 	db	03ch,066h,06eh,07eh,076h,066h,066h,000h    ;89
        66 00                 C	
- CC02  66 6C 78 70 78 6C     C	 	db	066h,06ch,078h,070h,078h,06ch,066h,000h
+ CC02  66 6C 78 70 78 6C     C	 	db	066h,06ch,078h,070h,078h,06ch,066h,000h    ;8a
        66 00                 C	
- CC0A  1E 36 66 66 66 66     C	 	db	01eh,036h,066h,066h,066h,066h,066h,000h
+ CC0A  1E 36 66 66 66 66     C	 	db	01eh,036h,066h,066h,066h,066h,066h,000h    ;8b
        66 00                 C	
- CC12  C6 EE FE FE D6 C6     C	 	db	0c6h,0eeh,0feh,0feh,0d6h,0c6h,0c6h,000h
+ CC12  C6 EE FE FE D6 C6     C	 	db	0c6h,0eeh,0feh,0feh,0d6h,0c6h,0c6h,000h    ;8c
        C6 00                 C	
- CC1A  66 66 66 7E 66 66     C	 	db	066h,066h,066h,07eh,066h,066h,066h,000h
+ CC1A  66 66 66 7E 66 66     C	 	db	066h,066h,066h,07eh,066h,066h,066h,000h    ;8d
        66 00                 C	
- CC22  3C 66 66 66 66 66     C	 	db	03ch,066h,066h,066h,066h,066h,03ch,000h
+ CC22  3C 66 66 66 66 66     C	 	db	03ch,066h,066h,066h,066h,066h,03ch,000h    ;8e
        3C 00                 C	
- CC2A  7E 66 66 66 66 66     C	 	db	07eh,066h,066h,066h,066h,066h,066h,000h
+ CC2A  7E 66 66 66 66 66     C	 	db	07eh,066h,066h,066h,066h,066h,066h,000h    ;8f
        66 00                 C	
- CC32  7C 66 66 66 7C 60     C	 	db	07ch,066h,066h,066h,07ch,060h,060h,000h
+ CC32  7C 66 66 66 7C 60     C	 	db	07ch,066h,066h,066h,07ch,060h,060h,000h    ;90
        60 00                 C	
- CC3A  3C 66 60 60 60 66     C	 	db	03ch,066h,060h,060h,060h,066h,03ch,000h
+ CC3A  3C 66 60 60 60 66     C	 	db	03ch,066h,060h,060h,060h,066h,03ch,000h    ;91
        3C 00                 C	
- CC42  7E 18 18 18 18 18     C	 	db	07eh,018h,018h,018h,018h,018h,018h,000h
+ CC42  7E 18 18 18 18 18     C	 	db	07eh,018h,018h,018h,018h,018h,018h,000h    ;92
        18 00                 C	
- CC4A  66 66 66 3E 06 66     C	 	db	066h,066h,066h,03eh,006h,066h,03ch,000h
+ CC4A  66 66 66 3E 06 66     C	 	db	066h,066h,066h,03eh,006h,066h,03ch,000h    ;93
        3C 00                 C	
- CC52  7E DB DB DB 7E 18     C	 	db	07eh,0dbh,0dbh,0dbh,07eh,018h,018h,000h
+ CC52  7E DB DB DB 7E 18     C	 	db	07eh,0dbh,0dbh,0dbh,07eh,018h,018h,000h    ;94
        18 00                 C	
- CC5A  66 66 3C 18 3C 66     C	 	db	066h,066h,03ch,018h,03ch,066h,066h,000h
+ CC5A  66 66 3C 18 3C 66     C	 	db	066h,066h,03ch,018h,03ch,066h,066h,000h    ;95
        66 00                 C	
- CC62  66 66 66 66 66 66     C	 	db	066h,066h,066h,066h,066h,066h,07fh,003h
+ CC62  66 66 66 66 66 66     C	 	db	066h,066h,066h,066h,066h,066h,07fh,003h    ;96
        7F 03                 C	
- CC6A  66 66 66 3E 06 06     C	 	db	066h,066h,066h,03eh,006h,006h,006h,000h
+ CC6A  66 66 66 3E 06 06     C	 	db	066h,066h,066h,03eh,006h,006h,006h,000h    ;97
        06 00                 C	
- CC72  DB DB DB DB DB DB     C	 	db	0dbh,0dbh,0dbh,0dbh,0dbh,0dbh,0ffh,000h
+ CC72  DB DB DB DB DB DB     C	 	db	0dbh,0dbh,0dbh,0dbh,0dbh,0dbh,0ffh,000h    ;98
        FF 00                 C	
- CC7A  DB DB DB DB DB DB     C	 	db	0dbh,0dbh,0dbh,0dbh,0dbh,0dbh,0ffh,003h
+ CC7A  DB DB DB DB DB DB     C	 	db	0dbh,0dbh,0dbh,0dbh,0dbh,0dbh,0ffh,003h    ;99
        FF 03                 C	
- CC82  E0 60 60 7C 66 66     C	 	db	0e0h,060h,060h,07ch,066h,066h,07ch,000h
+ CC82  E0 60 60 7C 66 66     C	 	db	0e0h,060h,060h,07ch,066h,066h,07ch,000h    ;9a
        7C 00                 C	
- CC8A  C6 C6 C6 F6 DE DE     C	 	db	0c6h,0c6h,0c6h,0f6h,0deh,0deh,0f6h,000h
+ CC8A  C6 C6 C6 F6 DE DE     C	 	db	0c6h,0c6h,0c6h,0f6h,0deh,0deh,0f6h,000h    ;9b
        F6 00                 C	
- CC92  60 60 60 7C 66 66     C	 	db	060h,060h,060h,07ch,066h,066h,07ch,000h
+ CC92  60 60 60 7C 66 66     C	 	db	060h,060h,060h,07ch,066h,066h,07ch,000h    ;9c
        7C 00                 C	
- CC9A  78 0C 06 3E 06 0C     C	 	db	078h,00ch,006h,03eh,006h,00ch,078h,000h
+ CC9A  78 0C 06 3E 06 0C     C	 	db	078h,00ch,006h,03eh,006h,00ch,078h,000h    ;9d
        78 00                 C	
- CCA2  CE DB DB FB DB DB     C	 	db	0ceh,0dbh,0dbh,0fbh,0dbh,0dbh,0ceh,000h
+ CCA2  CE DB DB FB DB DB     C	 	db	0ceh,0dbh,0dbh,0fbh,0dbh,0dbh,0ceh,000h    ;9e
        CE 00                 C	
- CCAA  3E 66 66 66 3E 36     C	 	db	03eh,066h,066h,066h,03eh,036h,066h,000h
+ CCAA  3E 66 66 66 3E 36     C	 	db	03eh,066h,066h,066h,03eh,036h,066h,000h    ;9f
        66 00                 C	
- CCB2  00 00 78 0C 7C CC     C	 	db	000h,000h,078h,00ch,07ch,0cch,076h,000h
+ CCB2  00 00 78 0C 7C CC     C	 	db	000h,000h,078h,00ch,07ch,0cch,076h,000h    ;a0
        76 00                 C	
- CCBA  00 3C 60 3C 66 66     C	 	db	000h,03ch,060h,03ch,066h,066h,03ch,000h
+ CCBA  00 3C 60 3C 66 66     C	 	db	000h,03ch,060h,03ch,066h,066h,03ch,000h    ;a1
        3C 00                 C	
- CCC2  00 3C 66 7C 66 66     C	 	db	000h,03ch,066h,07ch,066h,066h,07ch,000h
+ CCC2  00 3C 66 7C 66 66     C	 	db	000h,03ch,066h,07ch,066h,066h,07ch,000h    ;a2
        7C 00                 C	
- CCCA  00 00 7E 60 60 60     C	 	db	000h,000h,07eh,060h,060h,060h,060h,000h
+ CCCA  00 00 7E 60 60 60     C	 	db	000h,000h,07eh,060h,060h,060h,060h,000h    ;a3
        60 00                 C	
- CCD2  00 00 3C 6C 6C 6C     C	 	db	000h,000h,03ch,06ch,06ch,06ch,0feh,0c6h
+ CCD2  00 00 3C 6C 6C 6C     C	 	db	000h,000h,03ch,06ch,06ch,06ch,0feh,0c6h    ;a4
        FE C6                 C	
- CCDA  00 00 3C 66 7E 60     C	 	db	000h,000h,03ch,066h,07eh,060h,03ch,000h
+ CCDA  00 00 3C 66 7E 60     C	 	db	000h,000h,03ch,066h,07eh,060h,03ch,000h    ;a5
        3C 00                 C	
- CCE2  00 00 DB 7E 3C 7E     C	 	db	000h,000h,0dbh,07eh,03ch,07eh,0dbh,000h
+ CCE2  00 00 DB 7E 3C 7E     C	 	db	000h,000h,0dbh,07eh,03ch,07eh,0dbh,000h    ;a6
        DB 00                 C	
- CCEA  00 00 3C 66 0C 66     C	 	db	000h,000h,03ch,066h,00ch,066h,03ch,000h
+ CCEA  00 00 3C 66 0C 66     C	 	db	000h,000h,03ch,066h,00ch,066h,03ch,000h    ;a7
        3C 00                 C	
- CCF2  00 00 66 6E 7E 76     C	 	db	000h,000h,066h,06eh,07eh,076h,066h,000h
+ CCF2  00 00 66 6E 7E 76     C	 	db	000h,000h,066h,06eh,07eh,076h,066h,000h    ;a8
        66 00                 C	
- CCFA  00 18 66 6E 7E 76     C	 	db	000h,018h,066h,06eh,07eh,076h,066h,000h
+ CCFA  00 18 66 6E 7E 76     C	 	db	000h,018h,066h,06eh,07eh,076h,066h,000h    ;a9
        66 00                 C	
- CD02  00 00 66 6C 78 6C     C	 	db	000h,000h,066h,06ch,078h,06ch,066h,000h
+ CD02  00 00 66 6C 78 6C     C	 	db	000h,000h,066h,06ch,078h,06ch,066h,000h    ;aa
        66 00                 C	
- CD0A  00 00 1E 36 66 66     C	 	db	000h,000h,01eh,036h,066h,066h,066h,000h
+ CD0A  00 00 1E 36 66 66     C	 	db	000h,000h,01eh,036h,066h,066h,066h,000h    ;ab
        66 00                 C	
- CD12  00 00 C6 FE FE D6     C	 	db	000h,000h,0c6h,0feh,0feh,0d6h,0c6h,000h
+ CD12  00 00 C6 FE FE D6     C	 	db	000h,000h,0c6h,0feh,0feh,0d6h,0c6h,000h    ;ac
        C6 00                 C	
- CD1A  00 00 66 66 7E 66     C	 	db	000h,000h,066h,066h,07eh,066h,066h,000h
+ CD1A  00 00 66 66 7E 66     C	 	db	000h,000h,066h,066h,07eh,066h,066h,000h    ;ad
        66 00                 C	
- CD22  00 00 3C 66 66 66     C	 	db	000h,000h,03ch,066h,066h,066h,03ch,000h
+ CD22  00 00 3C 66 66 66     C	 	db	000h,000h,03ch,066h,066h,066h,03ch,000h    ;ae
        3C 00                 C	
- CD2A  00 00 7E 66 66 66     C	 	db	000h,000h,07eh,066h,066h,066h,066h,000h
+ CD2A  00 00 7E 66 66 66     C	 	db	000h,000h,07eh,066h,066h,066h,066h,000h    ;af
        66 00                 C	
- CD32  92 00 92 00 92 00     C	 	db	092h,000h,092h,000h,092h,000h,092h,000h
-       92 00                 C	
- CD3A  92 49 92 49 92 49     C	 	db	092h,049h,092h,049h,092h,049h,092h,000h
-       92 00                 C	
- CD42  AA 55 AA 55 AA 55     C	 	db	0aah,055h,0aah,055h,0aah,055h,0aah,000h
-       AA 00                 C	
- CD4A  18 18 18 18 18 18     C	 	db	018h,018h,018h,018h,018h,018h,018h,018h
+                             C	;	db	092h,000h,092h,000h,092h,000h,092h,000h    ;b0_es_old
+ CD32  22 88 22 88 22 88     C	 	db	022H,088H,022H,088H,022H,088H,022H,088H    ;b0_ibm
+       22 88                 C	
+                             C	;	db	092h,049h,092h,049h,092h,049h,092h,000h    ;b1_es_old
+ CD3A  55 AA 55 AA 55 AA     C	 	db      055H,0AAH,055H,0AAH,055H,0AAH,055H,0AAH    ;b1_ibm
+       55 AA                 C	
+                             C	;	db	0aah,055h,0aah,055h,0aah,055h,0aah,000h    ;b2_es_old
+ CD42  DB 77 DB EE DB 77     C	 	db	0DBH,077H,0DBH,0EEH,0DBH,077H,0DBH,0EEH    ;b2_ibm	
+       DB EE                 C	
+ CD4A  18 18 18 18 18 18     C	 	db	018h,018h,018h,018h,018h,018h,018h,018h    ;b3
        18 18                 C	
- CD52  18 18 18 F8 18 18     C	 	db	018h,018h,018h,0f8h,018h,018h,018h,018h
+ CD52  18 18 18 F8 18 18     C	 	db	018h,018h,018h,0f8h,018h,018h,018h,018h    ;b4
        18 18                 C	
- CD5A  18 18 F8 18 F8 18     C	 	db	018h,018h,0f8h,018h,0f8h,018h,018h,018h
+ CD5A  18 18 F8 18 F8 18     C	 	db	018h,018h,0f8h,018h,0f8h,018h,018h,018h    ;b5
        18 18                 C	
- CD62  6C 6C 6C EC 6C 6C     C	 	db	06ch,06ch,06ch,0ech,06ch,06ch,06ch,06ch
+ CD62  6C 6C 6C EC 6C 6C     C	 	db	06ch,06ch,06ch,0ech,06ch,06ch,06ch,06ch    ;b6
        6C 6C                 C	
- CD6A  00 00 00 FC 6C 6C     C	 	db	000h,000h,000h,0fch,06ch,06ch,06ch,06ch
+ CD6A  00 00 00 FC 6C 6C     C	 	db	000h,000h,000h,0fch,06ch,06ch,06ch,06ch    ;b7
        6C 6C                 C	
- CD72  00 00 F8 18 F8 18     C	 	db	000h,000h,0f8h,018h,0f8h,018h,018h,018h
+ CD72  00 00 F8 18 F8 18     C	 	db	000h,000h,0f8h,018h,0f8h,018h,018h,018h    ;b8
        18 18                 C	
- CD7A  6C 6C EC 0C EC 6C     C	 	db	06ch,06ch,0ech,00ch,0ech,06ch,06ch,06ch
+ CD7A  6C 6C EC 0C EC 6C     C	 	db	06ch,06ch,0ech,00ch,0ech,06ch,06ch,06ch    ;b9
        6C 6C                 C	
- CD82  6C 6C 6C 6C 6C 6C     C	 	db	06ch,06ch,06ch,06ch,06ch,06ch,06ch,06ch
+ CD82  6C 6C 6C 6C 6C 6C     C	 	db	06ch,06ch,06ch,06ch,06ch,06ch,06ch,06ch    ;ba
        6C 6C                 C	
- CD8A  00 00 FC 0C EC 6C     C	 	db	000h,000h,0fch,00ch,0ech,06ch,06ch,06ch
+ CD8A  00 00 FC 0C EC 6C     C	 	db	000h,000h,0fch,00ch,0ech,06ch,06ch,06ch    ;bb
        6C 6C                 C	
- CD92  6C 6C EC 0C FC 00     C	 	db	06ch,06ch,0ech,00ch,0fch,000h,000h,000h
+ CD92  6C 6C EC 0C FC 00     C	 	db	06ch,06ch,0ech,00ch,0fch,000h,000h,000h    ;bc
        00 00                 C	
- CD9A  6C 6C 6C FC 00 00     C	 	db	06ch,06ch,06ch,0fch,000h,000h,000h,000h
+ CD9A  6C 6C 6C FC 00 00     C	 	db	06ch,06ch,06ch,0fch,000h,000h,000h,000h    ;bd
        00 00                 C	
- CDA2  18 18 F8 18 F8 00     C	 	db	018h,018h,0f8h,018h,0f8h,000h,000h,000h
+ CDA2  18 18 F8 18 F8 00     C	 	db	018h,018h,0f8h,018h,0f8h,000h,000h,000h    ;be
        00 00                 C	
- CDAA  00 00 00 F8 18 18     C	 	db	000h,000h,000h,0f8h,018h,018h,018h,018h
+ CDAA  00 00 00 F8 18 18     C	 	db	000h,000h,000h,0f8h,018h,018h,018h,018h    ;bf
        18 18                 C	
- CDB2  18 18 18 1F 00 00     C	 	db	018h,018h,018h,01fh,000h,000h,000h,000h
+ CDB2  18 18 18 1F 00 00     C	 	db	018h,018h,018h,01fh,000h,000h,000h,000h    ;c0
        00 00                 C	
- CDBA  18 18 18 FF 00 00     C	 	db	018h,018h,018h,0ffh,000h,000h,000h,000h
+ CDBA  18 18 18 FF 00 00     C	 	db	018h,018h,018h,0ffh,000h,000h,000h,000h    ;c1
        00 00                 C	
- CDC2  00 00 00 FF 18 18     C	 	db	000h,000h,000h,0ffh,018h,018h,018h,018h
+ CDC2  00 00 00 FF 18 18     C	 	db	000h,000h,000h,0ffh,018h,018h,018h,018h    ;c2
        18 18                 C	
- CDCA  18 18 18 1F 18 18     C	 	db	018h,018h,018h,01fh,018h,018h,018h,018h
+ CDCA  18 18 18 1F 18 18     C	 	db	018h,018h,018h,01fh,018h,018h,018h,018h    ;c3
        18 18                 C	
- CDD2  00 00 00 FF 00 00     C	 	db	000h,000h,000h,0ffh,000h,000h,000h,000h
+ CDD2  00 00 00 FF 00 00     C	 	db	000h,000h,000h,0ffh,000h,000h,000h,000h    ;c4
        00 00                 C	
- CDDA  18 18 18 FF 18 18     C	 	db	018h,018h,018h,0ffh,018h,018h,018h,018h
+ CDDA  18 18 18 FF 18 18     C	 	db	018h,018h,018h,0ffh,018h,018h,018h,018h    ;c5
        18 18                 C	
- CDE2  18 18 1F 18 1F 18     C	 	db	018h,018h,01fh,018h,01fh,018h,018h,018h
+ CDE2  18 18 1F 18 1F 18     C	 	db	018h,018h,01fh,018h,01fh,018h,018h,018h    ;c6
        18 18                 C	
- CDEA  6C 6C 6C 6F 6C 6C     C	 	db	06ch,06ch,06ch,06fh,06ch,06ch,06ch,06ch
+ CDEA  6C 6C 6C 6F 6C 6C     C	 	db	06ch,06ch,06ch,06fh,06ch,06ch,06ch,06ch    ;c7
        6C 6C                 C	
- CDF2  6C 6C 6F 60 7F 00     C	 	db	06ch,06ch,06fh,060h,07fh,000h,000h,000h
+ CDF2  6C 6C 6F 60 7F 00     C	 	db	06ch,06ch,06fh,060h,07fh,000h,000h,000h    ;c8
        00 00                 C	
- CDFA  00 00 7F 60 6F 6C     C	 	db	000h,000h,07fh,060h,06fh,06ch,06ch,06ch
+ CDFA  00 00 7F 60 6F 6C     C	 	db	000h,000h,07fh,060h,06fh,06ch,06ch,06ch    ;c9
        6C 6C                 C	
- CE02  6C 6C EF 00 FF 00     C	 	db	06ch,06ch,0efh,000h,0ffh,000h,000h,000h
+ CE02  6C 6C EF 00 FF 00     C	 	db	06ch,06ch,0efh,000h,0ffh,000h,000h,000h    ;ca
        00 00                 C	
- CE0A  00 00 FF 00 EF 6C     C	 	db	000h,000h,0ffh,000h,0efh,06ch,06ch,06ch
+ CE0A  00 00 FF 00 EF 6C     C	 	db	000h,000h,0ffh,000h,0efh,06ch,06ch,06ch    ;cb
        6C 6C                 C	
- CE12  6C 6C 6F 60 6F 6C     C	 	db	06ch,06ch,06fh,060h,06fh,06ch,06ch,06ch
+ CE12  6C 6C 6F 60 6F 6C     C	 	db	06ch,06ch,06fh,060h,06fh,06ch,06ch,06ch    ;cc
        6C 6C                 C	
- CE1A  00 00 FF 00 FF 00     C	 	db	000h,000h,0ffh,000h,0ffh,000h,000h,000h
+ CE1A  00 00 FF 00 FF 00     C	 	db	000h,000h,0ffh,000h,0ffh,000h,000h,000h    ;cd
        00 00                 C	
- CE22  6C 6C EF 00 EF 6C     C	 	db	06ch,06ch,0efh,000h,0efh,06ch,06ch,06ch
+ CE22  6C 6C EF 00 EF 6C     C	 	db	06ch,06ch,0efh,000h,0efh,06ch,06ch,06ch    ;ce
        6C 6C                 C	
- CE2A  18 18 FF 00 FF 00     C	 	db	018h,018h,0ffh,000h,0ffh,000h,000h,000h
+ CE2A  18 18 FF 00 FF 00     C	 	db	018h,018h,0ffh,000h,0ffh,000h,000h,000h    ;cf
        00 00                 C	
- CE32  6C 6C 6C FF 00 00     C	 	db	06ch,06ch,06ch,0ffh,000h,000h,000h,000h
+ CE32  6C 6C 6C FF 00 00     C	 	db	06ch,06ch,06ch,0ffh,000h,000h,000h,000h    ;d0
        00 00                 C	
- CE3A  00 00 FF 00 FF 18     C	 	db	000h,000h,0ffh,000h,0ffh,018h,018h,018h
+ CE3A  00 00 FF 00 FF 18     C	 	db	000h,000h,0ffh,000h,0ffh,018h,018h,018h    ;d1
        18 18                 C	
- CE42  00 00 00 FF 6C 6C     C	 	db	000h,000h,000h,0ffh,06ch,06ch,06ch,06ch
+ CE42  00 00 00 FF 6C 6C     C	 	db	000h,000h,000h,0ffh,06ch,06ch,06ch,06ch    ;d2
        6C 6C                 C	
- CE4A  6C 6C 6C 7F 00 00     C	 	db	06ch,06ch,06ch,07fh,000h,000h,000h,000h
+ CE4A  6C 6C 6C 7F 00 00     C	 	db	06ch,06ch,06ch,07fh,000h,000h,000h,000h    ;d3
        00 00                 C	
- CE52  18 18 1F 18 1F 00     C	 	db	018h,018h,01fh,018h,01fh,000h,000h,000h
+ CE52  18 18 1F 18 1F 00     C	 	db	018h,018h,01fh,018h,01fh,000h,000h,000h    ;d4
        00 00                 C	
- CE5A  00 00 1F 18 1F 18     C	 	db	000h,000h,01fh,018h,01fh,018h,018h,018h
+ CE5A  00 00 1F 18 1F 18     C	 	db	000h,000h,01fh,018h,01fh,018h,018h,018h    ;d5
        18 18                 C	
- CE62  00 00 00 7F 6C 6C     C	 	db	000h,000h,000h,07fh,06ch,06ch,06ch,06ch
+ CE62  00 00 00 7F 6C 6C     C	 	db	000h,000h,000h,07fh,06ch,06ch,06ch,06ch    ;d6
        6C 6C                 C	
- CE6A  6C 6C 6C EF 6C 6C     C	 	db	06ch,06ch,06ch,0efh,06ch,06ch,06ch,06ch
+ CE6A  6C 6C 6C EF 6C 6C     C	 	db	06ch,06ch,06ch,0efh,06ch,06ch,06ch,06ch    ;d7
        6C 6C                 C	
- CE72  18 18 FF 00 FF 18     C	 	db	018h,018h,0ffh,000h,0ffh,018h,018h,018h
+ CE72  18 18 FF 00 FF 18     C	 	db	018h,018h,0ffh,000h,0ffh,018h,018h,018h    ;d8
        18 18                 C	
- CE7A  18 18 18 F8 00 00     C	 	db	018h,018h,018h,0f8h,000h,000h,000h,000h
+ CE7A  18 18 18 F8 00 00     C	 	db	018h,018h,018h,0f8h,000h,000h,000h,000h    ;d9
        00 00                 C	
- CE82  00 00 00 1F 18 18     C	 	db	000h,000h,000h,01fh,018h,018h,018h,018h
+ CE82  00 00 00 1F 18 18     C	 	db	000h,000h,000h,01fh,018h,018h,018h,018h    ;da
        18 18                 C	
- CE8A  FF FF FF FF FF FF     C	 	db	0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh
+ CE8A  FF FF FF FF FF FF     C	 	db	0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh    ;db
        FF FF                 C	
- CE92  00 00 00 00 FF FF     C	 	db	000h,000h,000h,000h,0ffh,0ffh,0ffh,0ffh
+ CE92  00 00 00 00 FF FF     C	 	db	000h,000h,000h,000h,0ffh,0ffh,0ffh,0ffh    ;dc
        FF FF                 C	
- CE9A  F0 F0 F0 F0 F0 F0     C	 	db	0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h
+ CE9A  F0 F0 F0 F0 F0 F0     C	 	db	0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h    ;dd
        F0 F0                 C	
- CEA2  0F 0F 0F 0F 0F 0F     C	 	db	00fh,00fh,00fh,00fh,00fh,00fh,00fh,00fh
+ CEA2  0F 0F 0F 0F 0F 0F     C	 	db	00fh,00fh,00fh,00fh,00fh,00fh,00fh,00fh    ;de
        0F 0F                 C	
- CEAA  FF FF FF FF 00 00     C	 	db	0ffh,0ffh,0ffh,0ffh,000h,000h,000h,000h
+ CEAA  FF FF FF FF 00 00     C	 	db	0ffh,0ffh,0ffh,0ffh,000h,000h,000h,000h    ;df
        00 00                 C	
                              C	
                              C	;╨Ф╨░╨╗╨╡╨╡ ╨╜╨╡╨╕╨╖╨╝╨╡╨╜╨╜╤Л╨╡ ╤Б╤В╨╛╨╗╨▒╤Ж╤Л E,F ╨╕╨╖ ╨Х╨б-╨╗╨╕╤Б╤В╨╕╨╜╨│╨░
- CEB2  00 00 7C 66 66 7C     C	 	db 000h,000h,07ch,066h,066h,07ch,060h,000h
+ CEB2  00 00 7C 66 66 7C     C	 	db 000h,000h,07ch,066h,066h,07ch,060h,000h         ;e0
        60 00                 C	
- CEBA  00 00 3C 66 60 66     C	 	db 000h,000h,03ch,066h,060h,066h,03ch,000h
+ CEBA  00 00 3C 66 60 66     C	 	db 000h,000h,03ch,066h,060h,066h,03ch,000h         ;e1
        3C 00                 C	
- CEC2  00 00 7E 18 18 18     C	 	db 000h,000h,07eh,018h,018h,018h,018h,000h
+ CEC2  00 00 7E 18 18 18     C	 	db 000h,000h,07eh,018h,018h,018h,018h,000h         ;e2
        18 00                 C	
- CECA  00 00 66 66 3E 06     C	 	db 000h,000h,066h,066h,03eh,006h,03ch,000h
+ CECA  00 00 66 66 3E 06     C	 	db 000h,000h,066h,066h,03eh,006h,03ch,000h         ;e3
        3C 00                 C	
- CED2  00 00 7E DB DB 7E     C	 	db 000h,000h,07eh,0dbh,0dbh,07eh,018h,000h
+ CED2  00 00 7E DB DB 7E     C	 	db 000h,000h,07eh,0dbh,0dbh,07eh,018h,000h         ;e4
        18 00                 C	
- CEDA  00 00 66 3C 18 3C     C	 	db 000h,000h,066h,03ch,018h,03ch,066h,000h
+ CEDA  00 00 66 3C 18 3C     C	 	db 000h,000h,066h,03ch,018h,03ch,066h,000h         ;e5
        66 00                 C	
- CEE2  00 00 66 66 66 66     C	 	db 000h,000h,066h,066h,066h,066h,07fh,003h
+ CEE2  00 00 66 66 66 66     C	 	db 000h,000h,066h,066h,066h,066h,07fh,003h         ;e6
        7F 03                 C	
- CEEA  00 00 66 66 3E 06     C	 	db 000h,000h,066h,066h,03eh,006h,006h,000h
+ CEEA  00 00 66 66 3E 06     C	 	db 000h,000h,066h,066h,03eh,006h,006h,000h         ;e7
        06 00                 C	
- CEF2  00 00 DB DB DB DB     C	 	db 000h,000h,0dbh,0dbh,0dbh,0dbh,0ffh,000h
+ CEF2  00 00 DB DB DB DB     C	 	db 000h,000h,0dbh,0dbh,0dbh,0dbh,0ffh,000h         ;e8
        FF 00                 C	
- CEFA  00 00 DB DB DB DB     C	 	db 000h,000h,0dbh,0dbh,0dbh,0dbh,0ffh,003h
+ CEFA  00 00 DB DB DB DB     C	 	db 000h,000h,0dbh,0dbh,0dbh,0dbh,0ffh,003h         ;e9
        FF 03                 C	
- CF02  00 00 E0 60 7C 66     C	 	db 000h,000h,0e0h,060h,07ch,066h,07ch,000h
+ CF02  00 00 E0 60 7C 66     C	 	db 000h,000h,0e0h,060h,07ch,066h,07ch,000h         ;ea
        7C 00                 C	
- CF0A  00 00 C6 C6 F6 DE     C	 	db 000h,000h,0c6h,0c6h,0f6h,0deh,0f6h,000h
+ CF0A  00 00 C6 C6 F6 DE     C	 	db 000h,000h,0c6h,0c6h,0f6h,0deh,0f6h,000h         ;eb
        F6 00                 C	
- CF12  00 00 60 60 7C 66     C	 	db 000h,000h,060h,060h,07ch,066h,07ch,000h
+ CF12  00 00 60 60 7C 66     C	 	db 000h,000h,060h,060h,07ch,066h,07ch,000h         ;ec
        7C 00                 C	
- CF1A  00 00 7C 06 3E 06     C	 	db 000h,000h,07ch,006h,03eh,006h,07ch,000h
+ CF1A  00 00 7C 06 3E 06     C	 	db 000h,000h,07ch,006h,03eh,006h,07ch,000h         ;ed
        7C 00                 C	
- CF22  00 00 CE DB FB DB     C	 	db 000h,000h,0ceh,0dbh,0fbh,0dbh,0ceh,000h
+ CF22  00 00 CE DB FB DB     C	 	db 000h,000h,0ceh,0dbh,0fbh,0dbh,0ceh,000h         ;ee
        CE 00                 C	
- CF2A  00 00 3E 66 3E 36     C	 	db 000h,000h,03eh,066h,03eh,036h,066h,000h
+ CF2A  00 00 3E 66 3E 36     C	 	db 000h,000h,03eh,066h,03eh,036h,066h,000h         ;ef
        66 00                 C	
- CF32  66 7E 60 7C 60 60     C	 	db 066h,07eh,060h,07ch,060h,060h,07eh,000h
+ CF32  66 7E 60 7C 60 60     C	 	db 066h,07eh,060h,07ch,060h,060h,07eh,000h         ;f0
        7E 00                 C	
- CF3A  00 66 3C 66 7E 60     C	 	db 000h,066h,03ch,066h,07eh,060h,03ch,000h
+ CF3A  00 66 3C 66 7E 60     C	 	db 000h,066h,03ch,066h,07eh,060h,03ch,000h         ;f1
        3C 00                 C	
                              C	
                              C	;╨Ш╨╖ ╤И╤А╨╕╤Д╤В╨░ 8x8 ╨║╨╛╨┤╨╛╨▓╨╛╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л 866 ╤Д╨░╨╣╨╗╨░ ega.cpi Windows 7
                              C	
- CF42  3C 66 C0 F8 C0 66     C	 	cp866_code_0f2h	db	03Ch, 066h, 0C0h, 0F8h, 0C0h, 066h, 03Ch, 000h	
- 	 	 	 	 	;╤Г╨║╤А ╨н ╨Ю╨С╨а╨Р╨в╨Э╨Ю╨Х
+ CF42  3C 66 C0 F8 C0 66     C	 	cp866_code_0f2h	db	03Ch, 066h, 0C0h, 0F8h, 0C0h, 066h, 03Ch, 000h	  	;╤Г╨║╤А ╨н ╨Ю╨С╨а╨Р╨в╨Э╨Ю╨Х
        3C 00                 C	
  CF4A  00 00 3E 63 78 63     C	        cp866_code_0f3h	db	000h, 000h, 03Eh, 063h, 078h, 063h, 03Eh, 000h          ;╤Г╨║╤А ╤Н ╨╛╨▒╤А╨░╤В╨╜╨╛╨╡
        3E 00                 C	
@@ -3050,8 +3058,7 @@
        06 7C                 C	
  CF72  38 6C 6C 38 00 00     C	 	cp866_code_0f8h	db	038h, 06Ch, 06Ch, 038h, 000h, 000h, 000h, 000h          ;╨│╤А╨░╨┤╤Г╤Б
        00 00                 C	
- CF7A  00 00 00 18 18 00     C	 	cp866_code_0f9h	db	000h, 000h, 000h, 018h, 018h, 000h, 000h, 000h	
- 	 	 	 	 	;╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║	
+ CF7A  00 00 00 18 18 00     C	 	cp866_code_0f9h	db	000h, 000h, 000h, 018h, 018h, 000h, 000h, 000h	  	;╨▒╨╛╨╗╤М╤И╨╛╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║	
        00 00                 C	
  CF82  00 00 00 00 18 00     C	 	cp866_code_0fah	db      000h, 000h, 000h, 000h, 018h, 000h, 000h, 000h          ;╨╝╨░╨╗╨╡╨╜╤М╨║╨╕╨╣ ╨┐╤А╤П╨╝╨╛╤Г╨│╨╛╨╗╤М╨╜╨╕╨║
        00 00                 C	
@@ -3071,40 +3078,45 @@
        00 00                 C	
  CFAA  00 00 00 00 00 00     C	 	cp866_code_0ffh	db	000h, 000h, 000h, 000h, 000h, 000h, 000h, 000h
        00 00                 C	
-                             C	
  	 	 	 	endif
  	 	 	 	;RCgoff end
  	 	 	 	
  	 	 	 	;rc программа реконфигурации памяти и определения кол-ва памяти во всех подключенных платах памяти типа 1841
- 	 	 	 	;rc выполняется тест записью нулей и считывание (без проверки четности). В случае ошибки
- 	 	 	 	;rc происходит реконфигурация. В случае ошибки в первых 16k платы 2b0 или отсутствия порта система
- 	 	 	 	;rc останавливается. По итогам проверки в обл данных BIOS заполняется таблица tabl1 в формате:
+ 	 	 	 	;rc выполняется тест блоками по 16k записью 0xaa55 и считывание (без проверки четности). При успехе (совпадении)  
+ 	 	 	 	;rc 16k блок заполняется нулями и снова происходит считывание и проверка. 
+ 	 	 	 	;rc В случае ошибки в адресах 0..384k происходит реконфигурация.
+ 	 	 	 	;rc В случае ошибки в первых 16k платы 2b0 после реконфигурации или при отсутствии порта 2b0 система останавливается.
+ 	 	 	 	;rc В случае ошибки в 384...640k объем памяти сокращается без реконфигурации.
+ 	 	 	 	;rc  По итогам проверки в обл данных BIOS заполняется таблица tabl1 в формате:
  	 	 	 	;rc номер порта платы (2 байта), число исправных килобайт на плате (кратно 16k) (2 байта)
  	 	 	 	;rc число исправных килобайт на плате 2b0 заносится также в mem_siz в области данных BIOS.
  	 	 	 	;rc этим значением воспользуется ОС. 
  	 	 	 	;rc Интервал 512..640 разделяется всеми платами, т.е. если 2 платы по 512 типа 1841 и одна плата 128 типа 1840,
  	 	 	 	;rc то в tabl1 будет стоять 640k у обоих плат.
- 	 	 	 	;rc реконфигурация включается для ошибок в адресах 0..384k.
+ 	 	 	 	
+ 	 	 	 	;rc тестирование памяти здесь неполное (aa55 и нули). Основная плата 2b0 полностью тестируется дальше в e190
+ 	 	 	 	;rc IBM-ской программой stgtst. Дополнительные платы остаются нетестированными в полной мере. 
+ 	 	 	 	
  	 	 	 	 	assume	ds:abs0
  CFB2	 	 	 	ca0:                	 	 
  CFB2  E4 61	 	 	 	in	al,port_b
- CFB4  24 CF	 	 	 	and	al,0cfh	 	;rc 0b1100.1111	clear bit5 i/o ch err en, bit4 ram err en
+ CFB4  24 CF	 	 	 	and	al,0cfh	 	;rc 0b1100.1111	clear bit5 (i/o ch err off), bit4 (ram err off)
  CFB6  E6 61	 	 	 	out	port_b,al
  CFB8  33 C0	 	 	 	xor	ax,ax
  CFBA  8E D8	 	 	 	mov	ds,ax
  CFBC  8E C0	 	 	 	mov	es,ax
  CFBE  BA 0213	 	 	 	mov	dx,213h
  CFC1  B0 01	 	 	 	mov	al,01
- CFC3  EE	 	 	 	out	dx,al	   ; активизировать плату расширения rc установить сигнал EXT
+ CFC3  EE	 	 	 	out	dx,al	   ; активизировать плату расширения rc установить сигнал EXT, как и в IBM
  CFC4  BB 0000	 	 	 	mov	bx,0
  CFC7  BA 02B0	 	 	 	mov	dx,2b0h
- CFCA  EC	 	 	 	in	al,dx      	;rc читать главную плату 2b0
+ CFCA  EC	 	 	 	in	al,dx      	;rc читать регистр главной платы памяти 2b0
  CFCB  24 0C	 	 	 	and	al,0ch
  CFCD  3C 0C	 	 	 	cmp	al,0ch          ;rc все 1?
  CFCF  74 04	 	 	 	jz	ca1      
  CFD1  8B 1E 0472 R	 	 	mov	bx,res_fl
  CFD5  B0 0A	 	 	ca1:	mov	al,0ah
- CFD7  EE	 	 	 	out	dx,al           ;rc 0b0000.1010 разрешить запись, конф банк 01
+ CFD7  EE	 	 	 	out	dx,al           ;rc 0b0000.1010 - проверочный паттерн
  CFD8  EC	 	 	 	in	al,dx           ;rc читать порт обратно
  CFD9  24 0F	 	 	 	and	al,0fh          ;rc 0b0000.1111 только младшая тетрада
  CFDB  3C 0A	 	 	 	cmp	al,0ah          ;rc сравниваем с записаным
@@ -3131,16 +3143,16 @@
  D00C  A8 03	 	 	 	test	al,03	   ; реконфигурация была? rc0b0000.0011
  D00E  74 12	 	 	 	jz	ca6        ;rc 00 в младших разрядах означает, что реконфига не было
  	 	 	 	
- 	 	 	 	;--------------rc случай ошибки в первых 16k 2b0 - неустранимый
- D010	 	 	 	oshp:
- D010  8A D8	 	 	 	mov	bl,al	   ; была реконфигурация  rc или вообще нет платы 2b0 или память 1840
- D012  B0 89	 	 	 	mov	al,89h     ;rc 0b1000.1001
- D014  E6 63	 	 	 	out	63h,al     ;rc out cmd_port,al
+ 	 	 	 	;--------------rc случай ошибки в первых 16k 2b0, если реконфиг уже был - неустранимый
+ D010	 	 	 	oshp:                      ; была реконфигурация  rc или вообще нет платы 2b0 или память 1840
+ D010  8A D8	 	 	 	mov	bl,al
+ D012  B0 89	 	 	 	mov	al,89h     ;rc 0b1000.1001 установить порты A,B на вывод, порт C на ввод
+ D014  E6 63	 	 	 	out	cmd_port,al
  D016  B0 04	 	 	 	mov	al,04      ;rc 0b0000.0100
- D018  E6 60	 	 	ca5:	out	60h,al     ;rc out port_a,al	//rc вывод в порт A
+ D018  E6 60	 	 	ca5:	out	port_a,al  ;rc вывод в порт A!! чего никогда не бывает в IBM
  D01A  33 C9	 	 	 	xor	cx,cx
- D01C  E2 FE	 	 	ca4:	loop	ca4	   ;rc бесконечный цикл с выводом в порт A 03h(сбой 16k) и 04h... 
- 	 	 	 	 	 	 	   ;rc ...или прочтенного по 2b0(нет платы) и 04h
+ D01C  E2 FE	 	 	ca4:	loop	ca4	   ;rc бесконечный цикл с выводом в порт A кода реконфиг (если сбой 16k) и 04h... 
+ 	 	 	 	 	 	 	   ;rc ...или прочтенного по 2b0 (если нет платы) и 04h
  D01E  86 D8	 	 	 	xchg	bl,al
  D020  EB F6	 	 	 	jmp	ca5
  	 	 	 	;--------------rc конец ошибки
@@ -3170,7 +3182,7 @@
  D049  B0 0F	 	 	 	mov	al,0fh      ;rc зачем???? затрется же сразу
  D04B  26: 8B 05	 	 	mov	ax,es:[di]  ;rc ...и сразу читаем
  D04E  33 C1	 	 	 	xor	ax,cx       ;rc сравниваем с эталоном
- D050  75 1F	 	 	 	jnz	ca11        ;rc разночтение->нет памяти->ca11
+ D050  75 1F	 	 	 	jnz	ca11        ;rc разночтение->нет памяти или ошибка->ca11
  D052  B9 2000	 	 	 	mov	cx,2000h
  D055  F3/ AB	 	 	 	rep	stosw       ;rc есть память->затрем очередные 16k нулями (ax=00 будет при идентичности с эталоном)
  D057  B9 2000	 	 	 	mov	cx,2000h
@@ -3187,7 +3199,7 @@
  	 	 	 	 	 	 	;rc здесь мы в случае отсутствия очередных 16k или обнаружения сбоя в очередных 16k
  D071  80 FE 60	 	 	ca11:	cmp	dh,60h     ;rc сравниваем адрес сегмента с 384K
  D074  73 1E	 	 	 	jnb	ca12       ;rc адрес >=384 ->ca12
- D076  8B D5	 	 	 	mov	dx,bp	   ; адрес меньше 512К  rc ошибка в комментарии!! должно было стоять меньше 384k
+ D076  8B D5	 	 	 	mov	dx,bp	   ; адрес меньше 512К  rc ошибка в заводском комментарии!! должно было стоять меньше 384k
  D078  EC	 	 	 	in	al,dx      ;rc читаем порт платы
  D079  A8 03	 	 	 	test	al,03      ;rc была реконфигурация?
  D07B  75 17	 	 	 	jnz	ca12       ;rc если реконфигурация была или порт отсутствует ->ca12
@@ -3256,14 +3268,14 @@
  	 	 	 	;
  	 	 	 	;
  	 	 	 	;-------rc программа ниже частично основана на IBM-ской e19, причем от XTBIOS.ASM (с печатью)
- 	 	 	 	;	взял оттуда комментарии
+ 	 	 	 	;	взял оттуда комментарии. Обработка ошибки (реконфигурация, ea1) - оригинальная минская.
  	 	 	 	;
  	 	 	 	 	assume cs:code,ds:data
  D0EB  1E	 	 	e190:	push	ds
  D0EC  B8 0010	 	 	 	mov	ax,16
  D0EF  81 3E 0072 R 1234	 	cmp	reset_flag,1234h
  D0F5  75 03	 	 	 	jnz	e20a
- D0F7  E9 E3BB R	 	 	jmp	e22	 	 	;rc при перезарузке просто выход
+ D0F7  E9 E3BB R	 	 	jmp	e22	 	 	;rc при горячей перезарузке просто выход (пропуск теста)
  D0FA  B8 0010	 	 	e20a:	mov	ax,16                   ; STARTING AMT. OF MEMORY OK   
  D0FD  EB 25	 	 	 	jmp	short prt_siz           ; POST MESSAGE                 
  D0FF  8B 1E 0013 R	 	e20b:	mov	bx,memory_size          ; GET MEM. SIZE WORD    
@@ -3351,8 +3363,10 @@
  D19E  58	 	 	ea1:	pop	ax      	 	;rc случай неустранимой ошибки
  D19F  8B D3	 	 	 	mov	dx,bx
  D1A1  5B	 	 	 	pop	bx
- D1A2  89 1E 00E2 R	 	 	mov	tabl+2,bx	 	;rc записываем адрес сбоя в таблицу tabl
+ D1A2  89 1E 00E2 R	 	 	mov	tabl+2,bx	 	;rc записываем новое число исправных кб платы 2b0 в таблицу tabl
  D1A6  89 1E 0013 R	 	 	mov	memory_size,bx	 	;rc сокращаем память, доступную ОС
+ 	 	 	 	;rc------------------rc tabl и tabl1, так же как и mem_siz и memory_size, указывают на одни и те же места в ОЗУ, 
+ 	 	 	 	;rc------------------rc просто tabl и memory_size в сегменте обл данных BIOS (40h), а tabl1 и mem_siz в сегменте 0h
  D1AA  50	 	 	 	push	ax
  D1AB  B0 0A	 	 	 	mov	al,10 	 	 	;rc печатаем перевод строки
  D1AD  E8 D1B4 R	 	 	call	prt_hex
