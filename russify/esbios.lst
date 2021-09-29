@@ -84,7 +84,9 @@
  	 	 	 	
  	 	 	 	
  	 	 	 	;ESBIOS9b - улучшены комментарии в реконфигураторе памяти, 
- 	 	 	 	;улучшен обработчик int10,ax1103
+ 	 	 	 	;добавлено переключение между основной и альт
+ 	 	 	 	;кодовыми таблицами по Ctrl-ИНФ.
+ 	 	 	 	;Улучшен обработчик int10,ax1103
  	 	 	 	; - в idnpol пишется идентификатор таблицы (содержимое BL) 
  	 	 	 	;29.09.2020 (24.09.21 - изменения для UTF-8)
  	 	 	 	
@@ -6747,8 +6749,8 @@
  EAF7  58	 	 	 	pop	ax
  EAF8  CF	 	 	 	iret
  	 	 	 	
- EAF9  B8 A000	 	 	k307:	mov	ax,0a000h	 	 	;rc клавиша ИНФ
- EAFC  E9 E71B R	 	 	jmp	k57
+ EAF9  B8 A000	 	 	k307:	mov	ax,0a000h	 	 	;rc клавиша ИНФ, расширенный скан-код
+ EAFC  E9 F905 R	 	 	jmp	inf_rc	 	    ;rc обработаем смену кодовой таблицы, если Ctrl-Инф
  	 	 	 	
  	 	 	 	
  	 	 	 	;---
@@ -9710,6 +9712,50 @@
  	 	 	 	;k89a:	add	al,01h
  	 	 	 	; 	jmp	k61
  	 	 	 	;endif
+ 	 	 	 	
+ 	 	 	 	
+ 	 	 	 	;RCgoff - в версии 9 здесь, на освобожденном от обработчиков capslock месте, 
+ 	 	 	 	;rc размещается обработчик ИНФ.
+ 	 	 	 	;rc отлавливается нажатие CTRL-ИНФ
+ 	 	 	 	;rc по такому нажатию происходит перезагрузка знакогенератора
+ 	 	 	 	;rc т.е. если была таблица 866, ставится основная ГОСТ, и наоборот.
+ 	 	 	 	;rc используется подфункция 1103h, модифицированная rc - 
+ 	 	 	 	;rc в id пользователя idnpol 40:90 заносится код таблицы.
+ 	 	 	 	;rc Эта idnpol используется как флажок для CTRL-ИНФ
+ 	 	 	 	
+ F905	 	 	 	inf_rc:
+ F905  50	 	 	 	push	ax
+ F906  F6 06 0017 R 04	 	 	test	kb_flag,ctl_shift
+ F90B  74 26	 	 	        jz	inf_ret 	 	;rc нет CTRL - обрабатываем ИНФ как обычно
+ F90D  A1 0090 R	 	 	mov	ax,idnpol	 	;rc грузим ид табл пользователя
+ F910  35 0802	 	 	 	xor	ax,0802h	 	;rc должен получиться инвертированный id в al
+ F913  A9 0FFD	 	 	 	test	ax,0ffdh	 	;rc если биты, кроме 1-го, равны 1, значит id или байт/симв не 0800,0802
+ F916  75 1B	 	 	 	jnz	inf_ret	 	 	;rc в этом случае выходим, ничего не меняя
+ F918  1E	 	 	 	push	ds                      ;rc если id и байт/симв ок, уст int 1fh на новую таблицу (для граф режимов)
+ F919  53	 	 	 	push	bx
+ F91A  33 DB	 	 	 	xor	bx,bx
+ F91C  8E DB	 	 	 	mov	ds,bx	 	 	;rc уст ds на табл вект прерыв
+ F91E  02 D8	 	 	 	add	bl,al	 	 	;rc играет роль пересылки, но с установкой флагов (bl=0)
+ 	 	 	 	
+ 	 	 	 	
+ 	 	 	 	;rc	jz	set866
+ 	 	 	 	;rc	mov	ax,offset crt_char_iso
+ 	 	 	 	
+ F920  D1 E3	 	 	        shl	bx,1
+ F922  2E: 8B 87 D453 R	 	 	mov	ax,cs:[offset charpg+bx]
+ F927  D1 EB	 	 	 	shr	bx,1
+ 	 	 	 	
+ F929  A3 007C	 	 	p866ret:mov	ds:7ch,ax	 	;rc 7ch суть адрес вектора 1fh, через 1fh*4 не работает
+ F92C  1F	 	 	 	pop	ds                      ;rc восст ds на обл данных ПЗУ
+ F92D  B8 1103	 	 	 	mov	ax,1103h	 	;rc функция загрузки верхней половины знакогенератора
+ F930  CD 10	 	 	 	int	10h
+ F932  5B	 	 	 	pop	bx
+ F933  58	 	 	inf_ret:pop	ax	 	 	;rc обычная обработка ИНФ (0a00 расширенный код уже записан в k307)
+ F934  E9 E71B R	 	 	jmp	k57    	 	 	
+ 	 	 	 	
+ 	 	 	 	;rc set866:	mov	ax,offset crt_char_866
+ 	 	 	 	;rc	jmp	short p866ret
+ 	 	 	 	
  F938	 	 	 	 	org	0f938h
  	 	 	 	;RCgoff end
  	 	 	 	
@@ -10691,6 +10737,8 @@ HF_TBL_VEC . . . . . . . . . . .	L DWORD	0104	ABS0
 HOLD_STATE . . . . . . . . . . .	Number	0008	
 IDNPOL . . . . . . . . . . . . .	L WORD 	0090	DATA
 INF_KEY. . . . . . . . . . . . .	Number	0059	
+INF_RC . . . . . . . . . . . . .	L NEAR 	F905	CODE
+INF_RET. . . . . . . . . . . . .	L NEAR 	F933	CODE
 INIT_DRV . . . . . . . . . . . .	N PROC	C427	CODE	Length =001D
 INIT_DRV_CMD . . . . . . . . . .	Number	000C	
 INIT_DRV_OUT . . . . . . . . . .	L NEAR 	C443	CODE
@@ -10977,6 +11025,7 @@ P6 . . . . . . . . . . . . . . .	L NEAR 	F3E8	CODE
 P7 . . . . . . . . . . . . . . .	L NEAR 	F3F3	CODE
 P7T. . . . . . . . . . . . . . .	L NEAR 	C093	CODE
 P8 . . . . . . . . . . . . . . .	L NEAR 	F3FA	CODE
+P866RET. . . . . . . . . . . . .	L NEAR 	F929	CODE
 P8T. . . . . . . . . . . . . . .	L NEAR 	C0B1	CODE
 P9 . . . . . . . . . . . . . . .	L NEAR 	F400	CODE
 P9T. . . . . . . . . . . . . . .	L NEAR 	C09D	CODE
@@ -11254,7 +11303,7 @@ ZGR. . . . . . . . . . . . . . .	L NEAR 	CB07	CODE
 ZNAK . . . . . . . . . . . . . .	L NEAR 	CAE3	CODE
 ZW . . . . . . . . . . . . . . .	L WORD 	0000	ABS0
 
-12092 Bytes free   
+11948 Bytes free   
 
 Warning Severe
 Errors	Errors 
