@@ -1,3 +1,6 @@
+;This source code made by Gleb Larionov, Prague.
+;Changed by Leonid Yadrennikov, Tyumen.
+;v1 - 04.10.2021 - ros_checksum removed
 ;___________________	 	 	 	
 ; v4 - ??/??/???? (Other version than 24/04/1981) новая клавиатура
  PAGE 55,120
@@ -596,15 +599,16 @@ c25:
  	mov	es:nmi_ptr+2,cod
  	jmp	short tst6	;переход к следующему тесту
 
-ros_checksum proc  near
- 	mov	cx,8192 	;число байт для сложения
- 	xor	al,al
-c26:	add	al,cs:[bx]
- 	inc	bx	 	;указание следующего байта
- 	loop	c26	 	;сложить все байты в модуле ROS
- 	or	al,al	 	;сумма = 0 ?
- 	ret
-ros_checksum endp
+;ros_checksum proc  near
+; 	mov	cx,8192 	;число байт для сложения
+; 	xor	al,al
+;c26:	add	al,cs:[bx]
+; 	inc	bx	 	;указание следующего байта
+; 	loop	c26	 	;сложить все байты в модуле ROS
+; 	or	al,al	 	;сумма = 0 ?
+; 	ret
+;ros_checksum endp
+	org	0e20bh
 ;______________________
 ;   Начальный тест надежности
 ;______________________
