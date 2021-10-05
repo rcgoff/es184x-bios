@@ -1,6 +1,6 @@
 ;This source code made by Gleb Larionov, Prague.
 ;Changed by Leonid Yadrennikov, Tyumen.
-;v1 - 04.10.2021 - ros_checksum removed
+;v1 - 05.10.2021 - ros_checksum removed, ES1841 memory switching-on added
 ;___________________	 	 	 	
 ; v4 - ??/??/???? (Other version than 24/04/1981) новая клавиатура
  PAGE 55,120
@@ -505,6 +505,12 @@ c18:	 	 	 	;выбор следующего регистра ПДП
  	out	dma+0bh,al
  	mov	al,43h	 	;уст режим для канала 3
  	out	dma+0bh,al
+;======================================RCgoff begin
+;-----------------turn ES1841 memory on, if present
+		mov dx,2b0h
+		mov al,0ch			;0b0000.1100 - turn RD,WD on, no reconfig
+		out dx,al
+;======================================RCgoffg end
 		mov	ax, dat
 		mov	ds, ax
 		
