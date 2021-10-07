@@ -53,11 +53,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
      48					     org     10h*4
      49	0040			     video_int label word
      50					     org     13h*4
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 2
-1840v4.asm
-
-
-
      51	004C			     org_vector	 label	dword
      52					     org     19h*4
      53	0064			     boot_vec  label  dword
@@ -108,11 +103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
      98
      99
     100
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 3
-1840v4.asm
-
-
-
     101	0008  04*(????)		     printer_base dw 4 dup(?)
     102
     103
@@ -163,11 +153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     148
     149	      =0045		     num_key equ     69
     150	      =0046		     scroll_key	equ  70
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 4
-1840v4.asm
-
-
-
     151	      =0038		     alt_key equ     56
     152	      =001D		     ctl_key equ     29
     153	      =0056		     caps_key equ    86
@@ -218,11 +203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     198				     ;	Область данных ЭЛИ
     199				     ;_____________________
     200	0049  ??		     crt_mode db     ?
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 5
-1840v4.asm
-
-
-
     201	004A  ????		     crt_cols dw     ?
     202	004C  ????		     crt_len  dw     ?
     203	004E  ????		     crt_start dw    ?
@@ -273,11 +253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     248					     org     3ff0h
     249	3FF0			     tmp_tos label   word
     250				     ;
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 6
-1840v4.asm
-
-
-
     251	3FF0			     data    ends
     252
     253				     ;___________________
@@ -328,11 +303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     298	E02A			     c2a:
     299	E02A  4F				     dec     di
     300	E02B  FD				     std
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 7
-1840v4.asm
-
-
-
     301
     302	E02C			     c2b:
     303	E02C  8B F7				     mov     si, di
@@ -383,11 +353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     348				     считывания-записи
     349				     ;	     общих	и сегментных	регистров.
     350				     ;_____________________________________
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 8
-1840v4.asm
-
-
-
     351	E05B			     reset   label   near
     352	E05B  FA		     start:  cli		     ; сброс признака разрешения+
     353				     прерывания
@@ -438,11 +403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     398	E0AB			     c9:
     399	E0AB  0B C7			     or	     ax,di	     ;нулевым шаблоном все	       +
     400				     регистры проверены ?
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 9
-1840v4.asm
-
-
-
     401	E0AD  74 02			     jz	     c10	     ;ДА - переход к следующему    +
     402				     тесту
     403	E0AF  EB AA		     err01:  jmp   short  start
@@ -493,11 +453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     448	E0DF  B0 54			     mov     al,54h	     ;выбор таймера	1,LSB, режим 2
     449	E0E1  E6 43			     out     timer+3,al
     450	E0E3  2B C9			     sub     cx,cx
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 10
-1840v4.asm
-
-
-
     451	E0E5  8A D9			     mov     bl,cl
     452	E0E7  8A C1			     mov     al,cl	     ;уст начального счетчика     +
     453				     таймера в 0
@@ -548,11 +503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     498	E120  B9 0008			     mov     cx,8	     ;уст цикла	счетчика
     499	E123  BA 0000			     mov     dx,dma	     ;уст адреса регистра порта  +
     500				     ввода/вывода
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 11
-1840v4.asm
-
-
-
     501	E126  EE		     c17:    out     dx,al	     ;запись  шаблона в регистр
     502	E127  EE			     out     dx,al	     ;старшие 16	бит регистра
     503	E128  B8 0101			     mov     ax,0101h	     ;изменение AX перед		       +
@@ -603,11 +553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     548	E15E  EE				     out dx,al
     549				     ;======================================RCgoffg end
     550	E15F  B8 0040				     mov     ax, dat
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 12
-1840v4.asm
-
-
-
     551	E162  8E D8				     mov     ds, ax
     552
     553	E164  8B 1E 0072r			     mov     bx, ds:reset_flag
@@ -658,11 +603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     598	E1B5  BC 3FF0r				     mov     sp, offset	tmp_tos
     599	E1B8  8E D0				     mov     ss, ax
     600	E1BA  8B F8				     mov     di, ax
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 13
-1840v4.asm
-
-
-
     601	E1BC  BB 0024				     mov     bx, 9*4	     ; int 9 (KBD)
     602	E1BF  C7 07 E2A8r			     mov     word ptr [bx], offset d11
     603	E1C3  43				     inc     bx
@@ -713,11 +653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     648				     ;	     mov     cx,8192	     ;число байт для сложения
     649				     ;	     xor     al,al
     650				     ;c26:   add     al,cs:[bx]
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 14
-1840v4.asm
-
-
-
     651				     ;	     inc     bx		     ;указание следующего байта
     652				     ;	     loop    c26	     ;сложить все байты в модуле +
     653				     ROS
@@ -768,11 +703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     698	E246  E6 21			     out     inta01,al	     ;запись в IMR
     699	E248  E4 21			     in	     al,inta01	     ;считывание IMR
     700	E24A  04 01			     add     al,1	     ;все биты IMR установлены ?
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 15
-1840v4.asm
-
-
-
     701	E24C  75 21			     jnz     d6		     ;НЕТ - в программу ошибок
     702
     703				     ;	 Контроль ожидания прерывания
@@ -823,11 +753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     748	E281  E6 43			     out     tim_ctl,al	 ;записать регистр режима	       +
     749				     управления таймера
     750	E283  B1 16			     mov     cl,16h	     ; уст счетчик программного  +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 16
-1840v4.asm
-
-
-
     751				     цикла
     752	E285  8A C1			     mov     al,cl	     ; установить счетчик	       +
     753				     таймера 0
@@ -878,11 +803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     798	E2B8  A8 40			     test    al,40h	     ; ошибка паритета при	       +
     799				     вводе/выводе ?
     800	E2BA  74 08			     jz	     d12	     ; да - признак сбрасывается  +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 17
-1840v4.asm
-
-
-
     801				     в	0
     802	E2BC  BE E20Br			     mov     si,offset d1    ; адрес поля сообщения об     +
     803				     ошибке
@@ -933,11 +853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     848				     в	память
     849
     850				     ;	 Установка таймера 0 в	режим 3
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 18
-1840v4.asm
-
-
-
     851
     852	E2EC  B0 FF			     mov     al,0ffh
     853	E2EE  E6 21			     out     inta01,al
@@ -988,11 +903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     898	E323  80 FC 20			     cmp     ah,20h	     ; режим 80х25 установлен ?
     899	E326  75 02			     jne     e8		     ; нет -	уст режим для 40х25
     900	E328  B0 03			     mov     al,3	     ; установить режим 80х25
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 19
-1840v4.asm
-
-
-
     901	E32A			     e8:
     902	E32A  50			     push    ax		     ; хранить режим ЭЛИ	в стеке
     903	E32B  2A E4			     sub     ah,ah	     ;
@@ -1043,11 +953,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     948	E36B  B4 00			     mov     ah,0
     949	E36D  CD 10			     int     10h
     950	E36F  B8 7020			     mov     ax,7020h	     ; запись пробелов в	режиме   +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 20
-1840v4.asm
-
-
-
     951				     реверса
     952	E372  2B FF			     sub     di,di	     ; установка начала области
     953	E374  B9 0028			     mov     cx,40	     ;
@@ -1098,11 +1003,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
     998	E3A1  D2 EC			     shr     ah,cl
     999	E3A3  75 E4			     jnz     e12
    1000	E3A5  EB 06			     jmp     short e18	     ; отобразить курсор на	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 21
-1840v4.asm
-
-
-
    1001				     экране
    1002				     ;
    1003				     ;	     Сообщение	об ошибке конттроллера СМ607
@@ -1153,11 +1053,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1048	E3DA  D2 E8			     shr     al,cl	     ;
    1049	E3DC  E8 0023			     call    xlat_print_cod  ; преобразование и печать    +
    1050				     кода
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 22
-1840v4.asm
-
-
-
    1051	E3DF  8A C6			     mov     al,dh
    1052	E3E1  24 0F			     and     al,0fh
    1053	E3E3  E8 001C			     call    xlat_print_cod  ; преобразование и печать    +
@@ -1208,11 +1103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1098				     ;_______________________
    1099
    1100					     assume  cs:code,ds:data
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 23
-1840v4.asm
-
-
-
    1101	E411  20 33 30 31	     f1	     db	     ' 301'
    1102	      =0004		     f1l     equ     4h		     ; сообщение клавиатуры
    1103	E415  31 33 31		     f2	     db	     '131'
@@ -1263,11 +1153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1148				     тестирования
    1149	E452  8A E8			     mov     ch,al	     ; сохранить код		       +
    1150				     сканирования
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 24
-1840v4.asm
-
-
-
    1151	E454  B1 04			     mov     cl,4
    1152	E456  D2 E8			     shr     al,cl
    1153	E458  E8 FFA7			     call    xlat_print_cod  ; преобразование и печать
@@ -1318,11 +1203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1198				     НГМД,
    1199	E492  E6 21			     out     inta01,al	     ; клавиатуры и таймера
    1200	E494  B4 00			     mov     ah,0	     ; сброс контроллера НГМД
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 25
-1840v4.asm
-
-
-
    1201	E496  CD 13			     int     13h	     ; переход к сбросу НГМД
    1202	E498  F6 C4 FF			     test    ah,0ffh	     ; состояние верно ?
    1203	E49B  75 20			     jnz     f13	     ; нет -	сбой устройства
@@ -1373,11 +1253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1248				     ;	 адаптера стыка С2, если устройства		       +
    1249				     подключены
    1250
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 26
-1840v4.asm
-
-
-
    1251	E4CC			     f15:
    1252	E4CC  83 FD 00			     cmp     bp,0000h
    1253	E4CF  74 18			     jz	     dal
@@ -1428,11 +1303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1298				     адаптера 1	стыка С2
    1299	E524  B0 8A			     mov     al,8ah
    1300	E526  EE			     out     dx,al
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 27
-1840v4.asm
-
-
-
    1301	E527  BA 02FF			     mov     dx,2ffh
    1302	E52A  EE			     out     dx,al
    1303	E52B  BA 03FC			     mov     dx,3fch
@@ -1483,11 +1353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1348	E570  E9 140D				     jmp     f20a
    1349	E573  90				     nop
    1350
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 28
-1840v4.asm
-
-
-
    1351	E574			     f20b:
    1352	E574  BA 0001				     mov     dx, 1
    1353	E577  E8 0006			     call    err_beep	     ; переход к подпрограмме      +
@@ -1538,11 +1403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1398				     ;	 Подпрограмма звукового сигнала
    1399
    1400	E5A9			     beep    proc    near
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 29
-1840v4.asm
-
-
-
    1401	E5A9  B0 B6			     mov     al,10110110b    ; таймер 2,младший и	старший +
    1402				     счет-
    1403								     ; чики, двоичный счет
@@ -1593,11 +1453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1448				     прерывания
    1449	E5E1  B4 00			     mov     ah,0
    1450	E5E3  2B C9			     sub     cx,cx	     ; уст счетчика ожидания	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 30
-1840v4.asm
-
-
-
    1451				     прерываний
    1452	E5E5  F6 C4 FF		     g9:     test    ah,0ffh	     ; прерывание клавиатуры       +
    1453				     возникло ?
@@ -1648,11 +1503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1498	E613  1E				     push    ds
    1499	E614  B8 0010				     mov     ax, 16
    1500	E617  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 31
-1840v4.asm
-
-
-
    1501	E61D  75 03				     jnz     e20a
    1502	E61F  E9 FDDD				     jmp     e22
    1503
@@ -1703,11 +1553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1548	E669  BE E69Fr				     mov     si, offset	e300 ; " Kb OK\r"
    1549
    1550	E66C			     kb_ok:
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 32
-1840v4.asm
-
-
-
    1551	E66C  2E: 8A 04				     mov     al, cs:[si]
    1552	E66F  46				     inc     si
    1553	E670  E8 0025				     call    prt_hex
@@ -1758,11 +1603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1598	E6CA  08 00			     db	     08h,0
    1599	E6CC  B9 C6 C3 BA B5 BD	B3+	     db	     0b9h,0c6h,0c3h,0bah,0b5h,0bdh,0b3h,0c8h
    1600	      C8
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 33
-1840v4.asm
-
-
-
    1601
    1602	E6D4  C9 B7 B6 CD 0D FF	C4+	     db	     0c9h,0b7h,0b6h,0cdh,0dh,-1,0c4h,0cbh
    1603	      CB
@@ -1813,11 +1653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1648	E704  B9 0004			     mov     cx,4	     ; установить счетчик	       +
    1649				     повторений
    1650	E707			     h1:			     ; первоначальная загрузка
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 34
-1840v4.asm
-
-
-
    1651	E707  51			     push    cx		     ; сохранить счетчик	       +
    1652				     повторений
    1653	E708  B4 00			     mov     ah,0	     ; сброс НГМД
@@ -1868,11 +1703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1698				     ;-----------------------
    1699	E72F			     nec_output	proc near
    1700	E72F  52			     push    dx		     ; сохранить регистры
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 35
-1840v4.asm
-
-
-
    1701	E730  51			     push    cx
    1702	E731  BA 03F4			     mov     dx,03f4h	     ; состояние порта
    1703	E734  33 C9			     xor     cx,cx	     ; счетчик времени вывода
@@ -1923,11 +1753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1748				     ;	  AH=0 - считать	следующий символ
    1749				     ;		  из буфера.При выходе	код
    1750				     ;		  сканирования в AH,код
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 36
-1840v4.asm
-
-
-
    1751				     ;		  ASCII	в AL.
    1752				     ;	 AH=1 -	установить ZF, если код
    1753				     ;		  ASCII	прочитан:
@@ -1978,11 +1803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1798				     ; распределенной области памяти	с адресом      +
    1799				     00418H, и	флажки
    1800				     ; ДОП, УПР, левое переключение регистра,	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 37
-1840v4.asm
-
-
-
    1801				     правое переключение
    1802				     ; регистра, Р/Л устанавливаются по нажатию      +
    1803				     клавиш и сбрасываются
@@ -2033,11 +1853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1848	E78D  3C 3B			     cmp     al,59
    1849	E78F  72 05			     jb	     k55
    1850	E791  B0 00			     mov     al,0
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 38
-1840v4.asm
-
-
-
    1851	E793  EB 0F				     jmp     short k57
    1852	E795  90				     nop
    1853
@@ -2088,11 +1903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1898
    1899	E7D5			     k60:
    1900	E7D5  3C 61			     cmp     al,'a'
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 39
-1840v4.asm
-
-
-
    1901	E7D7  72 06			     jb	     k61
    1902	E7D9  3C 7A			     cmp     al,'z'
    1903	E7DB  77 02			     ja	     k61
@@ -2143,11 +1953,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1948				     ASCII
    1949	E83E  FE CC			     dec     ah			  ; AH=2
    1950	E840  74 2D			     jz	     k3		  ; переход к получению байта    +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 40
-1840v4.asm
-
-
-
    1951				     состояния
    1952	E842  5B			     pop     bx			  ; восстановить регистр
    1953	E843  1F			     pop     ds
@@ -2198,11 +2003,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    1998
    1999	E86F			     k3:
    2000	E86F  A0 0017r			     mov     al,kb_flag	     ; получить	младший байт	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 41
-1840v4.asm
-
-
-
    2001				     состояния	    на
    2002	E872  5B			     pop     bx		     ; восстановить	регистр
    2003	E873  1F			     pop     ds		     ; восстановить	сегмент
@@ -2253,11 +2053,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2048	      FF
    2049
    2050	E8C1  20 FF			     db	     ' ',-1
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 42
-1840v4.asm
-
-
-
    2051
    2052				     ;	 Таблица	кодов сканирования при нажатой      +
    2053				     клавише УПР для
@@ -2308,11 +2103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2098	E925  51 57 45 52 54 59	55+	     db	     'QWERTYUIOP',-1,-1,0dh,-1
    2099	      49 4F 50 FF FF 0D	FF
    2100
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 43
-1840v4.asm
-
-
-
    2101
    2102	E933  41 53 44 46 47 48	4A+	     db	     'ASDFGHJKL'
    2103	      4B 4C
@@ -2363,11 +2153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2148	E97E  09*(00)				     db	9 dup(0)
    2149
    2150				     ;----INT 9--------------------------
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 44
-1840v4.asm
-
-
-
    2151				     ;
    2152				     ;	  Программа обработки	прерывания		       +
    2153				     клавиатуры
@@ -2418,11 +2203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2198	E9A6  8A E0			     mov     ah,al	    ; и сохранить его в AH
    2199
    2200				     ;---
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 45
-1840v4.asm
-
-
-
    2201
    2202	E9A8  3C FF			     cmp     al,0ffh  ;	сравнение с кодом заполнения  +
    2203				     буфера
@@ -2473,11 +2253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2248	E9F2  83 FF 0B			     cmp     di,0bh
    2249	E9F5  74 17			     je	     k401
    2250	E9F7  F6 06 0018r 04		     test    kb_flag_1,inv_shift
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 46
-1840v4.asm
-
-
-
    2251	E9FC  74 08			     jz	     k400
    2252	E9FE  80 0E 0018r 01		     or	     kb_flag_1,lat_shift
    2253	EA03  EB 43				     jmp     short k26a
@@ -2528,11 +2303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2298	EA5B  74 03			     jz	     k19
    2299	EA5D  EB 6D				     jmp     short k25
    2300	EA5F  90				     nop
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 47
-1840v4.asm
-
-
-
    2301	EA60  F6 06 0017r 20	     k19:    test    kb_flag,num_state	; опрос клавиши ЦИФ
    2302	EA65  75 0D			     jnz     k21
    2303	EA67  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift ; опрос клавиш	       +
@@ -2583,11 +2353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2348	EAB6  B4 00			     mov     ah,0
    2349	EAB8  88 26 0019r		     mov     alt_input,ah
    2350	EABC  3C 00			     cmp     al,0
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 48
-1840v4.asm
-
-
-
    2351	EABE  74 2B			     je	     k26
    2352	EAC0  E9 FCEA			     jmp     k58
    2353
@@ -2638,11 +2403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2398	EB04  75 03			     jnz     k29
    2399	EB06  EB 6D				     jmp     short k38
    2400	EB08  90				     nop
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 49
-1840v4.asm
-
-
-
    2401
    2402				     ;---
    2403
@@ -2693,11 +2453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2448	EB4C  F2> AE				     repne scasb
    2449	EB4E  75 05			     jne     k34
    2450	EB50  B0 00			     mov     al,0
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 50
-1840v4.asm
-
-
-
    2451	EB52  E9 FC4F			     jmp     k57
    2452
    2453				     ;---
@@ -2748,11 +2503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2498	EB9A  75 21			     jne     k41
    2499	EB9C  80 0E 0018r 08		     or	     kb_flag_1,hold_state
    2500	EBA1  B0 20			     mov     al,eoi
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 51
-1840v4.asm
-
-
-
    2501	EBA3  E6 20			     out     020h,al
    2502
    2503				     ;---
@@ -2803,11 +2553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2548	EBE9  E9 FBB8			     jmp     k57
    2549
    2550	EBEC			     k54a:
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 52
-1840v4.asm
-
-
-
    2551	EBEC  E9 FB9E			     jmp k54
    2552
    2553	EBEF			     k45:
@@ -2858,11 +2603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2598	EC37  B8 4A2D		     k50:    mov     ax,74*256+'-'
    2599	EC3A  E9 FB67			     jmp      k57
    2600
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 53
-1840v4.asm
-
-
-
    2601	EC3D  B8 4E2B		     k51:    mov     ax,78*256+'+'
    2602	EC40  E9 FB61			     jmp      k57
    2603
@@ -2913,11 +2653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2648				     ;	  AL - количество секторов (1-8,			       +
    2649				     неконтролируемое значение).
    2650				     ;
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 54
-1840v4.asm
-
-
-
    2651				     ;	  Для выполнения форматизации необходимо    +
    2652				     сформировать в
    2653				     ; памяти четырехбайтную таблицу	для каждого  +
@@ -2968,11 +2703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2698	EC5A  53			     push    bx		     ; сохранить адрес
    2699	EC5B  51			     push    cx
    2700	EC5C  1E			     push    ds		; сохранить сегментное	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 55
-1840v4.asm
-
-
-
    2701				     значение регистра
    2702	EC5D  56			     push    si		; сохранить все регистры во      +
    2703				     время	операции
@@ -3023,11 +2753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2748	ECA8  E9 0096			     jmp     disk_write
    2749	ECAB			     j2:
    2750	ECAB  FE CC			     dec     ah		     ; AH=4
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 56
-1840v4.asm
-
-
-
    2751	ECAD  74 68			     jz	     disk_verf
    2752	ECAF  FE CC			     dec     ah		     ; AH=5
    2753	ECB1  74 68			     jz	     disk_format
@@ -3078,11 +2803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2798	ECED  3C C0			     cmp     al,0c0h	; проверка готовности		       +
    2799				     устройства для передачи
    2800	ECEF  74 07			     jz	     j7		     ; устройство готово
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 57
-1840v4.asm
-
-
-
    2801	ECF1  80 0E 0041r 20		     or	     diskette_status,bad_nec  ;	уст код ошибки
    2802	ECF6  EB 11			     jmp     short j8
    2803
@@ -3133,11 +2853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2848				     ;	 Форматизация (AH=5)
    2849
    2850	ED1B			     disk_format proc near
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 58
-1840v4.asm
-
-
-
    2851	ED1B  80 0E 003Fr 80		     or	     motor_status,80h  ; индикация операции	       +
    2852				     записи
    2853	ED20  B0 4A			     mov     al,04ah	       ; установить команду
@@ -3188,11 +2903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2898	ED58  51			     push    cx
    2899	ED59  8A CA			     mov     cl,dl	     ; уст номер устройства, как  +
    2900				     счетчик сдвига
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 59
-1840v4.asm
-
-
-
    2901	ED5B  B0 01			     mov     al,1	     ; маска для определения	       +
    2902				     мотора устройства
    2903	ED5D  D2 E0			     sal     al,cl	     ; сдвиг
@@ -3243,11 +2953,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2948	EDA4  E2 FE		     j13:    loop    j13	     ; ожидать требуемое время
    2949	EDA6  FE CC			     dec     ah		     ; уменьшеть значение	       +
    2950				     времени
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 60
-1840v4.asm
-
-
-
    2951	EDA8  EB F6			     jmp     short j12	     ; повторить цикл
    2952
    2953	EDAA			     j14:
@@ -3298,11 +3003,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    2998	EDF0  BB 000B			     mov     bx,11
    2999	EDF3  E8 005B			     call    get_parm
    3000	EDF6  BB 000D			     mov     bx,13
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 61
-1840v4.asm
-
-
-
    3001	EDF9			     j16:
    3002	EDF9  E8 0055			     call    get_parm
    3003	EDFC  5E			     pop     si
@@ -3353,11 +3053,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3048	EE37  D0 E0			     sal     al,1
    3049	EE39  B4 02			     mov     ah,bad_addr_mark
    3050	EE3B  72 02			     jc	     j19
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 62
-1840v4.asm
-
-
-
    3051
    3052				     ;	 Контроллер вышел из строя
    3053
@@ -3408,11 +3103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3098				     выход
    3099	EE63  C3			     ret	     ; возврат к программе, вызвавшей+
    3100				     прерывание
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 63
-1840v4.asm
-
-
-
    3101	EE64  E9 F8C8		     nec_op: jmp     nec_output
    3102	EE67			     get_parm endp
    3103				     ;----------------------------
@@ -3463,11 +3153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3148	EE95  B4 0F			     mov     ah,0fh
    3149	EE97  E8 F895			     call    nec_output
    3150	EE9A  8A E2			     mov     ah,dl	     ; номер устройства
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 64
-1840v4.asm
-
-
-
    3151	EE9C  E8 F890			     call    nec_output
    3152	EE9F  8A E5			     mov     ah,ch	     ; номер дорожки
    3153	EEA1  90				     nop
@@ -3518,11 +3203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3198	EEC9  51			     push    cx		     ; сохранить регистр
    3199	EECA  E6 0C			     out     dma+12,al
    3200	EECC  E6 0B			     out     dma+11,al	     ; вывод байта состояния
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 65
-1840v4.asm
-
-
-
    3201	EECE  8C C0			     mov     ax,es	     ; получить	значение ES
    3202	EED0  B1 04			     mov     cl,4	     ; счетчик для сдвига
    3203	EED2  D3 C0			     rol ax,cl		     ; циклический сдвиг влево
@@ -3573,11 +3253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3248	EF09  59			     pop     cx		     ; восстановить	регистр
    3249	EF0A  B0 02			     mov     al,2	     ; режим для 8237
    3250	EF0C  E6 0A			     out     dma+10,al	     ; инициализация канала НГМД
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 66
-1840v4.asm
-
-
-
    3251	EF0E  C3			     ret	     ; возврат к программе, вызвавшей+
    3252				     прерывание
    3253	EF0F			     dma_setup	     endp
@@ -3628,11 +3303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3298				     ;
    3299				     ;	 ВЫВОД
    3300				     ;		   CY=0	- успешно,
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 67
-1840v4.asm
-
-
-
    3301				     ;		   CY=1	- сбой(состояние НГМД			       +
    3302				     устанавливается),
    3303				     ;-----------------------------------
@@ -3683,11 +3353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3348	EF5D  8E D8			     mov     ds,ax
    3349	EF5F  80 0E 003Er 80		     or	     seek_status,int_flag
    3350	EF64  B0 20			     mov     al,20h	     ; установить конец		       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 68
-1840v4.asm
-
-
-
    3351				     прерывания
    3352	EF66  E6 20			     out     20h,al	     ; послать конец прерывания  +
    3353				     в	порт
@@ -3738,11 +3403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3398				     состояния
    3399	EF8B  A8 40			     test    al,040h	     ; сбой	позиционирования
    3400	EF8D  75 07			     jnz     j42     ; если	все нормально, считать      +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 69
-1840v4.asm
-
-
-
    3401				     состояние
    3402	EF8F			     j41:
    3403	EF8F  80 0E 0041r 20		     or	     diskette_status,bad_nec
@@ -3793,11 +3453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3448	EFB5  A0 0047r			     mov     al,nec_status+5  ;	получить последний сектор
    3449	EFB8  74 0A			     jz	     j45
    3450	EFBA  BB 0008			     mov     bx,8
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 70
-1840v4.asm
-
-
-
    3451	EFBD  E8 FE91			     call    get_parm	     ; получить	значение EOT
    3452	EFC0  8A C4			     mov     al,ah	     ; AH в AL
    3453	EFC2  FE C0			     inc     al		     ; EOT+1
@@ -3848,11 +3503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3498				     ;	 0 - тайм-аут;
    3499				     ;	 3 - ошибка ввода-вывода;
    3500				     ;	 4 - выбран (SLCT);
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 71
-1840v4.asm
-
-
-
    3501				     ;	 5 - конец	бумаги (PE);
    3502				     ;	 6 - подтверждение;
    3503				     ;	 7 - занято.
@@ -3903,11 +3553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3548				     ожидания
    3549	EFFE  33 C9			     xor     cx,cx	     ; длительность	одного цикла
    3550	F000  EE			     out     dx,al	     ; вывести символ в порт
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 72
-1840v4.asm
-
-
-
    3551	F001  42			     inc     dx		     ; -1 из адреса порта
    3552	F002			     b3:			     ; ожидание	BUSY
    3553	F002  EC			     in	     al,dx	     ; получить	состояние
@@ -3958,11 +3603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3598	F03D			     b9:
    3599	F03D  48			     dec     ax		      ;	цикл задержки
    3600	F03E  75 FD			     jnz     b9
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 73
-1840v4.asm
-
-
-
    3601	F040  B0 0C			     mov     al,0ch
    3602	F042  EE			     out     dx,al
    3603	F043  EB DB			     jmp     short b6	 ; переход к считыванию байта   +
@@ -4013,11 +3653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3648				     ;	  AH=2	 - установить	текущую позицию курсора.  +
    3649				     Для выполнения
    3650				     ; функции необходимо задать	следующие	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 74
-1840v4.asm
-
-
-
    3651				     координаты курсора:
    3652				     ;	  BH - страница;
    3653				     ;	  DX - строка и колонка.
@@ -4068,11 +3703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3698				     Функция перемещает
    3699				     ; символы в пределах заданной области вниз по+
    3700				     экрану, заполняя
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 75
-1840v4.asm
-
-
-
    3701				     ; верхние строки пробелами с заданным	       +
    3702				     атрибутом.
    3703				     ;	  Для выполнения функции необходимо задать +
@@ -4123,11 +3753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3748				     ;	  AH=11	- установить цветовую	палитру.		       +
    3749				     ь
    3750				     ;	  При выполнении функции используются два   +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 76
-1840v4.asm
-
-
-
    3751				     варианта.
    3752				     ;	  Для первого	варианта в регистре BH		       +
    3753				     задается ноль,а в регистре
@@ -4178,11 +3803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3798				     ;	 После выполнения программы в регистре	AL     +
    3799				     находится	значение
    3800				     ; считанной точки.
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 77
-1840v4.asm
-
-
-
    3801				     ;
    3802				     ;	  AH=14	- записать телетайп. Функция выводит     +
    3803				     символ в буфер
@@ -4233,11 +3853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3848				     знакогенератор любым, необ-
    3849				     ; ходимым ему алфавитом.
    3850				     ;	  Для выполнения программы необходимо	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 78
-1840v4.asm
-
-
-
    3851				     задать следующие параметры:
    3852				     ;	  ES:BP	- адрес таблицы, сформированной	       +
    3853				     пользователем;
@@ -4288,11 +3903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3898				     ;	  DH,DL	- строку и колонку для	начала записи;
    3899				     ;	  BH	- номер страницы.
    3900				     ;-----------------------------------------------------------
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 79
-1840v4.asm
-
-
-
    3901
    3902					     assume cs:code,ds:data,es:video_ram
    3903
@@ -4343,11 +3953,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3948				     адаптера
    3949	F088  8B 3E 0010r		     mov     di,equip_flag   ; получить	тип адаптера
    3950	F08C  81 E7 0030		     and     di,30h	     ; выделить	биты режима ;	db 81h,+
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 80
-1840v4.asm
-
-
-
    3951				     0E7h,30h,00h  ; ###Gleb###
    3952	F090  83 FF 30			     cmp     di,30h	     ; есть	установка ч/б	       +
    3953				     адаптера ?
@@ -4398,11 +4003,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    3998	F0DB  19 02 0D 0B 0C		     db	     19h,2,0dh,0bh,0ch
    3999	F0E0  00 00 00 00		     db	     0,0,0,0
    4000
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 81
-1840v4.asm
-
-
-
    4001	F0E4			     m5	     label   word	     ; таблица для			       +
    4002				     восстановления длины
    4003	F0E4  0800			     dw	     2048
@@ -4453,11 +4053,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4048				     векторов
    4049					     assume  ds:abs0
    4050	F124  C5 1E 0074r		     lds     bx,parm_ptr ; получить значение		       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 82
-1840v4.asm
-
-
-
    4051				     параметров адаптера ЭЛИ
    4052	F128  58			     pop     ax		     ; восстановить	AX
    4053					     assume  ds:code
@@ -4508,11 +4103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4098	F155  89 3E 004Er		     mov     crt_start,di    ; сохранить начальный адрес
    4099	F159  C6 06 0062r 00		     mov     active_page,0   ; установить активную	       +
    4100				     страницу
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 83
-1840v4.asm
-
-
-
    4101	F15E  B9 2000			     mov     cx,8192	     ; количество слов в	цветном +
    4102				     адаптере
    4103	F161  80 FC 04			     cmp     ah,4	     ; опрос графики
@@ -4563,11 +4153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4148	F1B1  1E			     push    ds		     ; восстановить	сегмент
    4149	F1B2  07			     pop     es
    4150	F1B3  33 C0			     xor     ax,ax
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 84
-1840v4.asm
-
-
-
    4151	F1B5  F3> AB			     rep     stosw	     ; заполнить нулями
    4152
    4153				     ;	 Установка регистра сканирования
@@ -4618,11 +4203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4198	F1D5  E8 0002			     call    m16	     ; вывод регистра CX
    4199	F1D8  EB ED			     jmp     short video_return
    4200
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 85
-1840v4.asm
-
-
-
    4201	F1DA			     m16:
    4202	F1DA  8B 16 0063r		     mov     dx,addr_6845    ; адрес регистра
    4203	F1DE  8A C4			     mov     al,ah	     ; получить	значение
@@ -4673,11 +4253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4248	F209  E8 007F			     call    position
    4249	F20C  8B C8			     mov     cx,ax
    4250	F20E  03 0E 004Er		     add     cx,crt_start    ; сложить с начальным	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 86
-1840v4.asm
-
-
-
    4251				     адресом страницы
    4252	F212  D1 F9			     sar     cx,1	     ; делить на 2
    4253	F214  B4 0E			     mov     ah,14
@@ -4728,11 +4303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4298				     ;	 ВЫХОД
    4299				     ;		Выполняется сброс контроллера для	       +
    4300				     установки	новой страницы.
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 87
-1840v4.asm
-
-
-
    4301				     ;
    4302				     ;-----------------------------
    4303	F230			     act_disp_page proc	     near
@@ -4783,11 +4353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4348				     ;		Установленная цветовая палитра в	       +
    4349				     порту	3D9.
    4350				     ;------------------------------
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 88
-1840v4.asm
-
-
-
    4351	F254			     set_color proc  near
    4352	F254  8B 16 0063r		     mov     dx,addr_6845    ; порт	для палитры
    4353	F258  83 C2 05			     add     dx,5	     ; установить порт
@@ -4838,11 +4403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4398	F287  59			     pop     cx
    4399	F288  E9 FF3F			     jmp     m15	     ; возврат к программе
    4400	F28B			     video_state     endp
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 89
-1840v4.asm
-
-
-
    4401				     ;---------------------------
    4402				     ; position
    4403				     ;
@@ -4893,11 +4453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4448				     ;
    4449				     ;-----------------------------------
    4450					     assume cs:code,ds:data,es:data
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 90
-1840v4.asm
-
-
-
    4451	F29C			     scroll_up proc  near
    4452	F29C  8A D8			     mov     bl,al	 ; сохранить количество	       +
    4453				     перемещаемых строк
@@ -4948,11 +4503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4498	F2E6  8A DE			     mov     bl,dh
    4499	F2E8  EB DA			     jmp     short n3	     ; очистить
    4500	F2EA			     scroll_up	     endp
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 91
-1840v4.asm
-
-
-
    4501
    4502				     ;	 Обработка сдвига
    4503
@@ -5003,11 +4553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4548	F32C  1F			     pop     ds
    4549	F32D  80 FB 00			     cmp     bl,0	     ; 0 означает очистку блока
    4550	F330  C3			     ret		     ; возврат с установкой	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 92
-1840v4.asm
-
-
-
    4551				     флажков
    4552	F331			     scroll_position endp
    4553
@@ -5058,11 +4603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4598	F342  8A D8			     mov     bl,al	     ; количество строк в BL
    4599	F344  80 FC 04			     cmp     ah,4	     ; проверка	графики
    4600	F347  72 08			     jc	     n12
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 93
-1840v4.asm
-
-
-
    4601	F349  80 FC 07			     cmp     ah,7	     ; проверка	ч/б адаптера
    4602	F34C  74 03			     je	     n12
    4603	F34E  E9 01A6			     jmp     graphics_down
@@ -5113,11 +4653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4648					     assume cs:code,ds:data,es:data
    4649	F37D			     read_ac_current proc near
    4650	F37D  80 FC 04			     cmp     ah,4	     ; это графика ?
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 94
-1840v4.asm
-
-
-
    4651	F380  72 08			     jc	     p1
    4652	F382  80 FC 07			     cmp     ah,7	     ; ч/б адаптер ?
    4653	F385  74 03			     je	     p1
@@ -5168,11 +4703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4698				     ;---------------------
    4699				     ;write_ac_current
    4700				     ;
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 95
-1840v4.asm
-
-
-
    4701				     ;	 Эта	программа записывает	атрибут и код       +
    4702				     символа в текущую позицию
    4703				     ; курсора
@@ -5223,11 +4753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4748				     прерывания
    4749	F3F1  E2 E8			     loop    p7
    4750	F3F3  E9 FDD1			     jmp     video_return
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 96
-1840v4.asm
-
-
-
    4751	F3F6			     write_ac_current  endp
    4752				     ;---------------------
    4753				     ;write_c_current
@@ -5278,11 +4803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4798	F421  47			     inc     di
    4799	F422  E2 E8			     loop    p11	     ; цикл
    4800	F424  E9 FDA0			     jmp     video_return
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 97
-1840v4.asm
-
-
-
    4801	F427			     write_c_current endp
    4802				     ;---------------------
    4803				     ; read dot	- write	dot
@@ -5333,11 +4853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4848				     передачи указанных бит
    4849	F44C  22 CC			     and     cl,ah
    4850	F44E  0A C1			     or	     al,cl
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 98
-1840v4.asm
-
-
-
    4851	F450			     r1:
    4852	F450  26: 88 04			     mov es:[si],al	     ; восстановить	байт в памяти
    4853	F453  58			     pop     ax
@@ -5388,11 +4903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4898	F463  F6 E2			     mul     dl	  ; AX содержит	адрес первого байта   +
    4899				     указанной	строки
    4900	F465  5A			     pop     dx		     ; восстановить	его
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 99
-1840v4.asm
-
-
-
    4901	F466  F6 C2 01			     test    dl,1	     ; проверить			       +
    4902				     четность/нечетность
    4903	F469  74 03			     jz	     r4		     ; переход,если строка четная
@@ -5443,11 +4953,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4948				     ;	 Умножение BH (количество бит в байте) на	CH     +
    4949				     (бит смещения)
    4950
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 100
-1840v4.asm
-
-
-
    4951	F48E  2A C9			     sub     cl,cl
    4952	F490			     r6:
    4953	F490  D0 C8			     ror     al,1    ; левое крайнее значение в AL	для +
@@ -5498,11 +5003,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    4998				     ;	 Определение	адреса источника	в буфере
    4999	F4BC			     r7:
    5000	F4BC  06			     push    es
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 101
-1840v4.asm
-
-
-
    5001	F4BD  1F			     pop     ds
    5002	F4BE  2A ED			     sub     ch,ch	     ; обнулить	старший байт	       +
    5003				     счетчика
@@ -5553,11 +5053,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5048				     ;
    5049				     ;----------------------------------
    5050
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 102
-1840v4.asm
-
-
-
    5051	F4F7			     graphics_down proc	     near
    5052	F4F7  FD			     std		     ; установить направление
    5053	F4F8  8A D8			     mov     bl,al	     ; сохранить количество	       +
@@ -5608,11 +5103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5098
    5099	F533			     r13:
    5100	F533  E8 0021			     call    r17	     ; переместить одну строку
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 103
-1840v4.asm
-
-
-
    5101	F536  81 EE 2050		     sub     si,2000h+80     ; установить следующую	       +
    5102				     строку
    5103	F53A  81 EF 2050		     sub     di,2000h+80
@@ -5663,11 +5153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5148	F570			     r18     proc    near
    5149	F570  8A CA			     mov     cl,dl	     ; число байт в поле
    5150	F572  57			     push    di		     ; хранить указатель
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 104
-1840v4.asm
-
-
-
    5151	F573  F3> AA			     rep     stosb	     ; запомнить новое значение
    5152	F575  5F			     pop     di		     ; вернуть указатель
    5153	F576  81 C7 2000		     add     di,2000h	     ; указать нечетное поле
@@ -5718,11 +5203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5198	F58A  3C 80			     cmp     al,80h	     ; во второй половине ?
    5199	F58C  73 06			     jae     s1		     ; да
    5200
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 105
-1840v4.asm
-
-
-
    5201				     ;	 Изображение	есть в первой половине памяти
    5202
    5203	F58E  BE FA6Er			     mov     si, offset	crt_char_gen  ;	смещение изображения
@@ -5773,11 +5253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5248	F5BF			     s5:
    5249	F5BF  26: 88 85	1FFF		     mov es:[di+1fffh],al    ; запомнить во второй части
    5250	F5C4  83 C7 4F			     add     di,79	     ; передать	следующую строку
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 106
-1840v4.asm
-
-
-
    5251	F5C7  FE CE			     dec     dh		     ; выполнить цикл
    5252	F5C9  75 EC			     jnz     s4
    5253	F5CB  5E			     pop     si
@@ -5828,11 +5303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5298	F60C  74 0A			     jz	 s11
    5299	F60E  26: 32 A5	2000		     xor     ah,es:[di+2000h]	; из первой половины
    5300	F613  26: 32 85	2001		     xor     al,es:[di+2001h]	; и из второй половины
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 107
-1840v4.asm
-
-
-
    5301	F618  26: 88 A5	2000	     s11:    mov     es:[di+2000h],ah
    5302	F61D  26: 88 85	2001		     mov     es:[di+2001h],al	; запомнить вторую часть   +
    5303				     буфера
@@ -5883,11 +5353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5348	F652  88 46 00			     mov byte ptr [bp],al
    5349	F655  45			     inc     bp
    5350	F656  83 C6 50			     add     si,80	     ; переход на следующую	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 108
-1840v4.asm
-
-
-
    5351				     четную строку
    5352	F659  FE CE			     dec     dh
    5353	F65B  75 EB			     jnz     s12	     ; повторить
@@ -5938,11 +5403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5398	F699  75 ED			     jnz     s17	     ; повторить
    5399
    5400
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 109
-1840v4.asm
-
-
-
    5401	F69B  3C 00			     cmp     al,0
    5402	F69D  74 12			     je	     s18    ; переход, если все сканировано,  +
    5403				     но символ
@@ -5993,11 +5453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5448	F6CA  59			     pop     cx
    5449	F6CB  C3			     ret		     ; все выполнено
    5450	F6CC			     s19     endp
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 110
-1840v4.asm
-
-
-
    5451				     ;--------------------------------------
    5452				     ;
    5453				     ;	 Эта	программа берет байт в AL и	удваивает     +
@@ -6048,11 +5503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5498	F6FB  F8			     clc		     ; сбросить	признак переноса+
    5499				     CF
    5500	F6FC  74 01			     jz	     s25	     ; переход если 0
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 111
-1840v4.asm
-
-
-
    5501	F6FE  F9			     stc		     ; нет -	установить CF
    5502	F6FF  D0 D2		     s25:    rcl     dl,1	     ; циклический сдвиг
    5503	F701  D1 E9			     shr     cx,1
@@ -6103,11 +5553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5548				     строки выполняется ав-
    5549				     ; томатический	переход на новую строку. Если  +
    5550				     страница экрана за-
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 112
-1840v4.asm
-
-
-
    5551				     ; полнена (позиция курсора 24,79/39),	выполняется +
    5552				     перемещение экрана
    5553				     ; на одну строку вверх. Освободившаяся строка+
@@ -6158,11 +5603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5598	F746  3A 16 004Ar		     cmp     dl,byte ptr crt_cols
    5599	F74A  75 36			     jnz     u7		     ; переход к установке	       +
    5600				     курсора
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 113
-1840v4.asm
-
-
-
    5601	F74C  B2 00			     mov     dl,0
    5602	F74E  80 FE 18			     cmp     dh,24	     ; проверка	граничной строки
    5603	F751  75 2D			     jnz     u6		     ; установить курсор
@@ -6213,11 +5653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5648	F784  EB F4			     jmp     short u4	     ; установить новый курсор
    5649
    5650				     ;	 Сдвиг курсора на	одну позицию	влево
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 114
-1840v4.asm
-
-
-
    5651
    5652	F786			     u8:
    5653	F786  80 FA 00			     cmp     dl,0
@@ -6268,11 +5703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5698				     то программа определяет
    5699				     ; положение светового пера, в противном	       +
    5700				     случае, возврат без выдачи
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 115
-1840v4.asm
-
-
-
    5701				     ; информации.
    5702				     ;
    5703				     ;	 В ППЭВМ ЕС1841	функция не поддерживается
@@ -6323,11 +5753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5748	F7C1  8A C4			     mov     al,ah
    5749	F7C3  EE			     out     dx,al	     ; вывести в порт
    5750	F7C4  42			     inc     dx
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 116
-1840v4.asm
-
-
-
    5751	F7C5  EC			     in	     al,dx	     ; получить	значение из порта
    5752	F7C6  8A E8			     mov     ch,al	     ; сохранить его в CX
    5753	F7C8  4A			     dec     dx		     ; регистр адреса
@@ -6378,11 +5803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5798	F800  8A DC			     mov     bl,ah	     ; значение	колонки в BX
    5799	F802  2A FF			     sub     bh,bh	     ; умножить	на 8 для среднего +
    5800				     результата
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 117
-1840v4.asm
-
-
-
    5801	F804  80 3E 0049r 06		     cmp     crt_mode,6	     ; определить среднюю или      +
    5802				     наивысшую
    5803								     ; разрешающую способность
@@ -6433,11 +5853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5848	F839  5F			     pop     di		      ;	восстановить регистры
    5849	F83A  5E			     pop     si
    5850	F83B  1F			     pop     ds
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 118
-1840v4.asm
-
-
-
    5851	F83C  1F			     pop     ds
    5852	F83D  1F			     pop     ds
    5853	F83E  1F			     pop     ds
@@ -6488,11 +5903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5898				     графического
    5899				     ;			ЭЛИ;
    5900				     ;		   11 -	80х25,	черно-белый режим		       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 119
-1840v4.asm
-
-
-
    5901				     монохромного ЭЛИ.
    5902				     ;	 7,6	 - количество	НГМД;
    5903				     ;	 11,10,9 - количество	адаптеров стыка С2;
@@ -6543,11 +5953,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5948	F87A  46			     inc     si
    5949	F87B  26: 89 05			     mov     word ptr es:[di],ax
    5950	F87E  47			     inc     di
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 120
-1840v4.asm
-
-
-
    5951	F87F  47			     inc     di
    5952	F880  FE CB			     dec     bl
    5953	F882  75 F3			     jnz     bct2
@@ -6598,11 +6003,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    5998	F8CB  1B 31 32 33 34 35	36+	     db	     1bh,'1234567890-='
    5999	      37 38 39 30 2D 3D
    6000
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 121
-1840v4.asm
-
-
-
    6001
    6002	F8D8  08 09			     db	     08h,09h
    6003	F8DA  D9 E6 E3 DA D5 DD	D3+	     db	     0d9h,0e6h,0e3h,0dah,0d5h,0ddh,0d3h,0e8h
@@ -6653,11 +6053,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6048	F933  F6 06 0017r 03	     k89:    test    kb_flag,left_shift+right_shift
    6049	F938  74 11			     jz	     k80
    6050	F93A  3C F0			     cmp     al,0f0h
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 122
-1840v4.asm
-
-
-
    6051	F93C  74 23			     je	     k89a
    6052	F93E  3C B0			     cmp     al,0b0h
    6053	F940  72 06			     jb	     k81
@@ -6708,11 +6103,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6098	F991  CF				     iret
    6099
    6100	F992  DC*(00)				     db	220 dup(0)
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 123
-1840v4.asm
-
-
-
    6101
    6102				     ;**************************************
    6103				     ;
@@ -6763,11 +6153,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6148	      18
    6149
    6150	FAD6  3F 33 3F 30 30 70	F0+	     db	     03fh,033h,03fh,030h,030h,070h,0f0h,0e0h ;d_0d
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 124
-1840v4.asm
-
-
-
    6151	      E0
    6152
    6153	FADE  7F 63 7F 63 63 67	E6+	     db	     07fh,063h,07fh,063h,063h,067h,0e6h,0c0h ;d_0e
@@ -6818,11 +6203,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6198
    6199	FB56  00 24 66 FF 66 24	00+	     db	     000h,024h,066h,0ffh,066h,024h,000h,000h ;d_1d
    6200	      00
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 125
-1840v4.asm
-
-
-
    6201
    6202	FB5E  00 18 3C 7E FF FF	00+	     db	     000h,018h,03ch,07eh,0ffh,0ffh,000h,000h ;d_1e
    6203	      00
@@ -6873,11 +6253,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6248	FBD6  00 00 00 FC 00 00	00+	     db	     000h,000h,000h,0fch,000h,000h,000h,000h ;-	d_2d
    6249	      00
    6250
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 126
-1840v4.asm
-
-
-
    6251	FBDE  00 00 00 00 00 30	30+	     db	     000h,000h,000h,000h,000h,030h,030h,000h ;.	d_2e
    6252	      00
    6253
@@ -6928,11 +6303,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6298	      00
    6299
    6300	FC5E  60 30 18 0C 18 30	60+	     db	     060h,030h,018h,00ch,018h,030h,060h,000h ;>	d_3e
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 127
-1840v4.asm
-
-
-
    6301	      00
    6302
    6303	FC66  78 CC 0C 18 30 00	30+	     db	     078h,0cch,00ch,018h,030h,000h,030h,000h ;?	d_3f
@@ -6983,11 +6353,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6348
    6349	FCDE  C6 E6 F6 DE CE C6	C6+	     db	     0c6h,0e6h,0f6h,0deh,0ceh,0c6h,0c6h,000h ;N	d_4e
    6350	      00
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 128
-1840v4.asm
-
-
-
    6351
    6352	FCE6  38 6C C6 C6 C6 6C	38+	     db	     038h,06ch,0c6h,0c6h,0c6h,06ch,038h,000h ;O	d_4f
    6353	      00
@@ -7038,11 +6403,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6398	FD5E  10 38 6C C6 00 00	00+	     db	     010h,038h,06ch,0c6h,000h,000h,000h,000h ;cimpqumflex
    6399	      00
    6400
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 129
-1840v4.asm
-
-
-
    6401	FD66  00 00 00 00 00 00	00+	     db	     000h,000h,000h,000h,000h,000h,000h,0ffh ;_	d_5f
    6402	      FF
    6403
@@ -7093,11 +6453,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6448	      00
    6449
    6450	FDE6  00 00 78 CC CC CC	78+	     db	     000h,000h,078h,0cch,0cch,0cch,078h,000h ;o	d_6f
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 130
-1840v4.asm
-
-
-
    6451	      00
    6452
    6453
@@ -7148,11 +6503,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6498
    6499	FE66  00 10 38 6C C6 C6	FE+	     db	     000h,010h,038h,06ch,0c6h,0c6h,0feh,000h ;delta d_7f
    6500	      00
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 131
-1840v4.asm
-
-
-
    6501
    6502
    6503				     ;---int 1a-------------------------------
@@ -7203,11 +6553,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6548				     процедуру
    6549
    6550	FE82			     t2:     ; Считать текущее состояния	часов
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 132
-1840v4.asm
-
-
-
    6551
    6552	FE82  FA			     cli	     ; сбросить	признак разрешения    +
    6553				     прерывания
@@ -7258,11 +6603,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6598				     входить в заданную
    6599				     ; программу с частотой прерывания таймера (18.2+
    6600				     прерываний в секун-
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 133
-1840v4.asm
-
-
-
    6601				     ; ду). Для этого	в таблице векторов прерываний+
    6602				     по адресу 007CH
    6603				     ; необходимо задать адрес пользовательской   +
@@ -7313,11 +6653,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6648
    6649	FEE9			     t6:
    6650	FEE9  CD 1C			     int     1ch     ; передача	управления программе+
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 134
-1840v4.asm
-
-
-
    6651				     пользователя
    6652	FEEB  B0 20			     mov     al,eoi
    6653	FEED  E6 20			     out     020h,al	    ; конец прерывания
@@ -7368,11 +6703,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6698	FF21  F000			     dw	     cod
    6699
    6700	FF23  F929r			     dw	     offset rs232_io	     ; прерывание  14H
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 135
-1840v4.asm
-
-
-
    6701	FF25  F000			     dw	     cod
    6702
    6703	FF27  F92Dr			     dw	     offset ex_memory	     ; int 15h
@@ -7423,11 +6753,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6748				     ; одновременным нажатием клавиши ПЕЧ и	       +
    6749				     клавиши переключения регист-
    6750				     ; ров. Позиция курсора сохраняется до	       +
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 136
-1840v4.asm
-
-
-
    6751				     завершения процедуры обработки
    6752				     ; прерывания. Повторное	нажатие названных      +
    6753				     клавиш во время обработки
@@ -7478,11 +6803,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6798				     ;			 BH - номер отображаемой страницы.
    6799				     ;
    6800				     ;	 Стек содержит DS, AX, BX, CX, DX.
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 137
-1840v4.asm
-
-
-
    6801				     ;
    6802				     ;			 AL - режим
    6803				     ;
@@ -7533,11 +6853,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6848	FFAB  3A EE			     cmp     ch,dh
    6849	FFAD  75 D0			     jnz     pri10
    6850	FFAF  5A			     pop     dx
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 138
-1840v4.asm
-
-
-
    6851	FFB0  B4 02			     mov     ah,2
    6852	FFB2  CD 10			     int     10h
    6853	FFB4  C6 06 0000r 00		     mov     status_byte,0
@@ -7588,11 +6903,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6898
    6899	FFFD  00 00				     db	   0, 0
    6900
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 139
-1840v4.asm
-
-
-
    6901	FFFF  00				     db	   0 ;
    6902				     ;vector ends
    6903
@@ -7603,11 +6913,6 @@ Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 1
    6908
    6909	0000			     code    ends
    6910					     end     POST
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 140
-Symbol Table
-
-
-
 
 Symbol Name			  Type	 Value
 
@@ -7658,11 +6963,6 @@ BUFFER_START			  Word	 DATA:0080
 BUFFER_TAIL			  Word	 DATA:001C
 C1				  Word	 CODE:E016
 C10				  Near16 CODE:E0B1
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 141
-Symbol Table
-
-
-
 C11				  Near16 CODE:E0D9
 C12				  Near16 CODE:E0EB
 C13				  Near16 CODE:E0FC
@@ -7713,11 +7013,6 @@ D11				  Near16 CODE:E2A8
 D12				  Near16 CODE:E2C4
 D13				  Near16 CODE:E2CE
 D14				  Near16 CODE:E2D8
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 142
-Symbol Table
-
-
-
 D1L				  Number 000E
 D2				  Byte	 CODE:E219
 D2L				  Number 000E
@@ -7768,11 +7063,6 @@ E1L				  Number 0004
 E20A				  Near16 CODE:E622
 E20B				  Near16 CODE:E627
 E20C				  Near16 CODE:E637
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 143
-Symbol Table
-
-
-
 E21A				  Near16 CODE:E689
 E22				  Near16 CODE:E3FF
 E3				  Near16 CODE:E301
@@ -7823,11 +7113,6 @@ F5				  Near16 CODE:E44A
 F6				  Near16 CODE:E462
 F7				  Near16 CODE:E46B
 FIND_POSITION			  Near16 CODE:F3A7
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 144
-Symbol Table
-
-
-
 G1				  Near16 CODE:E58C
 G10				  Near16 CODE:E5EC
 G12				  Near16 CODE:E5FC
@@ -7878,11 +7163,6 @@ J12				  Near16 CODE:EDA0
 J13				  Near16 CODE:EDA4
 J14				  Near16 CODE:EDAA
 J15				  Near16 CODE:EDD4
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 145
-Symbol Table
-
-
-
 J16				  Near16 CODE:EDF9
 J17				  Near16 CODE:EE00
 J18				  Near16 CODE:EE3D
@@ -7933,11 +7213,6 @@ K15				  Byte	 CODE:E971
 K16				  Near16 CODE:E9AF
 K17				  Near16 CODE:E9D9
 K18				  Near16 CODE:EA4B
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 146
-Symbol Table
-
-
-
 K19				  Near16 CODE:EA60
 K2				  Near16 CODE:E85E
 K20				  Near16 CODE:EA6E
@@ -7988,11 +7263,6 @@ K5				  Near16 CODE:E767
 K50				  Near16 CODE:EC37
 K51				  Near16 CODE:EC3D
 K52				  Near16 CODE:EC43
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 147
-Symbol Table
-
-
-
 K53				  Near16 CODE:EC4A
 K54				  Near16 CODE:E78D
 K54A				  Near16 CODE:EBEC
@@ -8043,11 +7313,6 @@ LEFT_SHIFT			  Number 0002
 M1				  Word	 CODE:F045
 M10				  Near16 CODE:F144
 M11				  Near16 CODE:F16F
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 148
-Symbol Table
-
-
-
 M12				  Near16 CODE:F172
 M13				  Near16 CODE:F175
 M14				  Near16 CODE:F1C3
@@ -8098,11 +7363,6 @@ NMI_INT				  Near16 CODE:E2B5
 NMI_PTR				  Word	 ABS0:0008
 NUM_KEY				  Number 0045
 NUM_SHIFT			  Number 0020
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 149
-Symbol Table
-
-
-
 NUM_STATE			  Number 0020
 NUM_TRANS			  Near16 CODE:EFB0
 ORG_VECTOR			  Dword	 ABS0:004C
@@ -8153,11 +7413,6 @@ R5				  Near16 CODE:F486
 R6				  Near16 CODE:F490
 R7				  Near16 CODE:F4BC
 R8				  Near16 CODE:F4D4
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 150
-Symbol Table
-
-
-
 R9				  Near16 CODE:F4E3
 READ_AC_CURRENT			  Near16 CODE:F37D
 READ_CURSOR			  Near16 CODE:F21A
@@ -8208,11 +7463,6 @@ S9				  Near16 CODE:F5EA
 SCROLL_DOWN			  Near16 CODE:F341
 SCROLL_KEY			  Number 0046
 SCROLL_POSITION			  Near16 CODE:F2EA
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 151
-Symbol Table
-
-
-
 SCROLL_SHIFT			  Number 0010
 SCROLL_STATE			  Number 0010
 SCROLL_UP			  Near16 CODE:F29C
@@ -8263,11 +7513,6 @@ U5				  Near16 CODE:F77C
 U6				  Near16 CODE:F780
 U7				  Near16 CODE:F782
 U8				  Near16 CODE:F786
-Turbo Assembler	 Version 5.0	    10-05-21 23:12:45	    Page 152
-Symbol Table
-
-
-
 U9				  Near16 CODE:F78F
 V1				  Byte	 CODE:F7A1
 V2				  Near16 CODE:F7E8
