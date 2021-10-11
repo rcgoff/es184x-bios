@@ -285,7 +285,7 @@ stgtst:
 
 stgtst_cnt	proc	near
 		cld
-		mov	bx, cx
+		mov	ds, cx
 		mov	ax, 0FFFFh
 		mov	dx, 0AA55h
 		sub	di, di
@@ -297,9 +297,10 @@ c2a:
 
 c2b:
 		mov	si, di
-		mov	cx, bx
+		mov	cx, ds
 
 c3:
+		db	     26h     ;rc ES segment prefix
 		lodsb
 		xor	al, ah
 		jnz	c7x
