@@ -286,44 +286,52 @@ stgtst:
  	 	mov	cx,4000h
 
 stgtst_cnt	proc	near
+		shr	cx,1		;rc words count is 2x less than bytes
 		cld
 		mov	ds, cx
 		mov	ax, 0FFFFh
 		mov	dx, 0AA55h
 		sub	di, di
-		repe stosb
+		repe stosw
 
 c2a:
+		dec	di
 		dec	di
 		std
 
 c2b:
 		mov	si, di
 		mov	cx, ds
+;---------------rc:
+		mov	bh, ah
+		mov	bl, bh		;rc now old pattern is in BX
 
 c3:
-		db	     26h     ;rc ES segment prefix
-		lodsb
-		xor	al, ah
+		db	26h		;rc ES segment prefix
+		lodsw
+		xor	ax, bx
 		jnz	c7x
 		in	al, 62h
 		and	al, 40h
 		mov	al, 0
 		jnz	c7x
-		cmp	ah, 0
+		cmp	bx, 0
 		jz	c3a
 		mov	al, dl
-		stosb
+		mov	ah, al		;rc now new pattern is in AX
+		stosw
 
 c3a:
 		loop	c3
-		cmp	ah, 0
+		cmp	bx, 0
 		jz	c7x
-		mov	ah, al
+		mov	bx, ax
 		xchg	dh, dl
 		cld
 		inc	di
+		inc	di
 		jz	c2b
+		dec	di
 		dec	di
 		mov	dx, 1
 		jmp	short c2a
