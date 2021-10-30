@@ -534,20 +534,17 @@ c18:	 	 	 	;выбор следующего регистра ПДП
 		inc	al
 		add	al, al
 		mov	dx, 0
-		mov	ah, al
-		mov	al, 0
+		mov	si,ax				;SI will be segment count
+		xor	ax, ax				;write 0 to mem
 		cld
 
+		sub	di, di				;not in loop because after writing 32768 words already will be DI=0
 c19:
-		sub	di, di
-		mov	cx, 0
-
-c20:
-		stosb
-		loop	c20
-		add	dx, 4096
+		mov	cx, 32768
+		rep stosw				;clear full segment (32768 words=6536 bytes)
+		add	dx, 4096			;next segment
 		mov	es, dx
-		dec	ah
+		dec	si
 		jz	c21
 		jmp	short c19
 ;____________________
