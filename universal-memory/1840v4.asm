@@ -526,15 +526,15 @@ c18:	 	 	 	;выбор следующего регистра ПДП
 		mov	ds, ax
 		
 		mov	bx, ds:reset_flag
+		mov si, ds:memory_size		;keep memory size in SI after reboot
 		sub	ax, ax
 		mov	es, ax
-		mov	ds, ax
 		in	al, port_c
 		and	al, 0Fh
 		inc	al
 		add	al, al
 		mov	dx, 0
-		mov	si,ax				;SI will be segment count
+		mov	bp,ax				;BP will be segment count (and will be 0, i.e. no error, after finish)
 		xor	ax, ax				;write 0 to mem
 		cld
 
@@ -544,7 +544,7 @@ c19:
 		rep stosw				;clear full segment (32768 words=6536 bytes)
 		add	dx, 4096			;next segment
 		mov	es, dx
-		dec	si
+		dec	bp
 		jz	c21
 		jmp	short c19
 ;____________________
@@ -560,10 +560,9 @@ c21:
  	out	inta01,al
 		sub	ax, ax
 		mov	es, ax
-		mov	si, dat
-		mov	ds, si
-		
+									;DS still points to BIOS data area
 		mov	ds:reset_flag, bx
+		mov	ds:memory_size, si
 		cmp	ds:reset_flag, 1234h
 		jz	c25
 		mov	ds, ax
@@ -918,16 +917,19 @@ e18:
 e19:
  	mov	ax,dat
  	mov	ds,ax
+	 	cmp	reset_flag,1234h
+		je	skip_size_det
 		in	al, port_c
 		and	al, 0Fh
 		inc	al
 		mov	ah, 80h
 		mul	ah
-		mov	ds:io_ram_size,	ax ; Reserved in original IBM PC
-		mov	dx, ax
 		mov	ds:memory_size,	ax
- 	cmp	reset_flag,1234h
- 	je	e22
+skip_size_det:
+		mov	ax,ds:memory_size		;restore if reboot and no damages if power-on
+		mov	ds:io_ram_size,	ax
+
+
 
 ;   Проверка любой действительной памяти
 ;   на считывание и запись
@@ -1057,7 +1059,7 @@ f7a:	movsw
 	inc	di
 	inc	di
 	loop	f7a
-	jmp	short tst14
+	jmp short tst14
 	
 	org	0e47dh		;rc для устранения съезжания при переделке загрузчика таблицы векторв прерываний
 
