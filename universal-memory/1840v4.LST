@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    10-14-21 00:09:58	    Page 1
+Turbo Assembler	 Version 5.0	    10-30-21 18:33:55	    Page 1
 1840v4.asm
 
 
@@ -559,10 +559,10 @@ Turbo Assembler	 Version 5.0	    10-14-21 00:09:58	    Page 1
     554				     ;======================================RCgoff begin
     555				     ;-----------------turn ES1841 memory on, if present
     556	E165  BA 02B0				     mov dx,2b0h
-    557	E168  B0 0C				     mov al,0ch			     ;0b0000.1100 - turn RD,WD on, no  +
+    557	E168  B0 0C				     mov al,0ch			     ;0b0000.1100 - turn RD,WR on, no  +
     558				     reconfig
     559	E16A  EE				     out dx,al
-    560				     ;======================================RCgoffg end
+    560				     ;======================================RCgoff end
     561	E16B  B8 0040				     mov     ax, dat
     562	E16E  8E D8				     mov     ds, ax
     563
@@ -6895,9 +6895,9 @@ Turbo Assembler	 Version 5.0	    10-14-21 00:09:58	    Page 1
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "10-14-21"
+??DATE				  Text	 "10-30-21"
 ??FILENAME			  Text	 "1840v4  "
-??TIME				  Text	 "00:09:58"
+??TIME				  Text	 "18:33:55"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE

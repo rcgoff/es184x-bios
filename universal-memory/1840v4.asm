@@ -519,9 +519,9 @@ c18:	 	 	 	;выбор следующего регистра ПДП
 ;======================================RCgoff begin
 ;-----------------turn ES1841 memory on, if present
 		mov dx,2b0h
-		mov al,0ch			;0b0000.1100 - turn RD,WD on, no reconfig
+		mov al,0ch			;0b0000.1100 - turn RD,WR on, no reconfig
 		out dx,al
-;======================================RCgoffg end
+;======================================RCgoff end
 		mov	ax, dat
 		mov	ds, ax
 		
