@@ -14,9 +14,11 @@ Option Explicit
 '             добавлено исправление CR-LF;
 '             доработано удаление пустых строк после dup(?) - и для db, и для dw
 '             реструктуризация программы с выделением проходов в отдельные функции
+'07.11.2021 - возможность отключения генерации ASM-файла
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: ListBox выбора формата и вообще интерфейс
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: сохранение файлов с LF вместо CR-LF под другим именем (а не перезапись)
+'ЕЩЕ НЕ РЕАЛИЗОВАНО: размещение настроек в INI-файле, чтобы не править код
 
 'константы формата листинга
 Private Type LstFormatTable
@@ -41,6 +43,11 @@ Private Type PassReturn
     stopListing As Integer
 End Type
 
+Private Type Permissions
+    DeleteLineNumbers As Boolean
+    CreateASMFile As Boolean
+End Type
+
 
 '=============================================================================
 Sub InPath()  'процедура основная, выбор файлов
@@ -48,6 +55,7 @@ Dim flname As Variant           'это потому что по-другому 
 Dim LstFormat As LstFormatTable
 Dim LstFormatName As String
 Dim wasProgramRan As Boolean
+Dim filePermissions As Permissions
 
 'load listing format
 'здесь нужно раскомментировать нужный формат (только один!)
@@ -55,6 +63,12 @@ Dim wasProgramRan As Boolean
 'LstFormatName = "MASM3 with line numbers"
 'LstFormatName = "MASM3 without line numbers"
 LstFormatName = "TASM5 with line numbers"
+'=====================================================================
+'
+'specify permissions (true or false)
+'=====================================================================
+filePermissions.CreateASMFile = False
+filePermissions.DeleteLineNumbers = True
 '=====================================================================
 
 Select Case LstFormatName
@@ -97,7 +111,7 @@ With Application.FileDialog(msoFileDialogFilePicker)
 .Filters.Add "TXT-файлы", "*.txt", 1
 
     For Each flname In .SelectedItems
-        wasProgramRan = lst2asm(flname, LstFormat)
+        wasProgramRan = lst2asm(flname, LstFormat, filePermissions)
     Next
 End With
 
@@ -106,7 +120,7 @@ End Sub
 
 
 '=============================================================================
-Private Function lst2asm(flname, LstFormat As LstFormatTable) As Boolean
+Private Function lst2asm(flname, LstFormat As LstFormatTable, filePermissions As Permissions) As Boolean
 'шапка двухпроходного преобразования
 
 Dim firstOut As PassReturn
@@ -120,7 +134,7 @@ firstOut = FirstPass(flname, LstFormat)
         Exit Function
     End If
     
-secondOut = SecondPass(flname, LstFormat, firstOut.OutArray, firstOut.stopListing)
+secondOut = SecondPass(flname, LstFormat, firstOut.OutArray, firstOut.stopListing, filePermissions)
     If secondOut.ok = False Then lst2asm = False
 
 End Function
@@ -217,7 +231,8 @@ End Function
 
 
 '=============================================================================
-Private Function SecondPass(flname As Variant, LstFormat As LstFormatTable, ListingArrays As TwoListingArrays, stopListing As Integer) As PassReturn
+Private Function SecondPass(flname As Variant, LstFormat As LstFormatTable, ListingArrays As TwoListingArrays, _
+                            stopListing As Integer, filePermissions As Permissions) As PassReturn
 'второй проход - запись поправленного по строкам файла
 'выделено в отдельную 07.10.2021
 
@@ -242,13 +257,15 @@ prevline = ""
 SecondPass.ok = True
 
 'проверки на затирание выходных файлов
-'файл с укороченными строками для ассемблера
-If Dir(Left(flname, Len(flname) - 3) + "asm") <> "" Then
-    FileExsistAnswer = MsgBox(Left(flname, Len(flname) - 3) + "asm" & _
-        ": ASM file already exist and will be erased, proceed anyway?", _
-        vbQuestion + vbYesNo + vbDefaultButton2, "ASM file exists")
-    If FileExsistAnswer = vbNo Then SecondPass.ok = False
-    FileExsistAnswer = 0
+If filePermissions.CreateASMFile = True Then
+    'файл с укороченными строками для ассемблера
+    If Dir(Left(flname, Len(flname) - 3) + "asm") <> "" Then
+        FileExsistAnswer = MsgBox(Left(flname, Len(flname) - 3) + "asm" & _
+            ": ASM file already exist and will be erased, proceed anyway?", _
+            vbQuestion + vbYesNo + vbDefaultButton2, "ASM file exists")
+        If FileExsistAnswer = vbNo Then SecondPass.ok = False
+        FileExsistAnswer = 0
+    End If
 End If
 
 If SecondPass.ok = True Then
@@ -264,7 +281,9 @@ End If
 
 If SecondPass.ok = True Then
     Open flname For Input As #1
-    Open Left(flname, Len(flname) - 3) + "asm" For Output As #2
+    If filePermissions.CreateASMFile = True Then
+        Open Left(flname, Len(flname) - 3) + "asm" For Output As #2
+    End If
     Open Left(flname, Len(flname) - 4) + "_clean" + Right(flname, 4) For Output As #3
 Else
     Exit Function
@@ -321,25 +340,27 @@ Do While Not EOF(1)
     'а секция кода - нет. И такие строки не включаются в asm-файл
     '
     If Len(prevline) = 0 Then 'блокировка вывода в файлы части переносимой строки
-        If lstcnt < stopListing Then
+        If filePermissions.CreateASMFile = True Then
+            If lstcnt < stopListing Then
     
-            codeSection = ViewPosMid(lstline, LstFormat.LstMachCodeBegin, LstFormat.LstMachCodeEnd)
-            asmString = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
-            If isStringEmpty(asmString) Then
-                If isStringEmpty(codeSection) Then
-                    If Not (PrevLineEndDup) Then Print #2, asmString
+                codeSection = ViewPosMid(lstline, LstFormat.LstMachCodeBegin, LstFormat.LstMachCodeEnd)
+                asmString = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
+                If isStringEmpty(asmString) Then
+                    If isStringEmpty(codeSection) Then
+                        If Not (PrevLineEndDup) Then Print #2, asmString
+                    End If
+                Else
+                    Print #2, asmString
                 End If
-            Else
-                Print #2, asmString
-            End If
             
-            'отловим ложную пустую строку, возникающую в конце dup-последовательностей,
-            'если после dup в строке кода ничего не было
-            If StringExceptSpacesTabs(codeSection) = "]" Then        'была ли текущая строка третьей в DUP-последовательности?
-                                                                     '(работать с ней будем на следующем проходе)
-                PrevLineEndDup = True
-            Else
-                PrevLineEndDup = False
+                'отловим ложную пустую строку, возникающую в конце dup-последовательностей,
+                'если после dup в строке кода ничего не было
+                If StringExceptSpacesTabs(codeSection) = "]" Then        'была ли текущая строка третьей в DUP-последовательности?
+                                                                         '(работать с ней будем на следующем проходе)
+                    PrevLineEndDup = True
+                Else
+                    PrevLineEndDup = False
+                End If
             End If
         End If
         Print #3, lstline
