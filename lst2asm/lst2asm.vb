@@ -14,7 +14,8 @@ Option Explicit
 '             добавлено исправление CR-LF;
 '             доработано удаление пустых строк после dup(?) - и для db, и для dw
 '             реструктуризация программы с выделением проходов в отдельные функции
-'07.11.2021 - возможность отключения генерации ASM-файла
+'07.11.2021 - возможность отключения генерации ASM-файла;
+'             возможность удаления номеров строк из листинга
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: ListBox выбора формата и вообще интерфейс
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: сохранение файлов с LF вместо CR-LF под другим именем (а не перезапись)
@@ -30,6 +31,7 @@ Private Type LstFormatTable
     LstMachCodeEnd As Integer       'позиция конца машкода
     NextPageSkippedLines As Integer 'сколько строк пропускать при встрече новой страницы (считая ту, которая с ASCII 12)
     EndingPhrase As String          'фраза, после которой в листинге идет таблица символов (ее не включаем в asm)
+    EnumerStartLine As Integer      'строка, с которой в файле листинга начинается нумерация (только начиная с нее обрезаем)
 End Type
 
 Private Type TwoListingArrays
@@ -82,6 +84,7 @@ Case "MASM3 with line numbers"
     LstFormat.LstMachCodeEnd = 32
     LstFormat.NextPageSkippedLines = 4
     LstFormat.EndingPhrase = "Segments and Groups:"
+    LstFormat.EnumerStartLine = 5
 
 Case "MASM3 without line numbers"
         'если листинг без номеров страниц, позиции становятся на 8 (одну позицию tab) меньше. Это листинг, генерируемый на моем компе
@@ -102,6 +105,7 @@ Case "TASM5 with line numbers"
     LstFormat.LstMachCodeEnd = 34    'там дальше в 35-й позиции "+", но он нам не нужен
     LstFormat.NextPageSkippedLines = 5
     LstFormat.EndingPhrase = "Symbol Name"
+    LstFormat.EnumerStartLine = 6
 End Select
 
 With Application.FileDialog(msoFileDialogFilePicker)
@@ -361,6 +365,11 @@ Do While Not EOF(1)
                 Else
                     PrevLineEndDup = False
                 End If
+            End If
+        End If
+        If filePermissions.DeleteLineNumbers = True And LstFormat.isLineNumbersInFile = True Then
+            If Not (lstcnt < LstFormat.EnumerStartLine) And lstcnt < stopListing Then
+                lstline = ViewPosMid(lstline, LstFormat.LstAddrBegin)
             End If
         End If
         Print #3, lstline
