@@ -5160,35 +5160,24 @@ bct2:	mov	al,cs:[si]
 		mov	al, 1
 		mov	dx, 3DFh
 		out	dx, al
-		mov	dx, 3D8h
-		in	al, dx
-		mov	bl, al
+		mov	dl, 0D8h
 		mov	al, 0
 		out	dx, al
 		xor	di, di
 		mov	cx, 1024
-		xor	ax, ax
-		cld
-		repe stosw
 		mov	si, offset crt_char_gen
-		mov	cx, 1024
 		xor	di, di
-
-bct4:
-		mov	al, cs:[si]
-		mov	es:[di], al
-		inc	si
-		inc	di
-		loop	bct4
-		mov	al, 0
-		mov	dx, 3DFh
+		db	02eh		;cs:  segment prefix (not handled by Turbo Assembler)
+		rep movsb
+		mov	al, 00001001b
 		out	dx, al
-		mov	dx, 3D8h
-		mov	al, bl
+		mov	al,0
+		mov	dl, 0DFh
 		out	dx, al
 		ret
 bct	endp
 
+org	0f8cbh
 ;
 ;   Таблица кодов русских маленьких букв (строчных)
 ;

@@ -1,5 +1,5 @@
-Turbo Assembler	 Version 5.0	    11-07-21 12:37:36	    Page 1
-1840v4.asm
+Turbo Assembler	 Version 5.0	    11-08-21 23:03:02	    Page 1
+1840v5.asm
 
 
 
@@ -5989,35 +5989,25 @@ F891  8E C0				     mov     es, ax
 F893  B0 01				     mov     al, 1
 F895  BA 03DF				     mov     dx, 3DFh
 F898  EE				     out     dx, al
-F899  BA 03D8				     mov     dx, 3D8h
-F89C  EC				     in	     al, dx
-F89D  8A D8				     mov     bl, al
-F89F  B0 00				     mov     al, 0
-F8A1  EE				     out     dx, al
-F8A2  33 FF				     xor     di, di
-F8A4  B9 0400				     mov     cx, 1024
-F8A7  33 C0				     xor     ax, ax
-F8A9  FC				     cld
-F8AA  F3> AB				     repe stosw
-F8AC  BE FA6Er				     mov     si, offset	crt_char_gen
-F8AF  B9 0400				     mov     cx, 1024
-F8B2  33 FF				     xor     di, di
+F899  B2 D8				     mov     dl, 0D8h
+F89B  B0 00				     mov     al, 0
+F89D  EE				     out     dx, al
+F89E  33 FF				     xor     di, di
+F8A0  B9 0400				     mov     cx, 1024
+F8A3  BE FA6Er				     mov     si, offset	crt_char_gen
+F8A6  33 FF				     xor     di, di
+F8A8  2E				     db	     02eh	     ;cs:  segment prefix (not handled by Turbo+
+			     Assembler)
+F8A9  F3> A4				     rep movsb
+F8AB  B0 09				     mov     al, 00001001b
+F8AD  EE				     out     dx, al
+F8AE  B0 00				     mov     al,0
+F8B0  B2 DF				     mov     dl, 0DFh
+F8B2  EE				     out     dx, al
+F8B3  C3				     ret
+F8B4			     bct     endp
 
-F8B4			     bct4:
-F8B4  2E: 8A 04				     mov     al, cs:[si]
-F8B7  26: 88 05				     mov     es:[di], al
-F8BA  46				     inc     si
-F8BB  47				     inc     di
-F8BC  E2 F6				     loop    bct4
-F8BE  B0 00				     mov     al, 0
-F8C0  BA 03DF				     mov     dx, 3DFh
-F8C3  EE				     out     dx, al
-F8C4  BA 03D8				     mov     dx, 3D8h
-F8C7  8A C3				     mov     al, bl
-F8C9  EE				     out     dx, al
-F8CA  C3				     ret
-F8CB			     bct     endp
-
+			     org     0f8cbh
 			     ;
 			     ;	 Таблица	кодов русских маленьких букв	       +
 			     (строчных)
@@ -6900,13 +6890,13 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "11-07-21"
-??FILENAME			  Text	 "1840v4  "
-??TIME				  Text	 "12:37:36"
+??DATE				  Text	 "11-08-21"
+??FILENAME			  Text	 "1840v5  "
+??TIME				  Text	 "23:03:02"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
-@FILENAME			  Text	 1840V4
+@FILENAME			  Text	 1840V5
 @WORDSIZE			  Text	 2
 A5700051COPR_IB			  Byte	 CODE:E000
 ACTIVE_PAGE			  Byte	 DATA:0062
@@ -6935,7 +6925,6 @@ BCT				  Near16 CODE:F859
 BCT1				  Near16 CODE:F875
 BCT2				  Near16 CODE:F877
 BCT3				  Near16 CODE:F86C
-BCT4				  Near16 CODE:F8B4
 BEEP				  Near16 CODE:E5A9
 BIOS_BREAK			  Byte	 DATA:0071
 BOOT_LOCN			  Far16	 ABS0:7C00
