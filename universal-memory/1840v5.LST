@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-08-21 23:03:02	    Page 1
+Turbo Assembler	 Version 5.0	    11-09-21 20:44:49	    Page 1
 1840v5.asm
 
 
@@ -1596,7 +1596,7 @@ E686  E9 FD6B				     jmp     e22
 E689			     e21a:
 E689  5B				     pop     bx
 E68A  83 C4 06				     add     sp, 6
-E68D  8C DA				     mov     dx, ds
+E68D  8C C2				     mov     dx, es
 E68F  1F				     pop     ds
 E690  1E				     push    ds
 E691  89 1E 0013r			     mov     ds:memory_size, bx
@@ -6890,9 +6890,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "11-08-21"
+??DATE				  Text	 "11-09-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "23:03:02"
+??TIME				  Text	 "20:44:49"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE

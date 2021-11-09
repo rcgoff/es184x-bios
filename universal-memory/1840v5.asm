@@ -1405,7 +1405,7 @@ kb_ok:
 e21a:
 		pop	bx
 		add	sp, 6
-		mov	dx, ds
+		mov	dx, es
 		pop	ds
 		push	ds
 		mov	ds:memory_size,	bx
