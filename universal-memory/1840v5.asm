@@ -309,7 +309,7 @@ c3:
 		db	26h		;rc ES segment prefix
 		lodsw
 		xor	ax, bx
-		jnz	c7x
+		jnz	c4			;rc if error, make it 8bit compartible
 		in	al, 62h
 		and	al, 40h
 		mov	al, 0
@@ -334,7 +334,12 @@ c3a:
 		dec	di
 		mov	dx, 1
 		jmp	short c2a
-
+		
+c4:						;rc make 16-bit test result 8-bit (old) error processing compartible
+		cmp al,0
+		jne c7x			;rc L-byte - proceed as usual, saving NZ flag
+		mov al,ah		;rc else make compartible with 8bit
+		dec di			;rc set DI to even address and NZ flag
 c7x:
 		retn
 stgtst_cnt	endp
