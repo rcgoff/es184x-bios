@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-09-21 20:44:49	    Page 1
+Turbo Assembler	 Version 5.0	    11-14-21 00:36:33	    Page 1
 1840v5.asm
 
 
@@ -287,67 +287,67 @@ E000  35 37 30 30 30 35	31+  a5700051Copr_Ib db	'5700051 copr. ibm 1981'
       20 63 6F 70 72 2E	20+
       69 62 6D 20 31 39	38+
       31
-E016  E0E5r		     c1		     dw	offset c11	     ; адрес    возврата
-E018  E1F1r		     caw	     dw	offset ca3
+E016  E0E3r		     c1		     dw	offset c11	     ; адрес    возврата
+E018  E1EFr		     caw	     dw	offset ca3
 				     assume cs:code,ss:code,es:abs0,ds:data
 
 E01A			     stgtst:
-E01A  B9 4000				     mov     cx,4000h
+E01A  B9 2000				     mov     cx,4000h/2		     ;rc 2x less because 16bit	       +
+			     (by-word) testing
 
 E01D			     stgtst_cnt	     proc    near
-E01D  D1 E9				     shr     cx,1	     ;rc words count is	2x less	than bytes
-E01F  FC				     cld
-E020  8E D9				     mov     ds, cx
-E022  B8 FFFF				     mov     ax, 0FFFFh
-E025  BA AA55				     mov     dx, 0AA55h
-E028  2B FF				     sub     di, di
-E02A  F3> AB				     repe stosw
+E01D  FC				     cld
+E01E  8E D9				     mov     ds, cx
+E020  B8 FFFF				     mov     ax, 0FFFFh
+E023  BA AA55				     mov     dx, 0AA55h
+E026  2B FF				     sub     di, di
+E028  F3> AB				     repe stosw
 
-E02C			     c2a:
-E02C  4F				     dec     di
-E02D  4F				     dec     di
-E02E  FD				     std
+E02A			     c2a:
+E02A  4F				     dec     di
+E02B  4F				     dec     di
+E02C  FD				     std
 
-E02F			     c2b:
-E02F  8B F7				     mov     si, di
-E031  8C D9				     mov     cx, ds
+E02D			     c2b:
+E02D  8B F7				     mov     si, di
+E02F  8C D9				     mov     cx, ds
 			     ;---------------rc:
-E033  8A FC				     mov     bh, ah
-E035  8A DF				     mov     bl, bh	     ;rc now old pattern is in BX
+E031  8A FC				     mov     bh, ah
+E033  8A DF				     mov     bl, bh	     ;rc now old pattern is in BX
 
-E037			     c3:
-E037  26				     db	     26h	     ;rc ES segment prefix
-E038  AD				     lodsw
-E039  33 C3				     xor     ax, bx
-E03B  75 29				     jnz     c7x
-E03D  E4 62				     in	     al, 62h
-E03F  24 40				     and     al, 40h
-E041  B0 00				     mov     al, 0
-E043  75 21				     jnz     c7x
-E045  83 FB 00				     cmp     bx, 0
-E048  74 05				     jz	     c3a
-E04A  8A C2				     mov     al, dl
-E04C  8A E0				     mov     ah, al	     ;rc now new pattern is in AX
-E04E  AB				     stosw
+E035			     c3:
+E035  26				     db	     26h	     ;rc ES segment prefix
+E036  AD				     lodsw
+E037  33 C3				     xor     ax, bx
+E039  75 29				     jnz     c7x
+E03B  E4 62				     in	     al, 62h
+E03D  24 40				     and     al, 40h
+E03F  B0 00				     mov     al, 0
+E041  75 21				     jnz     c7x
+E043  83 FB 00				     cmp     bx, 0
+E046  74 05				     jz	     c3a
+E048  8A C2				     mov     al, dl
+E04A  8A E0				     mov     ah, al	     ;rc now new pattern is in AX
+E04C  AB				     stosw
 
-E04F			     c3a:
-E04F  E2 E6				     loop    c3
-E051  83 FB 00				     cmp     bx, 0
-E054  74 10				     jz	     c7x
-E056  8B D8				     mov     bx, ax
-E058  86 F2				     xchg    dh, dl
-E05A  FC				     cld
-E05B  47				     inc     di
-E05C  47				     inc     di
-E05D  74 D0				     jz	     c2b
-E05F  4F				     dec     di
-E060  4F				     dec     di
-E061  BA 0001				     mov     dx, 1
-E064  EB C6				     jmp     short c2a
+E04D			     c3a:
+E04D  E2 E6				     loop    c3
+E04F  83 FB 00				     cmp     bx, 0
+E052  74 10				     jz	     c7x
+E054  8B D8				     mov     bx, ax
+E056  86 F2				     xchg    dh, dl
+E058  FC				     cld
+E059  47				     inc     di
+E05A  47				     inc     di
+E05B  74 D0				     jz	     c2b
+E05D  4F				     dec     di
+E05E  4F				     dec     di
+E05F  BA 0001				     mov     dx, 1
+E062  EB C6				     jmp     short c2a
 
-E066			     c7x:
-E066  C3				     retn
-E067			     stgtst_cnt	     endp
+E064			     c7x:
+E064  C3				     retn
+E065			     stgtst_cnt	     endp
 
 
 			     ;____________________
@@ -364,89 +364,89 @@ E067			     stgtst_cnt	     endp
 			     считывания-записи
 			     ;	     общих	и сегментных	регистров.
 			     ;_____________________________________
-E067			     reset   label   near
-E067  FA		     start:  cli		     ; сброс признака разрешения+
+E065			     reset   label   near
+E065  FA		     start:  cli		     ; сброс признака разрешения+
 			     прерывания
-E068  B4 D5			     mov     ah,0d5h	     ;уст признаки SF,CF,ZF,AF
-E06A  9E			     sahf
-E06B  73 4E			     jnc     err01	     ;CF=0,в программу ошибок
-E06D  75 4C			     jnz     err01	     ;ZF=0,в программу ошибок
-E06F  7B 4A			     jnp     err01	     ;PF=0,в программу ошибок
-E071  79 48			     jns     err01	     ;SF=0,в программу ошибок
-E073  9F			     lahf		     ;загрузить признаки в AH
-E074  B1 05			     mov     cl,5	     ;загрузить счетчик
-E076  D2 EC			     shr     ah,cl	     ;выделить бит переноса
-E078  73 41			     jnc     err01	     ;признак AF=0
-E07A  B0 40			     mov     al,40h	     ;уст признак переполнения
-E07C  D0 E0			     shl     al,1	     ;уст для контроля
-E07E  71 3B			     jno     err01	     ;признак OF	не уст
-E080  32 E4			     xor     ah,ah	     ;уст AH=0
-E082  9E			     sahf		     ;уст в	исходное состояние SF,+
+E066  B4 D5			     mov     ah,0d5h	     ;уст признаки SF,CF,ZF,AF
+E068  9E			     sahf
+E069  73 4E			     jnc     err01	     ;CF=0,в программу ошибок
+E06B  75 4C			     jnz     err01	     ;ZF=0,в программу ошибок
+E06D  7B 4A			     jnp     err01	     ;PF=0,в программу ошибок
+E06F  79 48			     jns     err01	     ;SF=0,в программу ошибок
+E071  9F			     lahf		     ;загрузить признаки в AH
+E072  B1 05			     mov     cl,5	     ;загрузить счетчик
+E074  D2 EC			     shr     ah,cl	     ;выделить бит переноса
+E076  73 41			     jnc     err01	     ;признак AF=0
+E078  B0 40			     mov     al,40h	     ;уст признак переполнения
+E07A  D0 E0			     shl     al,1	     ;уст для контроля
+E07C  71 3B			     jno     err01	     ;признак OF	не уст
+E07E  32 E4			     xor     ah,ah	     ;уст AH=0
+E080  9E			     sahf		     ;уст в	исходное состояние SF,+
 			     CF,ZF,PF
-E083  72 36			     jc	     err01	     ;признак CF=1
-E085  74 34			     jz	     err01	     ;признак ZF=1
-E087  78 32			     js	     err01	     ;признак SF=1
-E089  7A 30			     jp	     err01	     ;признак PF=1
-E08B  9F			     lahf		     ;загрузить признаки в AH
-E08C  B1 05			     mov     cl,5	     ;загрузить счетчик
-E08E  D2 EC			     shr     ah,cl	     ;выделить бит переноса
-E090  72 29			     jc	     err01	     ;признак IF=1
-E092  D0 E4			     shl     ah,1	     ;контроль,	что OF сброшен
-E094  70 25			     jo	     err01
-E096  B8 FFFF			     mov     ax,0ffffh	     ;уст эталона в AX
-E099  F9			     stc
-E09A  8E D8		     c8:     mov     ds,ax	     ;запись во	все регистры
-E09C  8C DB			     mov     bx,ds
-E09E  8E C3			     mov     es,bx
-E0A0  8C C1			     mov     cx,es
-E0A2  8E D1			     mov     ss,cx
-E0A4  8C D2			     mov     dx,ss
-E0A6  8B E2			     mov     sp,dx
-E0A8  8B EC			     mov     bp,sp
-E0AA  8B F5			     mov     si,bp
-E0AC  8B FE			     mov     di,si
-E0AE  73 07			     jnc     c9
-E0B0  33 C7			     xor     ax,di	     ;проверка всех	регистров
+E081  72 36			     jc	     err01	     ;признак CF=1
+E083  74 34			     jz	     err01	     ;признак ZF=1
+E085  78 32			     js	     err01	     ;признак SF=1
+E087  7A 30			     jp	     err01	     ;признак PF=1
+E089  9F			     lahf		     ;загрузить признаки в AH
+E08A  B1 05			     mov     cl,5	     ;загрузить счетчик
+E08C  D2 EC			     shr     ah,cl	     ;выделить бит переноса
+E08E  72 29			     jc	     err01	     ;признак IF=1
+E090  D0 E4			     shl     ah,1	     ;контроль,	что OF сброшен
+E092  70 25			     jo	     err01
+E094  B8 FFFF			     mov     ax,0ffffh	     ;уст эталона в AX
+E097  F9			     stc
+E098  8E D8		     c8:     mov     ds,ax	     ;запись во	все регистры
+E09A  8C DB			     mov     bx,ds
+E09C  8E C3			     mov     es,bx
+E09E  8C C1			     mov     cx,es
+E0A0  8E D1			     mov     ss,cx
+E0A2  8C D2			     mov     dx,ss
+E0A4  8B E2			     mov     sp,dx
+E0A6  8B EC			     mov     bp,sp
+E0A8  8B F5			     mov     si,bp
+E0AA  8B FE			     mov     di,si
+E0AC  73 07			     jnc     c9
+E0AE  33 C7			     xor     ax,di	     ;проверка всех	регистров
 							     ;эталонами "FFFF", "0000"
-E0B2  75 07			     jnz     err01
-E0B4  F8			     clc
-E0B5  73 E3			     jnc     c8
-E0B7			     c9:
-E0B7  0B C7			     or	     ax,di	     ;нулевым шаблоном все	       +
+E0B0  75 07			     jnz     err01
+E0B2  F8			     clc
+E0B3  73 E3			     jnc     c8
+E0B5			     c9:
+E0B5  0B C7			     or	     ax,di	     ;нулевым шаблоном все	       +
 			     регистры проверены ?
-E0B9  74 02			     jz	     c10	     ;ДА - переход к следующему    +
+E0B7  74 02			     jz	     c10	     ;ДА - переход к следующему    +
 			     тесту
-E0BB  EB AA		     err01:  jmp   short  start
+E0B9  EB AA		     err01:  jmp   short  start
 			     ;_______________________
 			     ; ТЕСТ.02
 			     ;_______________________
-E0BD			     c10:
-E0BD  B0 00			     mov     al,0	     ;запретить прерывaния NMI
-E0BF  E6 A0			     out     0a0h,al
-E0C1  E6 83			     out     83h,al	     ;инициализация регистрa       +
+E0BB			     c10:
+E0BB  B0 00			     mov     al,0	     ;запретить прерывaния NMI
+E0BD  E6 A0			     out     0a0h,al
+E0BF  E6 83			     out     83h,al	     ;инициализация регистрa       +
 			     страниц ПДП
-E0C3  B0 99			     mov     al,99h	     ;уст A,C -ввод, B -	вывод
-E0C5  E6 63			    out	     cmd_port,al	     ;запись в регистр	       +
+E0C1  B0 99			     mov     al,99h	     ;уст A,C -ввод, B -	вывод
+E0C3  E6 63			    out	     cmd_port,al	     ;запись в регистр	       +
 			     режима
 								     ;трехканального порта
-E0C7  B0 FC			     mov     al,0fch		     ;блокировка контроля    +
+E0C5  B0 FC			     mov     al,0fch		     ;блокировка контроля    +
 			     по четности
-E0C9  E6 61			     out     port_b,al
-E0CB  2A C0			     sub     al,al
-E0CD  BA 03D8			     mov     dx,3d8h
-E0D0  EE			     out     dx,al	     ;блокировка цветного ЭЛИ
-E0D1  FE C0			     inc     al
-E0D3  BA 03B8			     mov     dx,3b8h
-E0D6  EE			     out     dx,al	     ;блокировка черно-белого     +
+E0C7  E6 61			     out     port_b,al
+E0C9  2A C0			     sub     al,al
+E0CB  BA 03D8			     mov     dx,3d8h
+E0CE  EE			     out     dx,al	     ;блокировка цветного ЭЛИ
+E0CF  FE C0			     inc     al
+E0D1  BA 03B8			     mov     dx,3b8h
+E0D4  EE			     out     dx,al	     ;блокировка черно-белого     +
 			     ЭЛИ
-E0D7  B8 F000			     mov     ax,cod	     ;уст сегментного регистра SS
-E0DA  8E D0			     mov     ss,ax
-E0DC  BB E000			     mov     bx,0e000h		     ;уст начального адреса +
+E0D5  B8 F000			     mov     ax,cod	     ;уст сегментного регистра SS
+E0D8  8E D0			     mov     ss,ax
+E0DA  BB E000			     mov     bx,0e000h		     ;уст начального адреса +
 			     памяти
-E0DF  BC E016r			     mov     sp,offset c1	     ;уст адреса возврата
-E0E2  EB 03			     jmp     short ros
-E0E4  90				     nop
-E0E5  75 D4		     c11:    jne     err01
+E0DD  BC E016r			     mov     sp,offset c1	     ;уст адреса возврата
+E0E0  EB 03			     jmp     short ros
+E0E2  90				     nop
+E0E3  75 D4		     c11:    jne     err01
 			     ;------------------------
 			     ;	ТЕСТ.03
 			     ;	 Осуществляет проверку, инициализацию и      +
@@ -455,205 +455,205 @@ E0E5  75 D4		     c11:    jne     err01
 			     ;_________________________
 			     ;	 Блокировка контроллера ПДП
 
-E0E7  B0 04		     ros:    mov     al,04
-E0E9  E6 08			     out     dma08,al
+E0E5  B0 04		     ros:    mov     al,04
+E0E7  E6 08			     out     dma08,al
 
 			     ;	 Проверка правильности функционирования
 			     ;	 таймера	1
 
-E0EB  B0 54			     mov     al,54h	     ;выбор таймера	1,LSB, режим 2
-E0ED  E6 43			     out     timer+3,al
-E0EF  2B C9			     sub     cx,cx
-E0F1  8A D9			     mov     bl,cl
-E0F3  8A C1			     mov     al,cl	     ;уст начального счетчика     +
+E0E9  B0 54			     mov     al,54h	     ;выбор таймера	1,LSB, режим 2
+E0EB  E6 43			     out     timer+3,al
+E0ED  2B C9			     sub     cx,cx
+E0EF  8A D9			     mov     bl,cl
+E0F1  8A C1			     mov     al,cl	     ;уст начального счетчика     +
 			     таймера в 0
-E0F5  E6 41			     out     timer+1,al
-E0F7			     c12:
-E0F7  B0 40			     mov     al,40h
-E0F9  E6 43			     out     timer+3,al
-E0FB  E4 41			     in	     al,timer+1	     ;считывание счетчика	       +
+E0F3  E6 41			     out     timer+1,al
+E0F5			     c12:
+E0F5  B0 40			     mov     al,40h
+E0F7  E6 43			     out     timer+3,al
+E0F9  E4 41			     in	     al,timer+1	     ;считывание счетчика	       +
 			     таймера 1
-E0FD  0A D8			     or	     bl,al	     ;все биты таймера включены ?
-E0FF  80 FB FF			     cmp     bl,0ffh	     ;ДА - сравнение	с FF
-E102  74 04			     je	     c13	     ;биты таймера сброшены
-E104  E2 F1			     loop    c12	     ;биты таймера установлены
-E106  EB B3			     jmp     short err01     ;сбой таймера 1, останов	       +
+E0FB  0A D8			     or	     bl,al	     ;все биты таймера включены ?
+E0FD  80 FB FF			     cmp     bl,0ffh	     ;ДА - сравнение	с FF
+E100  74 04			     je	     c13	     ;биты таймера сброшены
+E102  E2 F1			     loop    c12	     ;биты таймера установлены
+E104  EB B3			     jmp     short err01     ;сбой таймера 1, останов	       +
 			     системы
-E108			     c13:
-E108  8A C3			     mov     al,bl	     ;уст счетчика таймера 1
-E10A  2B C9			     sub     cx,cx
-E10C  E6 41			     out     timer+1,al
-E10E			     c14:	     ;цикл таймера
-E10E  B0 40			     mov     al,40h
-E110  E6 43			     out     timer+3,al
-E112  E4 41			     in	     al,timer+1		     ;считывание счетчика    +
+E106			     c13:
+E106  8A C3			     mov     al,bl	     ;уст счетчика таймера 1
+E108  2B C9			     sub     cx,cx
+E10A  E6 41			     out     timer+1,al
+E10C			     c14:	     ;цикл таймера
+E10C  B0 40			     mov     al,40h
+E10E  E6 43			     out     timer+3,al
+E110  E4 41			     in	     al,timer+1		     ;считывание счетчика    +
 			     таймера 1
-E114  22 D8			     and     bl,al
-E116  74 04			     jz	     c15
-E118  E2 F4			     loop    c14	     ;цикл таймера
-E11A  EB 9F			     jmp     short err01
+E112  22 D8			     and     bl,al
+E114  74 04			     jz	     c15
+E116  E2 F4			     loop    c14	     ;цикл таймера
+E118  EB 9F			     jmp     short err01
 
 			     ;	 Инициализация таймера 1
 
-E11C			     c15:
-E11C  B0 54			     mov     al,54h
-E11E  E6 43			     out     timer+3,al	     ;запись в регистр режима      +
+E11A			     c15:
+E11A  B0 54			     mov     al,54h
+E11C  E6 43			     out     timer+3,al	     ;запись в регистр режима      +
 			     таймера
-E120  B0 07			     mov     al,7    ;уст коэффициента деления для    +
+E11E  B0 07			     mov     al,7    ;уст коэффициента деления для    +
 			     регенерации
-E122  E6 41			     out     timer+1,al	     ;запись в счетчик таймера 1
-E124  E6 0D			     out     dma+0dh,al	     ;послать гашение ПДП
+E120  E6 41			     out     timer+1,al	     ;запись в счетчик таймера 1
+E122  E6 0D			     out     dma+0dh,al	     ;послать гашение ПДП
 
 			     ;	 Цикл проверки регистров ПДП
 
-E126  B0 FF			     mov     al,0ffh	     ;запись шаблона FF во все       +
+E124  B0 FF			     mov     al,0ffh	     ;запись шаблона FF во все       +
 			     регистры
-E128  8A D8		     c16:    mov     bl,al	     ;сохранить шаблон для	       +
+E126  8A D8		     c16:    mov     bl,al	     ;сохранить шаблон для	       +
 			     сравнения
-E12A  8A F8			     mov     bh,al
-E12C  B9 0008			     mov     cx,8	     ;уст цикла	счетчика
-E12F  BA 0000			     mov     dx,dma	     ;уст адреса регистра порта  +
+E128  8A F8			     mov     bh,al
+E12A  B9 0008			     mov     cx,8	     ;уст цикла	счетчика
+E12D  BA 0000			     mov     dx,dma	     ;уст адреса регистра порта  +
 			     ввода/вывода
-E132  EE		     c17:    out     dx,al	     ;запись  шаблона в регистр
-E133  EE			     out     dx,al	     ;старшие 16	бит регистра
-E134  B8 0101			     mov     ax,0101h	     ;изменение AX перед		       +
+E130  EE		     c17:    out     dx,al	     ;запись  шаблона в регистр
+E131  EE			     out     dx,al	     ;старшие 16	бит регистра
+E132  B8 0101			     mov     ax,0101h	     ;изменение AX перед		       +
 			     считыванием
-E137  EC			     in	     al,dx
-E138  8A E0			     mov     ah,al	     ;сохранить младшие	16 бит      +
+E135  EC			     in	     al,dx
+E136  8A E0			     mov     ah,al	     ;сохранить младшие	16 бит      +
 			     регистра
-E13A  EC			     in	     al,dx
-E13B  3B D8			     cmp     bx,ax	     ;считан тот же шаблон ?
-E13D  74 03			     je	     c18	     ;ДА - проверка следующего     +
+E138  EC			     in	     al,dx
+E139  3B D8			     cmp     bx,ax	     ;считан тот же шаблон ?
+E13B  74 03			     je	     c18	     ;ДА - проверка следующего     +
 			     регистра
-E13F  E9 FF79			     jmp     err01	     ;НЕТ - ошибка
-E142			     c18:			     ;выбор следующего регистра +
+E13D  E9 FF79			     jmp     err01	     ;НЕТ - ошибка
+E140			     c18:			     ;выбор следующего регистра +
 			     ПДП
-E142  42			     inc     dx		     ;установка адреса		       +
+E140  42			     inc     dx		     ;установка адреса		       +
 			     следующего
 							     ;регистра ПДП
-E143  E2 ED			     loop    c17	     ;запись шаблона для	       +
+E141  E2 ED			     loop    c17	     ;запись шаблона для	       +
 			     следующего регистра
-E145  F6 D0			     not     al		       ;уст шаблона в 0
-E147  74 DF			     jz	     c16
+E143  F6 D0			     not     al		       ;уст шаблона в 0
+E145  74 DF			     jz	     c16
 
 			     ;	 Инициализация и запуск ПДП
 
-E149  B0 FF			     mov     al,0ffh	     ;уст счетчика 64K для	       +
+E147  B0 FF			     mov     al,0ffh	     ;уст счетчика 64K для	       +
 			     регенерации
+E149  E6 01			     out     dma+1,al
 E14B  E6 01			     out     dma+1,al
-E14D  E6 01			     out     dma+1,al
-E14F  B0 58			     mov     al,058h	     ;уст режим	ПДП,	счетчик 0,      +
+E14D  B0 58			     mov     al,058h	     ;уст режим	ПДП,	счетчик 0,      +
 			     считывание
-E151  E6 0B			     out     dma+0bh,al	     ;запись в регистр режима ПДП
-E153  B0 00			     mov     al,0	     ;доступность контроллера    +
+E14F  E6 0B			     out     dma+0bh,al	     ;запись в регистр режима ПДП
+E151  B0 00			     mov     al,0	     ;доступность контроллера    +
 			     ПДП
-E155  E6 08			     out     dma+8,al	     ;уст регистр команд ПДП
-E157  E6 0A			     out     dma+10,al	     ;доступность канала 0 для     +
+E153  E6 08			     out     dma+8,al	     ;уст регистр команд ПДП
+E155  E6 0A			     out     dma+10,al	     ;доступность канала 0 для     +
 			     регенерации
-E159  B0 41			     mov     al,41h	     ;уст режим	дла канала 1
-E15B  E6 0B			     out     dma+0bh,al
-E15D  B0 42			     mov     al,42h	     ;уст режим	для канала 2
-E15F  E6 0B			     out     dma+0bh,al
-E161  B0 43			     mov     al,43h	     ;уст режим	для канала 3
-E163  E6 0B			     out     dma+0bh,al
+E157  B0 41			     mov     al,41h	     ;уст режим	дла канала 1
+E159  E6 0B			     out     dma+0bh,al
+E15B  B0 42			     mov     al,42h	     ;уст режим	для канала 2
+E15D  E6 0B			     out     dma+0bh,al
+E15F  B0 43			     mov     al,43h	     ;уст режим	для канала 3
+E161  E6 0B			     out     dma+0bh,al
 			     ;======================================RCgoff begin
 			     ;-----------------turn ES1841 memory on, if present
-E165  BA 02B0				     mov dx,2b0h
-E168  B0 0C				     mov al,0ch			     ;0b0000.1100 - turn RD,WR on, no  +
+E163  BA 02B0				     mov dx,2b0h
+E166  B0 0C				     mov al,0ch			     ;0b0000.1100 - turn RD,WR on, no  +
 			     reconfig
-E16A  EE				     out dx,al
+E168  EE				     out dx,al
 			     ;======================================RCgoff end
-E16B  B8 0040				     mov     ax, dat
-E16E  8E D8				     mov     ds, ax
+E169  B8 0040				     mov     ax, dat
+E16C  8E D8				     mov     ds, ax
 
-E170  8B 1E 0072r			     mov     bx, ds:reset_flag
-E174  8B 36 0013r			     mov si, ds:memory_size	     ;keep memory size in SI after     +
+E16E  8B 1E 0072r			     mov     bx, ds:reset_flag
+E172  8B 36 0013r			     mov si, ds:memory_size	     ;keep memory size in SI after     +
 			     reboot
-E178  2B C0				     sub     ax, ax
-E17A  8E C0				     mov     es, ax
-E17C  E4 62				     in	     al, port_c
-E17E  24 0F				     and     al, 0Fh
-E180  FE C0				     inc     al
-E182  02 C0				     add     al, al
-E184  BA 0000				     mov     dx, 0
-E187  8B E8				     mov     bp,ax			     ;BP will be segment count +
+E176  2B C0				     sub     ax, ax
+E178  8E C0				     mov     es, ax
+E17A  E4 62				     in	     al, port_c
+E17C  24 0F				     and     al, 0Fh
+E17E  FE C0				     inc     al
+E180  02 C0				     add     al, al
+E182  BA 0000				     mov     dx, 0
+E185  8B E8				     mov     bp,ax			     ;BP will be segment count +
 			     (and will be 0, i.e. no error, after finish)
-E189  33 C0				     xor     ax, ax			     ;write 0 to mem
-E18B  FC				     cld
+E187  33 C0				     xor     ax, ax			     ;write 0 to mem
+E189  FC				     cld
 
-E18C  2B FF				     sub     di, di			     ;not in loop because after+
+E18A  2B FF				     sub     di, di			     ;not in loop because after+
 			     writing 32768 words already will be DI=0
-E18E			     c19:
-E18E  B9 8000				     mov     cx, 32768
-E191  F3> AB				     rep stosw				     ;clear full segment (32768+
+E18C			     c19:
+E18C  B9 8000				     mov     cx, 32768
+E18F  F3> AB				     rep stosw				     ;clear full segment (32768+
 			     words=6536	bytes)
-E193  81 C2 1000			     add     dx, 4096			     ;next segment
-E197  8E C2				     mov     es, dx
-E199  4D				     dec     bp
-E19A  74 02				     jz	     c21
-E19C  EB F0				     jmp     short c19
+E191  81 C2 1000			     add     dx, 4096			     ;next segment
+E195  8E C2				     mov     es, dx
+E197  4D				     dec     bp
+E198  74 02				     jz	     c21
+E19A  EB F0				     jmp     short c19
 			     ;____________________
 			     ;	 Инициализация контроллера
 			     ;	 прерываний 8259
 			     ;____________________
-E19E			     c21:
-E19E  B0 13			     mov     al,13h	     ;ICW1 - EDGE, SNGL, ICW4
-E1A0  E6 20			     out     inta00,al
-E1A2  B0 08			     mov     al,8	     ;УСТ ICW2 - прерывание типа 8(8-F)
-E1A4  E6 21			     out     inta01,al
-E1A6  B0 09			     mov     al,9	     ;уст ICW4 - BUFFERD , режим 8086
-E1A8  E6 21			     out     inta01,al
-E1AA  2B C0				     sub     ax, ax
-E1AC  8E C0				     mov     es, ax
+E19C			     c21:
+E19C  B0 13			     mov     al,13h	     ;ICW1 - EDGE, SNGL, ICW4
+E19E  E6 20			     out     inta00,al
+E1A0  B0 08			     mov     al,8	     ;УСТ ICW2 - прерывание типа 8(8-F)
+E1A2  E6 21			     out     inta01,al
+E1A4  B0 09			     mov     al,9	     ;уст ICW4 - BUFFERD , режим 8086
+E1A6  E6 21			     out     inta01,al
+E1A8  2B C0				     sub     ax, ax
+E1AA  8E C0				     mov     es, ax
 												     ;DS still +
 			     points to BIOS data area
-E1AE  89 1E 0072r			     mov     ds:reset_flag, bx
-E1B2  89 36 0013r			     mov     ds:memory_size, si
-E1B6  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
-E1BC  74 38				     jz	     c25
-E1BE  8E D8				     mov     ds, ax
-E1C0  BC 3FF0r				     mov     sp, offset	tmp_tos
-E1C3  8E D0				     mov     ss, ax
-E1C5  8B F8				     mov     di, ax
-E1C7  BB 0024				     mov     bx, 9*4	     ; int 9 (KBD)
-E1CA  C7 07 E299r			     mov     word ptr [bx], offset d11
-E1CE  43				     inc     bx
-E1CF  43				     inc     bx
-E1D0  8C 0F				     mov     [bx], cs
-E1D2  E8 03F6				     call    kbd_reset
-E1D5  80 FB 65				     cmp     bl, 65h	     ; Manufacturing test mode - viz document  +
+E1AC  89 1E 0072r			     mov     ds:reset_flag, bx
+E1B0  89 36 0013r			     mov     ds:memory_size, si
+E1B4  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
+E1BA  74 38				     jz	     c25
+E1BC  8E D8				     mov     ds, ax
+E1BE  BC 3FF0r				     mov     sp, offset	tmp_tos
+E1C1  8E D0				     mov     ss, ax
+E1C3  8B F8				     mov     di, ax
+E1C5  BB 0024				     mov     bx, 9*4	     ; int 9 (KBD)
+E1C8  C7 07 E297r			     mov     word ptr [bx], offset d11
+E1CC  43				     inc     bx
+E1CD  43				     inc     bx
+E1CE  8C 0F				     mov     [bx], cs
+E1D0  E8 03F8				     call    kbd_reset
+E1D3  80 FB 65				     cmp     bl, 65h	     ; Manufacturing test mode - viz document  +
 			     in	BIOS root or http://www.vcfed.org/forum/archive/index.php/t-12377.html
-E1D8  75 0E				     jnz     c23
-E1DA  B2 FF				     mov     dl, 0FFh
+E1D6  75 0E				     jnz     c23
+E1D8  B2 FF				     mov     dl, 0FFh
 
-E1DC			     c22:
-E1DC  E8 03F9				     call    sp_test
-E1DF  8A C3				     mov     al, bl
-E1E1  AA				     stosb
-E1E2  FE CA				     dec     dl
-E1E4  75 F6				     jnz     c22
-E1E6  CD 3E				     int     3Eh
+E1DA			     c22:
+E1DA  E8 03FB				     call    sp_test
+E1DD  8A C3				     mov     al, bl
+E1DF  AA				     stosb
+E1E0  FE CA				     dec     dl
+E1E2  75 F6				     jnz     c22
+E1E4  CD 3E				     int     3Eh
 
-E1E8			     c23:
-E1E8  0E				     push    cs
-E1E9  17				     pop     ss
+E1E6			     c23:
+E1E6  0E				     push    cs
+E1E7  17				     pop     ss
 					     assume ss:code
-E1EA  FA				     cli
-E1EB  BC E018r				     mov     sp, offset	caw  ; [caw] = offset ca3 (next	jmp -> indirect+
+E1E8  FA				     cli
+E1E9  BC E018r				     mov     sp, offset	caw  ; [caw] = offset ca3 (next	jmp -> indirect+
 			     call)
-E1EE  E9 FE29				     jmp     stgtst
+E1EC  E9 FE2B				     jmp     stgtst
 
-E1F1			     ca3:
-E1F1  74 03				     jz	     c25
-E1F3  E9 FEC5				     jmp     err01
+E1EF			     ca3:
+E1EF  74 03				     jz	     c25
+E1F1  E9 FEC5				     jmp     err01
 
 			     ;	 Установка сегмента стека	и SP
 
-E1F6			     c25:
-E1F6  B8 0030			     mov     ax,sta	     ;получить величину	стека
-E1F9  8E D0			     mov     ss,ax	     ;уст стек
-E1FB  BC 0100r			     mov     sp,offset tos   ;стек готов
-E1FE  EB 1C			     jmp     short tst6	     ;переход к	следующему тесту
+E1F4			     c25:
+E1F4  B8 0030			     mov     ax,sta	     ;получить величину	стека
+E1F7  8E D0			     mov     ss,ax	     ;уст стек
+E1F9  BC 0100r			     mov     sp,offset tos   ;стек готов
+E1FC  EB 1C			     jmp     short tst6	     ;переход к	следующему тесту
 
 			     ;ros_checksum proc	 near
 			     ;	     mov     cx,8192	     ;число байт для сложения
@@ -670,12 +670,12 @@ E1FE  EB 1C			     jmp     short tst6	     ;переход к	следующем
 			     ;______________________
 				     assume  cs:code,es:abs0
 
-E200  70 61 72 69 74 79	20+  d1		     db	'parity	check 2'
+E1FE  70 61 72 69 74 79	20+  d1		     db	'parity	check 2'
       63 68 65 63 6B 20	32
 
 
       =000E		     d1l     equ     14
-E20E  70 61 72 69 74 79	20+  d2		     db	'parity	check 1'
+E20C  70 61 72 69 74 79	20+  d2		     db	'parity	check 1'
       63 68 65 63 6B 20	31
 
 
@@ -685,270 +685,270 @@ E20E  70 61 72 69 74 79	20+  d2		     db	'parity	check 1'
 			     ;	      Тест контроллера прерываний
 			     ;	      8259
 			     ;_______________________
-E21C			     tst6:
+E21A			     tst6:
 			     ;	 Проверка регистра масок прерываний (IMR)
 
-E21C  FA			     cli		     ;сброс признака разрешения +
+E21A  FA			     cli		     ;сброс признака разрешения +
 			     прерываний
-E21D  B0 00			     mov     al,0	     ;уст IMR в 0
-E21F  E6 21			     out     inta01,al
-E221  E4 21			     in	     al,inta01	     ;считывание IMR
-E223  0A C0			     or	     al,al	     ;IMR=0 ?
-E225  75 39			     jnz     d6		     ;IMR не 0,в программу ошибок
-E227  B0 FF			     mov     al,0ffh	     ;недоступность прерываний
-E229  E6 21			     out     inta01,al	     ;запись в IMR
-E22B  E4 21			     in	     al,inta01	     ;считывание IMR
-E22D  04 01			     add     al,1	     ;все биты IMR установлены ?
-E22F  75 2F			     jnz     d6		     ;НЕТ - в программу ошибок
+E21B  B0 00			     mov     al,0	     ;уст IMR в 0
+E21D  E6 21			     out     inta01,al
+E21F  E4 21			     in	     al,inta01	     ;считывание IMR
+E221  0A C0			     or	     al,al	     ;IMR=0 ?
+E223  75 39			     jnz     d6		     ;IMR не 0,в программу ошибок
+E225  B0 FF			     mov     al,0ffh	     ;недоступность прерываний
+E227  E6 21			     out     inta01,al	     ;запись в IMR
+E229  E4 21			     in	     al,inta01	     ;считывание IMR
+E22B  04 01			     add     al,1	     ;все биты IMR установлены ?
+E22D  75 2F			     jnz     d6		     ;НЕТ - в программу ошибок
 
-E231  2B C0			     sub     ax,ax	     ;уст регистра ES
-E233  8E C0			     mov     es,ax
+E22F  2B C0			     sub     ax,ax	     ;уст регистра ES
+E231  8E C0			     mov     es,ax
 
 
 			     ;	 Контроль ожидания прерывания
 
-E235  FC			     cld		     ; уст признак направления
-E236  B9 0020			     mov     cx,20h	     ;rc все	прерывания 00..1F,	       +
+E233  FC			     cld		     ; уст признак направления
+E234  B9 0020			     mov     cx,20h	     ;rc все	прерывания 00..1F,	       +
 			     относящиеся к BIOS
-E239  33 FF			     xor     di,di
-E23B			     d3:
-E23B  B8 E299r			     mov     ax,offset d11   ; установить адрес		       +
+E237  33 FF			     xor     di,di
+E239			     d3:
+E239  B8 E297r			     mov     ax,offset d11   ; установить адрес		       +
 			     процедуры	прерываний
-E23E  AB			     stosw
-E23F  B8 F000			     mov     ax,cod  ; получить	адрес сегмента	       +
+E23C  AB			     stosw
+E23D  B8 F000			     mov     ax,cod  ; получить	адрес сегмента	       +
 			     процедуры
-E242  AB			     stosw
-E243  E2 F6			     loop    d3
+E240  AB			     stosw
+E241  E2 F6			     loop    d3
 
 			     ;	 Установка указателя вектора прерывания NMI
-E245  26: C7 06	0008r	  +	     mov     es:nmi_ptr,offset nmi_int
-      E2A6r
+E243  26: C7 06	0008r	  +	     mov     es:nmi_ptr,offset nmi_int
+      E2A4r
 			     ;-----уст вектора прерываний 5
-E24C  26: C7 06	0014r	  +	     mov     es:int5_ptr,offset	print_screen   ; печать экрана
+E24A  26: C7 06	0014r	  +	     mov     es:int5_ptr,offset	print_screen   ; печать экрана
       FF54r
 
 			     ;	 Прерывания замаскированы
 
-E253  32 E4			     xor     ah,ah	     ;очистить регистр AH
-E255  FB			     sti		     ; установка признака	       +
+E251  32 E4			     xor     ah,ah	     ;очистить регистр AH
+E253  FB			     sti		     ; установка признака	       +
 			     разрешения прерывания
-E256  2B C9			     sub     cx,cx	     ; ожидание	1 сек любого	       +
+E254  2B C9			     sub     cx,cx	     ; ожидание	1 сек любого	       +
 			     прерывания,
-E258  E2 FE		     d4:     loop    d4		     ; которое может произойти
-E25A  E2 FE		     d5:     loop    d5
-E25C  0A E4			     or	     ah,ah	     ; прерывание возникло ?
-E25E  74 08			     jz	     d7		     ; нет -	к следующему	тесту
-E260  BA 0101		     d6:     mov     dx,101h	     ; уст длительности		       +
+E256  E2 FE		     d4:     loop    d4		     ; которое может произойти
+E258  E2 FE		     d5:     loop    d5
+E25A  0A E4			     or	     ah,ah	     ; прерывание возникло ?
+E25C  74 08			     jz	     d7		     ; нет -	к следующему	тесту
+E25E  BA 0101		     d6:     mov     dx,101h	     ; уст длительности		       +
 			     звукового	сигнала
-E263  E8 031A			     call    err_beep	     ; идти	в программу		       +
+E261  E8 031C			     call    err_beep	     ; идти	в программу		       +
 			     звукового	сигнала
-E266  FA			     cli
-E267  F4			     hlt		     ; останов системы
+E264  FA			     cli
+E265  F4			     hlt		     ; останов системы
 			     ;__________________
 			     ;	 ТЕСТ.07
 			     ;	      Проверка таймера 8253
 			     ;___________________
-E268			     d7:
-E268  B4 00			     mov     ah,0	     ; сброс признака прерывания+
+E266			     d7:
+E266  B4 00			     mov     ah,0	     ; сброс признака прерывания+
 			     таймера
-E26A  32 ED			     xor     ch,ch	     ; очистить	регистр CH
-E26C  B0 FE			     mov     al,0feh   ; маскировать	все прерывания,   +
+E268  32 ED			     xor     ch,ch	     ; очистить	регистр CH
+E26A  B0 FE			     mov     al,0feh   ; маскировать	все прерывания,   +
 			     кроме	LVL 0
-E26E  E6 21			     out     inta01,al	     ; запись IMR
-E270  B0 10			     mov     al,00010000b    ; выбрать TIM 0, LSD, режим 0,	BINARY
-E272  E6 43			     out     tim_ctl,al	 ;записать регистр режима	       +
+E26C  E6 21			     out     inta01,al	     ; запись IMR
+E26E  B0 10			     mov     al,00010000b    ; выбрать TIM 0, LSD, режим 0,	BINARY
+E270  E6 43			     out     tim_ctl,al	 ;записать регистр режима	       +
 			     управления таймера
-E274  B1 16			     mov     cl,16h	     ; уст счетчик программного  +
+E272  B1 16			     mov     cl,16h	     ; уст счетчик программного  +
 			     цикла
-E276  8A C1			     mov     al,cl	     ; установить счетчик	       +
+E274  8A C1			     mov     al,cl	     ; установить счетчик	       +
 			     таймера 0
-E278  E6 40			     out     timero,al	     ; записать	счетчик таймера 0
-E27A  F6 C4 FF		     d8:     test    ah,0ffh	     ; прерывание таймера 0	       +
+E276  E6 40			     out     timero,al	     ; записать	счетчик таймера 0
+E278  F6 C4 FF		     d8:     test    ah,0ffh	     ; прерывание таймера 0	       +
 			     произошло	?
-E27D  75 04			     jnz     d9		     ; да - таймер считал	медленно
-E27F  E2 F9			     loop    d8		     ; ожидание	прерывания	       +
+E27B  75 04			     jnz     d9		     ; да - таймер считал	медленно
+E27D  E2 F9			     loop    d8		     ; ожидание	прерывания	       +
 			     определенное время
-E281  EB DD			     jmp     short d6	;прерывание таймера 0 не	       +
+E27F  EB DD			     jmp     short d6	;прерывание таймера 0 не	       +
 			     произошло	- ошибка
-E283  B1 12		     d9:     mov     cl,18	     ; уст счетчик программного  +
+E281  B1 12		     d9:     mov     cl,18	     ; уст счетчик программного  +
 			     цикла
-E285  B0 FF			     mov     al,0ffh	     ; записать	счетчик таймера 0
-E287  E6 40			     out     timero,al
-E289  B4 00			     mov     ah,0	     ; сброс признака,		       +
+E283  B0 FF			     mov     al,0ffh	     ; записать	счетчик таймера 0
+E285  E6 40			     out     timero,al
+E287  B4 00			     mov     ah,0	     ; сброс признака,		       +
 			     полученного прерывания
-E28B  B0 FE			     mov     al,0feh	     ; недоступность прерываний +
+E289  B0 FE			     mov     al,0feh	     ; недоступность прерываний +
 			     таймера 0
-E28D  E6 21			     out     inta01,al
-E28F  F6 C4 FF		     d10:    test    ah,0ffh	     ; прерывание таймера 0	       +
+E28B  E6 21			     out     inta01,al
+E28D  F6 C4 FF		     d10:    test    ah,0ffh	     ; прерывание таймера 0	       +
 			     произошло	?
-E292  75 CC			     jnz     d6		     ; да - таймер считает быстро
-E294  E2 F9			     loop    d10	     ; ожидание	прерывания	       +
+E290  75 CC			     jnz     d6		     ; да - таймер считает быстро
+E292  E2 F9			     loop    d10	     ; ожидание	прерывания	       +
 			     определенное время
-E296  EB 37			     jmp     short tst8		     ; переход к следующему  +
+E294  EB 37			     jmp     short tst8		     ; переход к следующему  +
 			     тесту
-E298  90			     nop
+E296  90			     nop
 			     ;____________________
 			     ;	 Программа обслуживания
 			     ;	 временного прерывания
 			     ;____________________
-E299			     d11     proc    near
-E299  B4 01			     mov     ah,1
-E29B  50			     push    ax		     ; хранить регистр AX
-E29C  B0 FF			     mov     al,0ffh	     ; размаскировать все	       +
+E297			     d11     proc    near
+E297  B4 01			     mov     ah,1
+E299  50			     push    ax		     ; хранить регистр AX
+E29A  B0 FF			     mov     al,0ffh	     ; размаскировать все	       +
 			     прерывания
-E29E  E6 21			     out     inta01,al
-E2A0  B0 20			     mov     al,eoi
-E2A2  E6 20			     out     inta00,al
-E2A4  58			     pop     ax		     ; восстановить	регистр AX
-E2A5  CF			     iret
-E2A6			     d11     endp
+E29C  E6 21			     out     inta01,al
+E29E  B0 20			     mov     al,eoi
+E2A0  E6 20			     out     inta00,al
+E2A2  58			     pop     ax		     ; восстановить	регистр AX
+E2A3  CF			     iret
+E2A4			     d11     endp
 
-E2A6			     nmi_int proc    near
-E2A6  50			     push    ax		     ; хранить регистр AX
-E2A7  E4 62			     in	     al,port_c
-E2A9  A8 40			     test    al,40h	     ; ошибка паритета при	       +
+E2A4			     nmi_int proc    near
+E2A4  50			     push    ax		     ; хранить регистр AX
+E2A5  E4 62			     in	     al,port_c
+E2A7  A8 40			     test    al,40h	     ; ошибка паритета при	       +
 			     вводе/выводе ?
-E2AB  74 08			     jz	     d12	     ; да - признак сбрасывается  +
+E2A9  74 08			     jz	     d12	     ; да - признак сбрасывается  +
 			     в	0
-E2AD  BE E200r			     mov     si,offset d1    ; адрес поля сообщения об     +
+E2AB  BE E1FEr			     mov     si,offset d1    ; адрес поля сообщения об     +
 			     ошибке
-E2B0  B9 000E			     mov     cx,d1l	     ; длина поля сообщения об     +
+E2AE  B9 000E			     mov     cx,d1l	     ; длина поля сообщения об     +
 			     ошибке
-E2B3  EB 0A			     jmp     short d13	     ; отобразить ошибку на	       +
+E2B1  EB 0A			     jmp     short d13	     ; отобразить ошибку на	       +
 			     дисплее
-E2B5			     d12:
-E2B5  A8 80			     test    al,80h
-E2B7  74 10			     jz	     d14
-E2B9  BE E20Er			     mov     si,offset d2    ; адрес поля сообщения об     +
+E2B3			     d12:
+E2B3  A8 80			     test    al,80h
+E2B5  74 10			     jz	     d14
+E2B7  BE E20Cr			     mov     si,offset d2    ; адрес поля сообщения об     +
 			     ошибке
-E2BC  B9 000E			     mov     cx,d2l	     ; длина поля сообщения об     +
+E2BA  B9 000E			     mov     cx,d2l	     ; длина поля сообщения об     +
 			     ошибке
-E2BF			     d13:
-E2BF  B8 0000			     mov     ax,0	     ; инициировать	и установить+
+E2BD			     d13:
+E2BD  B8 0000			     mov     ax,0	     ; инициировать	и установить+
 			     режим	ЭЛИ
-E2C2  CD 10			     int     10h	     ; вызвать процедуру VIDEO_IO
-E2C4  E8 032E			     call    p_msg	     ; распечатать ошибку
-E2C7  FA			     cli
-E2C8  F4			     hlt		     ; останов системы
-E2C9			     d14:
-E2C9  58			     pop     ax		     ; восстановить	AX
-E2CA  CF			     iret
-E2CB			     nmi_int endp
+E2C0  CD 10			     int     10h	     ; вызвать процедуру VIDEO_IO
+E2C2  E8 0330			     call    p_msg	     ; распечатать ошибку
+E2C5  FA			     cli
+E2C6  F4			     hlt		     ; останов системы
+E2C7			     d14:
+E2C7  58			     pop     ax		     ; восстановить	AX
+E2C8  CF			     iret
+E2C9			     nmi_int endp
 			     ;____________________
 			     ;	 Начальный тест надежности
 			     ;____________________
 				     assume  cs:code,ds:data
 
-E2CB  20 32 30 31	     e1	     db	     ' 201'
+E2C9  20 32 30 31	     e1	     db	     ' 201'
       =0004		     e1l     equ     04h
 
 			     ;	 Выполнение программы БСУВВ,
 			     ;	 генерирующей вектора прерываний
 
-E2CF			     tst8:
-E2CF  FC			     cld		     ; установить признак	       +
+E2CD			     tst8:
+E2CD  FC			     cld		     ; установить признак	       +
 			     направления вперед
-E2D0  BF 0040r			     mov     di,offset video_int   ; уст адреса области	       +
+E2CE  BF 0040r			     mov     di,offset video_int   ; уст адреса области	       +
 			     прерываний
-E2D3  0E			     push    cs
-E2D4  1F			     pop     ds		     ; уст адреса таблицы	       +
+E2D1  0E			     push    cs
+E2D2  1F			     pop     ds		     ; уст адреса таблицы	       +
 			     векторов
-E2D5  BE FF03r			     mov     si,offset vector_table+10h	 ; смещение VECTOR_TABLE+(2*8) +
+E2D3  BE FF03r			     mov     si,offset vector_table+10h	 ; смещение VECTOR_TABLE+(2*8) +
 			     (начало прогр прерыв)
-E2D8  B9 0010			     mov     cx,10h
-E2DB  A5		     e1a:    movsw	     ; передать	таблицу векторов	в     +
+E2D6  B9 0010			     mov     cx,10h
+E2D9  A5		     e1a:    movsw	     ; передать	таблицу векторов	в     +
 			     память
-E2DC  47			     inc     di
-E2DD  47			     inc     di
-E2DE  E2 FB			     loop    e1a
+E2DA  47			     inc     di
+E2DB  47			     inc     di
+E2DC  E2 FB			     loop    e1a
 
 			     ;	 Установка таймера 0 в	режим 3
 
-E2E0  B0 FF			     mov     al,0ffh
-E2E2  E6 21			     out     inta01,al
-E2E4  B0 36			     mov     al,36h	     ; выбор счетчика 0,		       +
+E2DE  B0 FF			     mov     al,0ffh
+E2E0  E6 21			     out     inta01,al
+E2E2  B0 36			     mov     al,36h	     ; выбор счетчика 0,		       +
 			     считывания-за-
 			     ; писи	младшего,затем старшего байта		       +
 			     счетчика,уст режима 3
-E2E6  E6 43			     out     timer+3,al	     ; запись режима таймера
-E2E8  B0 C7			     mov     al,0c7h
-E2EA  E6 40			     out     timer,al	     ; записать	младшую часть      +
+E2E4  E6 43			     out     timer+3,al	     ; запись режима таймера
+E2E6  B0 C7			     mov     al,0c7h
+E2E8  E6 40			     out     timer,al	     ; записать	младшую часть      +
 			     счетчика
-E2EC  B0 DB			     mov     al,0dbh
-E2EE  E6 40			     out     timer,al	     ; записать	старшую часть      +
+E2EA  B0 DB			     mov     al,0dbh
+E2EC  E6 40			     out     timer,al	     ; записать	старшую часть      +
 			     счетчика
 
 
 				     assume  ds:data
-E2F0  B8 0040			     mov     ax,dat	     ; DS - сегмент данных
-E2F3  8E D8			     mov     ds,ax
-E2F5			     e3:
-E2F5  81 3E 0072r 1234		     cmp     reset_flag,1234h
-E2FB  74 03			     jz	     e3a
-E2FD  E8 1559			     call    bct     ;загрузка знакогенератора Ч/Б    +
+E2EE  B8 0040			     mov     ax,dat	     ; DS - сегмент данных
+E2F1  8E D8			     mov     ds,ax
+E2F3			     e3:
+E2F3  81 3E 0072r 1234		     cmp     reset_flag,1234h
+E2F9  74 03			     jz	     e3a
+E2FB  E8 155B			     call    bct     ;загрузка знакогенератора Ч/Б    +
 			     ЭЛИ
 			     ;_____________________
 			     ;	 ТЕСТ.08
 			     ;	      Инициализация и запуск
 			     ;	      контроллера ЭЛИ
 			     ;______________________
-E300  E4 60		     e3a:    in	     al,port_a	     ; считывание состояния	       +
+E2FE  E4 60		     e3a:    in	     al,port_a	     ; считывание состояния	       +
 			     переключателей
-E302  B4 00			     mov     ah,0
-E304  A3 0010r			     mov     equip_flag,ax   ; запомнить считанное	       +
+E300  B4 00			     mov     ah,0
+E302  A3 0010r			     mov     equip_flag,ax   ; запомнить считанное	       +
 			     состояние	пере-
 							     ; ключателей
-E307  24 30			     and     al,30h	     ; выделить	переключатели     +
+E305  24 30			     and     al,30h	     ; выделить	переключатели     +
 			     ЭЛИ
-E309  75 03			     jnz     e7		     ; переключатели ЭЛИ	       +
+E307  75 03			     jnz     e7		     ; переключатели ЭЛИ	       +
 			     установлены в 0 ?
-E30B  E9 0098			     jmp     e19	     ; пропустить тест ЭЛИ
-E30E			     e7:
-E30E  86 E0			     xchg    ah,al
-E310  80 FC 30			     cmp     ah,30h	     ; адаптер ч/б ?
-E313  74 09			     je	     e8		     ; да - установить режим для   +
+E309  E9 0098			     jmp     e19	     ; пропустить тест ЭЛИ
+E30C			     e7:
+E30C  86 E0			     xchg    ah,al
+E30E  80 FC 30			     cmp     ah,30h	     ; адаптер ч/б ?
+E311  74 09			     je	     e8		     ; да - установить режим для   +
 			     ч/б адаптера
-E315  FE C0			     inc     al	      ;	уст цветной режим для		       +
+E313  FE C0			     inc     al	      ;	уст цветной режим для		       +
 			     цветного адаптера
-E317  80 FC 20			     cmp     ah,20h	     ; режим 80х25 установлен ?
-E31A  75 02			     jne     e8		     ; нет -	уст режим для 40х25
-E31C  B0 03			     mov     al,3	     ; установить режим 80х25
-E31E			     e8:
-E31E  50			     push    ax		     ; хранить режим ЭЛИ	в стеке
-E31F  2A E4			     sub     ah,ah	     ;
-E321  CD 10			     int     10h
-E323  58			     pop     ax
-E324  50			     push    ax
-E325  BB B000			     mov     bx,0b000h
-E328  BA 03B8			     mov     dx,3b8h	     ; регистр режима для ч/б
-E32B  B9 1000			     mov     cx,4096	     ; счетчик байт для ч/б	       +
+E315  80 FC 20			     cmp     ah,20h	     ; режим 80х25 установлен ?
+E318  75 02			     jne     e8		     ; нет -	уст режим для 40х25
+E31A  B0 03			     mov     al,3	     ; установить режим 80х25
+E31C			     e8:
+E31C  50			     push    ax		     ; хранить режим ЭЛИ	в стеке
+E31D  2A E4			     sub     ah,ah	     ;
+E31F  CD 10			     int     10h
+E321  58			     pop     ax
+E322  50			     push    ax
+E323  BB B000			     mov     bx,0b000h
+E326  BA 03B8			     mov     dx,3b8h	     ; регистр режима для ч/б
+E329  B9 0800			     mov     cx,4096/2	     ; счетчик байт для ч/б	       +
 			     адаптера
-E32E  B0 01			     mov     al,1	     ; уст режим для	ч/б адаптера
-E330  80 FC 30			     cmp     ah,30h	     ; ч/б адаптер ЭЛИ подключен ?
-E333  74 0B			     je	     e9		     ; переход к проверке буфера +
+E32C  B0 01			     mov     al,1	     ; уст режим для	ч/б адаптера
+E32E  80 FC 30			     cmp     ah,30h	     ; ч/б адаптер ЭЛИ подключен ?
+E331  74 0B			     je	     e9		     ; переход к проверке буфера +
 			     ЭЛИ
-E335  BB B800			     mov     bx,0b800h
-E338  BA 03D8			     mov     dx,3d8h	     ; регистр режима для	       +
+E333  BB B800			     mov     bx,0b800h
+E336  BA 03D8			     mov     dx,3d8h	     ; регистр режима для	       +
 			     цветного адаптера
-E33B  B9 4000			     mov     cx,4000h
-E33E  FE C8			     dec     al		     ; уст режим в 0 для цветного  +
+E339  B9 2000			     mov     cx,4000h/2
+E33C  FE C8			     dec     al		     ; уст режим в 0 для цветного  +
 			     адаптера
 			     ;
 			     ;	     Проверка буфера ЭЛИ
 			     ;
-E340			     e9:
-E340  EE			     out     dx,al	     ; блокировка ЭЛИ для	       +
+E33E			     e9:
+E33E  EE			     out     dx,al	     ; блокировка ЭЛИ для	       +
 			     цветного адаптера
-E341  8E C3			     mov     es,bx
-E343  B8 0040			     mov     ax,dat	     ; DS - сегмент данных
-E346  8E D8			     mov     ds,ax
-E348  81 3E 0072r 1234		     cmp     reset_flag,1234h
-E34E  74 0D			     je	     e10
-E350  8E DB			     mov     ds,bx	     ;
-E352  E8 FCC8			     call    stgtst_cnt	     ; переход к проверке памяти
-E355  74 06			     je	     e10
-E357  BA 0102			     mov     dx,102h
-E35A  E8 0223			     call    err_beep
+E33F  8E C3			     mov     es,bx
+E341  B8 0040			     mov     ax,dat	     ; DS - сегмент данных
+E344  8E D8			     mov     ds,ax
+E346  81 3E 0072r 1234		     cmp     reset_flag,1234h
+E34C  74 0D			     je	     e10
+E34E  8E DB			     mov     ds,bx	     ;
+E350  E8 FCCA			     call    stgtst_cnt	     ; переход к проверке памяти
+E353  74 06			     je	     e10
+E355  BA 0102			     mov     dx,102h
+E358  E8 0225			     call    err_beep
 
 			     ;___________________________
 			     ;
@@ -956,140 +956,140 @@ E35A  E8 0223			     call    err_beep
 			     ;	      Осуществляет проверку	формирования       +
 			     строк	в буфере	ЭЛИ
 			     ;_________________________
-E35D			     e10:
-E35D  58			     pop     ax	  ; получить считанные			       +
+E35B			     e10:
+E35B  58			     pop     ax	  ; получить считанные			       +
 			     переключатели	ЭЛИ в AH
-E35E  50			     push    ax		     ; сохранить их
-E35F  B4 00			     mov     ah,0
-E361  CD 10			     int     10h
-E363  B8 7020			     mov     ax,7020h	     ; запись пробелов в	режиме   +
+E35C  50			     push    ax		     ; сохранить их
+E35D  B4 00			     mov     ah,0
+E35F  CD 10			     int     10h
+E361  B8 7020			     mov     ax,7020h	     ; запись пробелов в	режиме   +
 			     реверса
-E366  2B FF			     sub     di,di	     ; установка начала области
-E368  B9 0028			     mov     cx,40	     ;
-E36B  FC			     cld	 ; установить	признак направления  +
+E364  2B FF			     sub     di,di	     ; установка начала области
+E366  B9 0028			     mov     cx,40	     ;
+E369  FC			     cld	 ; установить	признак направления  +
 			     для уменьшения
-E36C  F3> AB			     rep     stosw	     ; записать	в память
+E36A  F3> AB			     rep     stosw	     ; записать	в память
 			     ;______________________
 			     ;	  ТЕСТ.10
 			     ;	       Осуществляет	проверку линий		       +
 			     интерфейса ЭЛИ
 			     ;______________________
-E36E  58			     pop     ax		     ; получить	считанные	       +
+E36C  58			     pop     ax		     ; получить	считанные	       +
 			     переключатели
-E36F  50			     push    ax		     ; сохранить их
-E370  80 FC 30			     cmp     ah,30h	     ; ч/б адаптер подключен ?
-E373  BA 03BA			     mov     dx,03bah	     ; уст адрес порта состояния +
+E36D  50			     push    ax		     ; сохранить их
+E36E  80 FC 30			     cmp     ah,30h	     ; ч/б адаптер подключен ?
+E371  BA 03BA			     mov     dx,03bah	     ; уст адрес порта состояния +
 			     ч/б дисплея
-E376  74 03			     je	     e11	     ; да - переход к	следующей     +
+E374  74 03			     je	     e11	     ; да - переход к	следующей     +
 			     строке
-E378  BA 03DA			     mov     dx,03dah	     ; цветной адаптер подключен
+E376  BA 03DA			     mov     dx,03dah	     ; цветной адаптер подключен
 			     ;
 			     ;	     Тест строчной развертки
 			     ;
-E37B			     e11:
-E37B  B4 08			     mov     ah,8
-E37D			     e12:
-E37D  2B C9			     sub     cx,cx
-E37F  EC		     e13:    in	     al,dx	 ;считывание порта состояния   +
+E379			     e11:
+E379  B4 08			     mov     ah,8
+E37B			     e12:
+E37B  2B C9			     sub     cx,cx
+E37D  EC		     e13:    in	     al,dx	 ;считывание порта состояния   +
 			     контроллера СМ607
-E380  22 C4			     and     al,ah	     ; проверка	строки
-E382  75 04			     jnz     e14
-E384  E2 F9			     loop    e13
-E386  EB 13			     jmp     short e17	     ; переход к сообщению об       +
+E37E  22 C4			     and     al,ah	     ; проверка	строки
+E380  75 04			     jnz     e14
+E382  E2 F9			     loop    e13
+E384  EB 13			     jmp     short e17	     ; переход к сообщению об       +
 			     ошибке
-E388  2B C9		     e14:    sub     cx,cx
-E38A  EC		     e15:    in	     al,dx     ;считывание порта	состояния     +
+E386  2B C9		     e14:    sub     cx,cx
+E388  EC		     e15:    in	     al,dx     ;считывание порта	состояния     +
 			     контроллера СМ607
-E38B  22 C4			     and     al,ah
-E38D  74 04			     jz	     e16
-E38F  E2 F9			     loop    e15
-E391  EB 08			     jmp     short e17
+E389  22 C4			     and     al,ah
+E38B  74 04			     jz	     e16
+E38D  E2 F9			     loop    e15
+E38F  EB 08			     jmp     short e17
 			     ;
 			     ;	     Следующий	строчный импульс
 			     ;
-E393			     e16:
-E393  B1 03			     mov     cl,3	     ; получить	следующий бит      +
+E391			     e16:
+E391  B1 03			     mov     cl,3	     ; получить	следующий бит      +
 			     для контроля
-E395  D2 EC			     shr     ah,cl
-E397  75 E4			     jnz     e12
-E399  EB 06			     jmp     short e18	     ; отобразить курсор на	       +
+E393  D2 EC			     shr     ah,cl
+E395  75 E4			     jnz     e12
+E397  EB 06			     jmp     short e18	     ; отобразить курсор на	       +
 			     экране
 			     ;
 			     ;	     Сообщение	об ошибке конттроллера СМ607
 			     ;
-E39B			     e17:
-E39B  BA 0103			     mov     dx,103h
-E39E  E8 01DF			     call    err_beep
+E399			     e17:
+E399  BA 0103			     mov     dx,103h
+E39C  E8 01E1			     call    err_beep
 			     ;
 			     ;	     Отображение курсора на	экране
 			     ;
-E3A1			     e18:
-E3A1  58			     pop     ax		     ; получить	считанные	       +
+E39F			     e18:
+E39F  58			     pop     ax		     ; получить	считанные	       +
 			     переключатели	в AH
-E3A2  B4 00			     mov     ah,0	     ; установить режим
-E3A4  CD 10			     int     10h
+E3A0  B4 00			     mov     ah,0	     ; установить режим
+E3A2  CD 10			     int     10h
 			     ;______________________
 			     ;	 ТЕСТ.11
 			     ;	      Дополнительный тест памяти
 			     ;______________________
 				     assume  ds:data
-E3A6			     e19:
-E3A6  B8 0040			     mov     ax,dat
-E3A9  8E D8			     mov     ds,ax
-E3AB  81 3E 0072r 1234			     cmp     reset_flag,1234h
-E3B1  74 0D				     je	     skip_size_det
-E3B3  E4 62				     in	     al, port_c
-E3B5  24 0F				     and     al, 0Fh
-E3B7  FE C0				     inc     al
-E3B9  B4 80				     mov     ah, 80h
-E3BB  F6 E4				     mul     ah
-E3BD  A3 0013r				     mov     ds:memory_size, ax
-E3C0			     skip_size_det:
-E3C0  A1 0013r				     mov     ax,ds:memory_size		     ;restore if reboot	and no +
+E3A4			     e19:
+E3A4  B8 0040			     mov     ax,dat
+E3A7  8E D8			     mov     ds,ax
+E3A9  81 3E 0072r 1234			     cmp     reset_flag,1234h
+E3AF  74 0D				     je	     skip_size_det
+E3B1  E4 62				     in	     al, port_c
+E3B3  24 0F				     and     al, 0Fh
+E3B5  FE C0				     inc     al
+E3B7  B4 80				     mov     ah, 80h
+E3B9  F6 E4				     mul     ah
+E3BB  A3 0013r				     mov     ds:memory_size, ax
+E3BE			     skip_size_det:
+E3BE  A1 0013r				     mov     ax,ds:memory_size		     ;restore if reboot	and no +
 			     damages if	power-on
-E3C3  A3 0015r				     mov     ds:io_ram_size, ax
+E3C1  A3 0015r				     mov     ds:io_ram_size, ax
 
 
 
 			     ;	 Проверка любой действительной памяти
 			     ;	 на считывание и запись
 
-E3C6  E9 024A			     jmp     e190
+E3C4  E9 024C			     jmp     e190
 
 			     ;	 Печать адреса и эталона, если
 			     ;	 произошла ошибка данных
 
 
-E3C9			     osh:
-E3C9  8A E8			     mov     ch,al	     ;
-E3CB  8A C6			     mov     al,dh	     ; получить	измененный адрес
-E3CD  B1 04			     mov     cl,4
-E3CF  D2 E8			     shr     al,cl	     ;
-E3D1  E8 0023			     call    xlat_print_cod  ; преобразование и печать    +
+E3C7			     osh:
+E3C7  8A E8			     mov     ch,al	     ;
+E3C9  8A C6			     mov     al,dh	     ; получить	измененный адрес
+E3CB  B1 04			     mov     cl,4
+E3CD  D2 E8			     shr     al,cl	     ;
+E3CF  E8 0023			     call    xlat_print_cod  ; преобразование и печать    +
 			     кода
-E3D4  8A C6			     mov     al,dh
-E3D6  24 0F			     and     al,0fh
-E3D8  E8 001C			     call    xlat_print_cod  ; преобразование и печать    +
+E3D2  8A C6			     mov     al,dh
+E3D4  24 0F			     and     al,0fh
+E3D6  E8 001C			     call    xlat_print_cod  ; преобразование и печать    +
 			     кода
-E3DB  8A C5			     mov     al,ch	     ; получить	следующий шаблон
-E3DD  B1 04			     mov     cl,4
-E3DF  D2 E8			     shr     al,cl
-E3E1  E8 0013			     call    xlat_print_cod  ; преобразование и печать    +
+E3D9  8A C5			     mov     al,ch	     ; получить	следующий шаблон
+E3DB  B1 04			     mov     cl,4
+E3DD  D2 E8			     shr     al,cl
+E3DF  E8 0013			     call    xlat_print_cod  ; преобразование и печать    +
 			     кода
-E3E4  8A C5			     mov     al,ch	     ;
-E3E6  24 0F			     and     al,0fh	     ;
-E3E8  E8 000C			     call    xlat_print_cod  ; преобразование и печать    +
+E3E2  8A C5			     mov     al,ch	     ;
+E3E4  24 0F			     and     al,0fh	     ;
+E3E6  E8 000C			     call    xlat_print_cod  ; преобразование и печать    +
 			     кода
-E3EB  BE E2CBr			     mov     si,offset e1    ; установить адрес поля	       +
+E3E9  BE E2C9r			     mov     si,offset e1    ; установить адрес поля	       +
 			     сообщения
 							     ; об ошибке
-E3EE  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
+E3EC  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
 			     сообщения	об ошибке
-E3F1  E8 0201			     call    p_msg	     ; печать ошибки
-E3F4			     e22:
-E3F4  EB 2C			     jmp     short tst12	     ; переход к следующему  +
+E3EF  E8 0203			     call    p_msg	     ; печать ошибки
+E3F2			     e22:
+E3F2  EB 2C			     jmp     short tst12	     ; переход к следующему  +
 			     тесту
-E3F6  90			     nop
+E3F4  90			     nop
 			     ;_____________________
 			     ;
 			     ;	 Процедура вывода на экран сообщения об       +
@@ -1097,18 +1097,18 @@ E3F6  90			     nop
 			     ;
 			     ;_______________________
 
-E3F7			     xlat_print_cod proc near
-E3F7  1E			     push    ds		     ; сохранить DS
-E3F8  0E			     push    cs
-E3F9  1F			     pop     ds
-E3FA  BB E412r			     mov     bx,offset f4e   ; адрес таблицы кодов ASCII
-E3FD  D7			     xlatb
-E3FE  B4 0E			     mov     ah,14
-E400  B7 00			     mov     bh,0
-E402  CD 10			     int     10h
-E404  1F			     pop     ds
-E405  C3			     ret
-E406			     xlat_print_cod endp
+E3F5			     xlat_print_cod proc near
+E3F5  1E			     push    ds		     ; сохранить DS
+E3F6  0E			     push    cs
+E3F7  1F			     pop     ds
+E3F8  BB E410r			     mov     bx,offset f4e   ; адрес таблицы кодов ASCII
+E3FB  D7			     xlatb
+E3FC  B4 0E			     mov     ah,14
+E3FE  B7 00			     mov     bh,0
+E400  CD 10			     int     10h
+E402  1F			     pop     ds
+E403  C3			     ret
+E404			     xlat_print_cod endp
 			     ;______________________
 			     ;	 Сброс системы - фаза 4
 			     ;______________________
@@ -1117,17 +1117,17 @@ E406			     xlat_print_cod endp
 			     ;_______________________
 
 				     assume  cs:code,ds:data
-E406  20 33 30 31	     f1	     db	     ' 301'
+E404  20 33 30 31	     f1	     db	     ' 301'
       =0004		     f1l     equ     4h		     ; сообщение клавиатуры
-E40A  31 33 31		     f2	     db	     '131'
+E408  31 33 31		     f2	     db	     '131'
       =0003		     f2l     equ     3h		     ; сообщение кассеты
-E40D  36 30 31		     f3	     db	     '601'
+E40B  36 30 31		     f3	     db	     '601'
       =0003		     f3l     equ     3h		     ; сообщение НГМД
 
-E410			     f4	     label   word
-E410  0378			     dw	     378h
-E412			     f4e     label   word
-E412  30 31 32 33 34 35	36+  ascii_tbl db    '0123456789abcdef'
+E40E			     f4	     label   word
+E40E  0378			     dw	     378h
+E410			     f4e     label   word
+E410  30 31 32 33 34 35	36+  ascii_tbl db    '0123456789abcdef'
       37 38 39 61 62 63	64+
       65 66
 
@@ -1136,69 +1136,69 @@ E412  30 31 32 33 34 35	36+  ascii_tbl db    '0123456789abcdef'
 			     ;	 ТЕСТ.12
 			     ;	 Тест клавиатуры
 			     ;______________________
-E422			     tst12:
+E420			     tst12:
 
-E422  B8 0040			     mov     ax,dat
-E425  8E D8			     mov     ds,ax
-E427  E8 01A1			     call    kbd_reset	     ; Сброс клавиатуры
-E42A  B0 4D			     mov     al,4dh	     ; доступность клавиатуры
-E42C  E6 61			     out     port_b,al
-E42E  E3 27			     jcxz    f6		     ; нет -	печать ошибки
-E430  80 FB AA			     cmp     bl,0aah	     ; код сканирования 'AA' ?
-E433  75 22			     jne     f6		     ; нет -	печать ошибки
+E420  B8 0040			     mov     ax,dat
+E423  8E D8			     mov     ds,ax
+E425  E8 01A3			     call    kbd_reset	     ; Сброс клавиатуры
+E428  B0 4D			     mov     al,4dh	     ; доступность клавиатуры
+E42A  E6 61			     out     port_b,al
+E42C  E3 27			     jcxz    f6		     ; нет -	печать ошибки
+E42E  80 FB AA			     cmp     bl,0aah	     ; код сканирования 'AA' ?
+E431  75 22			     jne     f6		     ; нет -	печать ошибки
 
 			     ;	 Поиск "залипших" клавиш
 
-E435  B0 CC			     mov     al,0cch	   ; сброс	клавиатуры, уст	       +
+E433  B0 CC			     mov     al,0cch	   ; сброс	клавиатуры, уст	       +
 			     синхронизации
-E437  E6 61			     out     port_b,al
-E439  B0 4C			     mov     al,4ch	   ; доступность клавиатуры
-E43B  E6 61			     out     port_b,al
-E43D  2B C9			     sub     cx,cx
+E435  E6 61			     out     port_b,al
+E437  B0 4C			     mov     al,4ch	   ; доступность клавиатуры
+E439  E6 61			     out     port_b,al
+E43B  2B C9			     sub     cx,cx
 			     ;
 			     ;	     Ожидание прерывания клавиатуры
 			     ;
-E43F			     f5:
-E43F  E2 FE			     loop    f5		     ; задержка
-E441  E4 60			     in	     al,kbd_in	     ; получение кода		       +
+E43D			     f5:
+E43D  E2 FE			     loop    f5		     ; задержка
+E43F  E4 60			     in	     al,kbd_in	     ; получение кода		       +
 			     сканирования
-E443  3C 00			     cmp     al,0	     ; код сканирования равен 0 ?
-E445  74 19			     je	     f7		     ; да - продолжение		       +
+E441  3C 00			     cmp     al,0	     ; код сканирования равен 0 ?
+E443  74 19			     je	     f7		     ; да - продолжение		       +
 			     тестирования
-E447  8A E8			     mov     ch,al	     ; сохранить код		       +
+E445  8A E8			     mov     ch,al	     ; сохранить код		       +
 			     сканирования
-E449  B1 04			     mov     cl,4
-E44B  D2 E8			     shr     al,cl
-E44D  E8 FFA7			     call    xlat_print_cod  ; преобразование и печать
-E450  8A C5			     mov     al,ch	     ; восстановить	код		       +
+E447  B1 04			     mov     cl,4
+E449  D2 E8			     shr     al,cl
+E44B  E8 FFA7			     call    xlat_print_cod  ; преобразование и печать
+E44E  8A C5			     mov     al,ch	     ; восстановить	код		       +
 			     сканирования
-E452  24 0F			     and     al,0fh	     ; выделить	младший байт
-E454  E8 FFA0			     call    xlat_print_cod  ; преобразование и печать
-E457  BE E406r		     f6:     mov     si,offset f1    ; получить	адрес поля	       +
+E450  24 0F			     and     al,0fh	     ; выделить	младший байт
+E452  E8 FFA0			     call    xlat_print_cod  ; преобразование и печать
+E455  BE E404r		     f6:     mov     si,offset f1    ; получить	адрес поля	       +
 			     сообщения	об
 							     ; ошибке
-E45A  B9 0004			     mov     cx,f1l	      ;	длина поля сообщения об    +
+E458  B9 0004			     mov     cx,f1l	      ;	длина поля сообщения об    +
 			     ошибке
-E45D  E8 0195			     call    p_msg	      ;	вывод сообщения об ошибке+
+E45B  E8 0197			     call    p_msg	      ;	вывод сообщения об ошибке+
 			     на экран
 
 			     ;	 Установка таблицы векторов прерываний
 
-E460			     f7:
-E460  2B C0			     sub     ax,ax
-E462  8E C0			     mov     es,ax
-E464  B9 0008			     mov     cx,8	     ; получить	счетчик векторов
-E467  0E			     push    cs
-E468  1F			     pop     ds
-E469  BE FEF3r			     mov     si,offset vector_table   ;	адрес таблицы	       +
+E45E			     f7:
+E45E  2B C0			     sub     ax,ax
+E460  8E C0			     mov     es,ax
+E462  B9 0008			     mov     cx,8	     ; получить	счетчик векторов
+E465  0E			     push    cs
+E466  1F			     pop     ds
+E467  BE FEF3r			     mov     si,offset vector_table   ;	адрес таблицы	       +
 			     векторов
-E46C  BF 0020r			     mov     di,offset int_ptr
-E46F  FC			     cld
-E470  A5		     f7a:    movsw
-E471  47			     inc     di
-E472  47			     inc     di
-E473  E2 FB			     loop    f7a
-E475  EB 06			     jmp short tst14
+E46A  BF 0020r			     mov     di,offset int_ptr
+E46D  FC			     cld
+E46E  A5		     f7a:    movsw
+E46F  47			     inc     di
+E470  47			     inc     di
+E471  E2 FB			     loop    f7a
+E473  EB 08			     jmp short tst14
 
 				     org     0e47dh	     ;rc для	устранения съезжания+
 			     при переделке загрузчика таблицы векторв      +
@@ -1257,7 +1257,7 @@ E4BB  73 09			     jnc     f14	     ; выключить мотор
 			     ;	  Ошибки НГМД
 
 E4BD			     f13:
-E4BD  BE E40Dr			     mov     si,offset f3    ; получить	адрес поля	       +
+E4BD  BE E40Br			     mov     si,offset f3    ; получить	адрес поля	       +
 			     сообщения	об
 							     ; ошибке
 E4C0  B9 0003			     mov     cx,f3l	     ; установить счетчик
@@ -1296,7 +1296,7 @@ E4F0  C7 06 001Ar 001Er			     mov     ds:buffer_head, offset kb_buffer ;	ERROR 
 			     6 lines upper, before int 16h
 E4F6  C7 06 001Cr 001Er			     mov     ds:buffer_tail, offset kb_buffer ;	ERROR -	Must be	approx.+
 			     6 lines upper, before int 16h
-E4FC  BD E410r			     mov     bp,offset f4    ; таблица PRT_SRC
+E4FC  BD E40Er			     mov     bp,offset f4    ; таблица PRT_SRC
 E4FF  BE 0000			     mov     si,0
 E502			     f16:
 E502  2E: 8B 56	00		     mov     dx,cs:[bp]	     ; получить	базовый адрес      +
@@ -1317,7 +1317,7 @@ E516			     f17:
 E516  45			     inc     bp		     ; указать следующий базовый+
 			     адрес
 E517  45			     inc     bp
-E518  81 FD E412r		     cmp     bp,offset f4e   ; все возможные адреса	       +
+E518  81 FD E410r		     cmp     bp,offset f4e   ; все возможные адреса	       +
 			     проверены	?
 E51C  75 E4			     jne     f16	     ; нет, к проверке следующего+
 			     адреса печати
@@ -1527,7 +1527,7 @@ E613  1E				     push    ds
 E614  B8 0010				     mov     ax, 16
 E617  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
 E61D  75 03				     jnz     e20a
-E61F  E9 FDD2				     jmp     e22
+E61F  E9 FDD0				     jmp     e22
 
 E622			     e20a:
 E622  B8 0010				     mov     ax, 16
@@ -1591,7 +1591,7 @@ E680  B0 0A				     mov     al, 10
 E682  E8 0013				     call    prt_hex
 E685  1F				     pop     ds
 
-E686  E9 FD6B				     jmp     e22
+E686  E9 FD69				     jmp     e22
 
 E689			     e21a:
 E689  5B				     pop     bx
@@ -1600,7 +1600,7 @@ E68D  8C C2				     mov     dx, es
 E68F  1F				     pop     ds
 E690  1E				     push    ds
 E691  89 1E 0013r			     mov     ds:memory_size, bx
-E695  E9 FD31				     jmp     osh
+E695  E9 FD2F				     jmp     osh
 
 E698			     prt_hex	     proc near
 E698  B4 0E				     mov     ah, 14
@@ -1699,7 +1699,7 @@ E725  E2 E0			     loop    h1		     ; цикл	повторения
 			     ;	 Загрузка с НГМД недоступна
 
 E727			     h3:			     ; кассета
-E727  E9 F991			     jmp     err01   ; отсутствует дискет загрузки
+E727  E9 F98F			     jmp     err01   ; отсутствует дискет загрузки
 
 			     ;	 Загрузка завершилась успешно
 
@@ -2440,7 +2440,7 @@ EB12  75 0B			     jne     k31
 EB14  C7 06 0072r 1234		     mov     reset_flag,1234h
 EB1A  EA			     db	     0eah		     ;	     db	     0eah,5bh,0e0h,00h,0f0h  ; +
 			     jmp far ptr start
-EB1B  E067r F000		     dw	     offset start, cod	     ;	     ###Gleb###
+EB1B  E065r F000		     dw	     offset start, cod	     ;	     ###Gleb###
 
 			     ;---
 
@@ -6700,7 +6700,7 @@ FF0B  F929r			     dw	     offset rs232_io	     ; прерывание  14H
 FF0D  F92Dr			     dw	     offset int15h	     ; int 15h (rc заглушка)
 FF0F  E82Er			     dw	     offset keyboard_io	     ; прерывание 16H
 FF11  EFD2r			     dw	     offset printer_io	     ; прерывание 17H
-FF13  E067r			     dw	     offset start	     ; rc перывание 18h,	       +
+FF13  E065r			     dw	     offset start	     ; rc перывание 18h,	       +
 			     поставил как в	1841 перезагрузку
 FF15  E6F7r			     dw	     offset boot_strap	     ; прерывание 19H
 FF17  FE6Er			     dw	     time_of_day     ; прерывание 1АH - время суток
@@ -6870,7 +6870,7 @@ FFDA  16*(00)				     db	22 dup(0)
 			     ;	 Переход	по включению	питания
 
 FFF0  EA		     POST:	     db	     0eah	     ; db    0eah,5bh,0e0h,00h,0f0h  ; jmp reset
-FFF1  E067r F000			     dw	     offset reset, cod	     ; ###Gleb###
+FFF1  E065r F000			     dw	     offset reset, cod	     ; ###Gleb###
 
 FFF5  30 34 2F 32 34 2F	38+		     db	'04/24/81'
       31
@@ -6890,9 +6890,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "11-09-21"
+??DATE				  Text	 "11-14-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "20:44:49"
+??TIME				  Text	 "00:36:33"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -6905,7 +6905,7 @@ ADDR_6845			  Word	 DATA:0063
 ALT_INPUT			  Byte	 DATA:0019
 ALT_KEY				  Number 0038
 ALT_SHIFT			  Number 0008
-ASCII_TBL			  Byte	 CODE:E412
+ASCII_TBL			  Byte	 CODE:E410
 B1				  Near16 CODE:EFF5
 B2				  Near16 CODE:EFFB
 B3				  Near16 CODE:F002
@@ -6935,28 +6935,28 @@ BUFFER_HEAD			  Word	 DATA:001A
 BUFFER_START			  Word	 DATA:0080
 BUFFER_TAIL			  Word	 DATA:001C
 C1				  Word	 CODE:E016
-C10				  Near16 CODE:E0BD
-C11				  Near16 CODE:E0E5
-C12				  Near16 CODE:E0F7
-C13				  Near16 CODE:E108
-C14				  Near16 CODE:E10E
-C15				  Near16 CODE:E11C
-C16				  Near16 CODE:E128
-C17				  Near16 CODE:E132
-C18				  Near16 CODE:E142
-C19				  Near16 CODE:E18E
-C21				  Near16 CODE:E19E
-C22				  Near16 CODE:E1DC
-C23				  Near16 CODE:E1E8
-C25				  Near16 CODE:E1F6
-C2A				  Near16 CODE:E02C
-C2B				  Near16 CODE:E02F
-C3				  Near16 CODE:E037
-C3A				  Near16 CODE:E04F
-C7X				  Near16 CODE:E066
-C8				  Near16 CODE:E09A
-C9				  Near16 CODE:E0B7
-CA3				  Near16 CODE:E1F1
+C10				  Near16 CODE:E0BB
+C11				  Near16 CODE:E0E3
+C12				  Near16 CODE:E0F5
+C13				  Near16 CODE:E106
+C14				  Near16 CODE:E10C
+C15				  Near16 CODE:E11A
+C16				  Near16 CODE:E126
+C17				  Near16 CODE:E130
+C18				  Near16 CODE:E140
+C19				  Near16 CODE:E18C
+C21				  Near16 CODE:E19C
+C22				  Near16 CODE:E1DA
+C23				  Near16 CODE:E1E6
+C25				  Near16 CODE:E1F4
+C2A				  Near16 CODE:E02A
+C2B				  Near16 CODE:E02D
+C3				  Near16 CODE:E035
+C3A				  Near16 CODE:E04D
+C7X				  Near16 CODE:E064
+C8				  Near16 CODE:E098
+C9				  Near16 CODE:E0B5
+CA3				  Near16 CODE:E1EF
 CAPS_KEY			  Number 0056
 CAPS_SHIFT			  Number 0040
 CAPS_STATE			  Number 0040
@@ -6979,22 +6979,22 @@ CTL_KEY				  Number 001D
 CTL_SHIFT			  Number 0004
 CURSOR_MODE			  Word	 DATA:0060
 CURSOR_POSN			  Word	 DATA:0050
-D1				  Byte	 CODE:E200
-D10				  Near16 CODE:E28F
-D11				  Near16 CODE:E299
-D12				  Near16 CODE:E2B5
-D13				  Near16 CODE:E2BF
-D14				  Near16 CODE:E2C9
+D1				  Byte	 CODE:E1FE
+D10				  Near16 CODE:E28D
+D11				  Near16 CODE:E297
+D12				  Near16 CODE:E2B3
+D13				  Near16 CODE:E2BD
+D14				  Near16 CODE:E2C7
 D1L				  Number 000E
-D2				  Byte	 CODE:E20E
+D2				  Byte	 CODE:E20C
 D2L				  Number 000E
-D3				  Near16 CODE:E23B
-D4				  Near16 CODE:E258
-D5				  Near16 CODE:E25A
-D6				  Near16 CODE:E260
-D7				  Near16 CODE:E268
-D8				  Near16 CODE:E27A
-D9				  Near16 CODE:E283
+D3				  Near16 CODE:E239
+D4				  Near16 CODE:E256
+D5				  Near16 CODE:E258
+D6				  Near16 CODE:E25E
+D7				  Near16 CODE:E266
+D8				  Near16 CODE:E278
+D9				  Near16 CODE:E281
 DAL				  Near16 CODE:E4E9
 DAT				  Number 0040
 DECIMAL_LOOP			  Near16 CODE:E653
@@ -7019,43 +7019,43 @@ DMA_BOUNDARY			  Number 0009
 DMA_SETUP			  Near16 CODE:EEC9
 DUMMM_RETURN			  Near16 CODE:F98B
 DUMMY_RETURN			  Near16 CODE:FF53
-E1				  Byte	 CODE:E2CB
-E10				  Near16 CODE:E35D
-E11				  Near16 CODE:E37B
-E12				  Near16 CODE:E37D
-E13				  Near16 CODE:E37F
-E14				  Near16 CODE:E388
-E15				  Near16 CODE:E38A
-E16				  Near16 CODE:E393
-E17				  Near16 CODE:E39B
-E18				  Near16 CODE:E3A1
-E19				  Near16 CODE:E3A6
+E1				  Byte	 CODE:E2C9
+E10				  Near16 CODE:E35B
+E11				  Near16 CODE:E379
+E12				  Near16 CODE:E37B
+E13				  Near16 CODE:E37D
+E14				  Near16 CODE:E386
+E15				  Near16 CODE:E388
+E16				  Near16 CODE:E391
+E17				  Near16 CODE:E399
+E18				  Near16 CODE:E39F
+E19				  Near16 CODE:E3A4
 E190				  Near16 CODE:E613
-E1A				  Near16 CODE:E2DB
+E1A				  Near16 CODE:E2D9
 E1L				  Number 0004
 E20A				  Near16 CODE:E622
 E20B				  Near16 CODE:E627
 E20C				  Near16 CODE:E637
 E21A				  Near16 CODE:E689
-E22				  Near16 CODE:E3F4
-E3				  Near16 CODE:E2F5
+E22				  Near16 CODE:E3F2
+E3				  Near16 CODE:E2F3
 E300				  Byte	 CODE:E69F
-E3A				  Near16 CODE:E300
-E7				  Near16 CODE:E30E
-E8				  Near16 CODE:E31E
-E9				  Near16 CODE:E340
+E3A				  Near16 CODE:E2FE
+E7				  Near16 CODE:E30C
+E8				  Near16 CODE:E31C
+E9				  Near16 CODE:E33E
 EOI				  Number 0020
 EQUIPMENT			  Far16	 CODE:F84D
 EQUIP_FLAG			  Word	 DATA:0010
 EQ_FL				  Byte	 ABS0:0410
-ERR01				  Near16 CODE:E0BB
+ERR01				  Near16 CODE:E0B9
 ERR10				  Near16 CODE:FFBB
 ERROR_BEEP			  Near16 CODE:E768
 ERR_BEEP			  Near16 CODE:E580
 ERR_WAIT			  Near16 CODE:E4E0
 EXIT				  Near16 CODE:FFC5
 EXT_PTR				  Dword	 ABS0:007C
-F1				  Byte	 CODE:E406
+F1				  Byte	 CODE:E404
 F10				  Near16 CODE:E490
 F11				  Near16 CODE:E4A5
 F12				  Near16 CODE:E4A7
@@ -7069,22 +7069,22 @@ F19				  Near16 CODE:E559
 F19A				  Near16 CODE:F96D
 F19B				  Near16 CODE:E55C
 F1L				  Number 0004
-F2				  Byte	 CODE:E40A
+F2				  Byte	 CODE:E408
 F20				  Near16 CODE:E570
 F20A				  Near16 CODE:F980
 F20B				  Near16 CODE:E574
 F21				  Near16 CODE:E57A
 F23				  Near16 CODE:E57D
 F2L				  Number 0003
-F3				  Byte	 CODE:E40D
+F3				  Byte	 CODE:E40B
 F39				  Byte	 CODE:E6A6
 F3L				  Number 0003
-F4				  Word	 CODE:E410
-F4E				  Word	 CODE:E412
-F5				  Near16 CODE:E43F
-F6				  Near16 CODE:E457
-F7				  Near16 CODE:E460
-F7A				  Near16 CODE:E470
+F4				  Word	 CODE:E40E
+F4E				  Word	 CODE:E410
+F5				  Near16 CODE:E43D
+F6				  Near16 CODE:E455
+F7				  Near16 CODE:E45E
+F7A				  Near16 CODE:E46E
 FIND_POSITION			  Near16 CODE:F3A7
 G1				  Near16 CODE:E58C
 G10				  Near16 CODE:E5EC
@@ -7333,14 +7333,14 @@ N9				  Near16 CODE:F30A
 NEC_OP				  Near16 CODE:EE64
 NEC_OUTPUT			  Near16 CODE:E72F
 NEC_STATUS			  Byte	 DATA:0042
-NMI_INT				  Near16 CODE:E2A6
+NMI_INT				  Near16 CODE:E2A4
 NMI_PTR				  Word	 ABS0:0008
 NUM_KEY				  Number 0045
 NUM_SHIFT			  Number 0020
 NUM_STATE			  Number 0020
 NUM_TRANS			  Near16 CODE:EFB0
 ORG_VECTOR			  Dword	 ABS0:004C
-OSH				  Near16 CODE:E3C9
+OSH				  Near16 CODE:E3C7
 P1				  Near16 CODE:F38A
 P10				  Near16 CODE:F403
 P11				  Near16 CODE:F40C
@@ -7395,13 +7395,13 @@ READ_LPEN			  Near16 CODE:F7A9
 RECORD_NOT_FND			  Number 0004
 REGEN				  Byte	 VIDEO_RAM:0000
 REGENW				  Word	 VIDEO_RAM:0000
-RESET				  Near16 CODE:E067
+RESET				  Near16 CODE:E065
 RESET_FLAG			  Word	 DATA:0072
 RESULTS				  Near16 CODE:EF6B
 RES_FL				  Word	 ABS0:0472
 RIGHT_KEY			  Number 0055
 RIGHT_SHIFT			  Number 0001
-ROS				  Near16 CODE:E0E7
+ROS				  Near16 CODE:E0E5
 RS232_BASE			  Word	 DATA:0000
 RS232_IO			  Near16 CODE:F929
 RUST				  Byte	 CODE:F8CB
@@ -7446,10 +7446,10 @@ SET_COLOR			  Near16 CODE:F254
 SET_CPOS			  Near16 CODE:F1F0
 SET_CTYPE			  Near16 CODE:F1CF
 SET_MODE			  Near16 CODE:F0FC
-SKIP_SIZE_DET			  Near16 CODE:E3C0
+SKIP_SIZE_DET			  Near16 CODE:E3BE
 SP_TEST				  Near16 CODE:E5D8
 STA				  Number 0030
-START				  Near16 CODE:E067
+START				  Near16 CODE:E065
 STATUS_BYTE			  Byte	 XXDATA:0000
 STAT_OFFSET			  Byte	 DATA:007C
 STGTST				  Near16 CODE:E01A
@@ -7475,10 +7475,10 @@ TIM_CTL				  Number 0043
 TMINT				  Number 0001
 TMP_TOS				  Word	 DATA:3FF0
 TOS				  Word	 STAC:0100
-TST12				  Near16 CODE:E422
+TST12				  Near16 CODE:E420
 TST14				  Near16 CODE:E47D
-TST6				  Near16 CODE:E21C
-TST8				  Near16 CODE:E2CF
+TST6				  Near16 CODE:E21A
+TST8				  Near16 CODE:E2CD
 U1				  Near16 CODE:F753
 U10				  Near16 CODE:F793
 U11				  Near16 CODE:F79A
@@ -7513,7 +7513,7 @@ WRITE_TTY			  Near16 CODE:F722
 WRITE_TTY2			  Near16 CODE:F966
 X1				  Near16 CODE:ED8B
 X2				  Near16 CODE:ED87
-XLAT_PRINT_COD			  Near16 CODE:E3F7
+XLAT_PRINT_COD			  Near16 CODE:E3F5
 XXDAT				  Number 0050
 ZB				  Byte	 ABS0:0000
 ZW				  Word	 ABS0:0000

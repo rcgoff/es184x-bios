@@ -283,10 +283,9 @@ caw		dw offset ca3
  	assume cs:code,ss:code,es:abs0,ds:data
 
 stgtst:
- 	 	mov	cx,4000h
+ 	 	mov	cx,4000h/2		;rc 2x less because 16bit (by-word) testing
 
 stgtst_cnt	proc	near
-		shr	cx,1		;rc words count is 2x less than bytes
 		cld
 		mov	ds, cx
 		mov	ax, 0FFFFh
@@ -821,13 +820,13 @@ e8:
  	push	ax
  	mov	bx,0b000h
  	mov	dx,3b8h 	; регистр режима для ч/б
- 	mov	cx,4096 	; счетчик байт для ч/б адаптера
+ 	mov	cx,4096/2 	; счетчик байт для ч/б адаптера
  	mov	al,1	 	; уст режим для ч/б адаптера
  	cmp	ah,30h	 	; ч/б адаптер ЭЛИ подключен ?
  	je	e9	 	; переход к проверке буфера ЭЛИ
  	mov	bx,0b800h
  	mov	dx,3d8h 	; регистр режима для цветного адаптера
- 	mov	cx,4000h
+ 	mov	cx,4000h/2
  	dec	al	 	; уст режим в 0 для цветного адаптера
 ;
 ;	Проверка буфера ЭЛИ
