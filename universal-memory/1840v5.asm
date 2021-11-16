@@ -337,7 +337,7 @@ c3a:
 		
 c4:						;rc make 16-bit test result 8-bit (old) error processing compartible
 		cmp al,0
-		jne c7x			;rc L-byte - proceed as usual, saving NZ flag
+		jne c7x			;rc L-byte - proceed as usual, precerving NZ flag
 		mov al,ah		;rc else make compartible with 8bit
 		dec di			;rc set DI to even address and NZ flag
 c7x:
@@ -947,26 +947,27 @@ skip_size_det:
 osh:
  	mov	ch,al	 	;
  	mov	al,dh	 	; получить измененный адрес
- 	mov	cl,4
- 	shr	al,cl	 	;
- 	call	xlat_print_cod	; преобразование и печать кода
- 	mov	al,dh
- 	and	al,0fh
- 	call	xlat_print_cod	; преобразование и печать кода
+	call prn_hex_byte
  	mov	al,ch	 	; получить следующий шаблон
- 	mov	cl,4
- 	shr	al,cl
- 	call	xlat_print_cod	; преобразование и печать кода
- 	mov	al,ch	 	;
- 	and	al,0fh	 	;
- 	call	xlat_print_cod	; преобразование и печать кода
+	call prn_hex_byte
  	mov	si,offset e1	; установить адрес поля сообщения
  	 	 	 	; об ошибке
  	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
  	call	p_msg	 	; печать ошибки
 e22:
  	jmp	short tst12	 	; переход к следующему тесту
-	nop
+prn_hex_byte proc near
+	push ax
+	mov	cl,4
+	shr	al,cl	 	;
+	call	xlat_print_cod	; преобразование и печать старшего разряда
+	pop ax
+	and	al,0fh
+	call	xlat_print_cod	; преобразование и печать младшего разряда
+	ret
+	
+prn_hex_byte endp
+org	0e3fch
 ;_____________________
 ;
 ;   Процедура вывода на экран сообщения об ошибке в коде ASCII

@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-14-21 00:40:12	    Page 1
+Turbo Assembler	 Version 5.0	    11-16-21 21:42:02	    Page 1
 1840v5.asm
 
 
@@ -349,8 +349,8 @@ E062  EB C6				     jmp     short c2a
 E064			     c4:					     ;rc make 16-bit test result 8-bit +
 			     (old) error processing compartible
 E064  3C 00				     cmp al,0
-E066  75 03				     jne c7x		     ;rc L-byte	- proceed as usual, saving NZ  +
-			     flag
+E066  75 03				     jne c7x		     ;rc L-byte	- proceed as usual, precerving +
+			     NZ	flag
 E068  8A C4				     mov al,ah		     ;rc else make compartible with 8bit
 E06A  4F				     dec di		     ;rc set DI	to even	address	and NZ flag
 E06B			     c7x:
@@ -1071,33 +1071,32 @@ E3CB  E9 0245			     jmp     e190
 E3CE			     osh:
 E3CE  8A E8			     mov     ch,al	     ;
 E3D0  8A C6			     mov     al,dh	     ; получить	измененный адрес
-E3D2  B1 04			     mov     cl,4
-E3D4  D2 E8			     shr     al,cl	     ;
-E3D6  E8 0023			     call    xlat_print_cod  ; преобразование и печать    +
-			     кода
-E3D9  8A C6			     mov     al,dh
-E3DB  24 0F			     and     al,0fh
-E3DD  E8 001C			     call    xlat_print_cod  ; преобразование и печать    +
-			     кода
-E3E0  8A C5			     mov     al,ch	     ; получить	следующий шаблон
-E3E2  B1 04			     mov     cl,4
-E3E4  D2 E8			     shr     al,cl
-E3E6  E8 0013			     call    xlat_print_cod  ; преобразование и печать    +
-			     кода
-E3E9  8A C5			     mov     al,ch	     ;
-E3EB  24 0F			     and     al,0fh	     ;
-E3ED  E8 000C			     call    xlat_print_cod  ; преобразование и печать    +
-			     кода
-E3F0  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
+E3D2  E8 0010			     call prn_hex_byte
+E3D5  8A C5			     mov     al,ch	     ; получить	следующий шаблон
+E3D7  E8 000B			     call prn_hex_byte
+E3DA  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
 			     сообщения
 							     ; об ошибке
-E3F3  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
+E3DD  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
 			     сообщения	об ошибке
-E3F6  E8 01FC			     call    p_msg	     ; печать ошибки
-E3F9			     e22:
-E3F9  EB 2C			     jmp     short tst12	     ; переход к следующему  +
+E3E0  E8 0212			     call    p_msg	     ; печать ошибки
+E3E3			     e22:
+E3E3  EB 42			     jmp     short tst12	     ; переход к следующему  +
 			     тесту
-E3FB  90			     nop
+E3E5			     prn_hex_byte proc near
+E3E5  50			     push ax
+E3E6  B1 04			     mov     cl,4
+E3E8  D2 E8			     shr     al,cl	     ;
+E3EA  E8 000F			     call    xlat_print_cod  ; преобразование и печать    +
+			     старшего разряда
+E3ED  58			     pop ax
+E3EE  24 0F			     and     al,0fh
+E3F0  E8 0009			     call    xlat_print_cod  ; преобразование и печать    +
+			     младшего разряда
+E3F3  C3			     ret
+
+E3F4			     prn_hex_byte endp
+			     org     0e3fch
 			     ;_____________________
 			     ;
 			     ;	 Процедура вывода на экран сообщения об       +
@@ -1535,7 +1534,7 @@ E613  1E				     push    ds
 E614  B8 0010				     mov     ax, 16
 E617  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
 E61D  75 03				     jnz     e20a
-E61F  E9 FDD7				     jmp     e22
+E61F  E9 FDC1				     jmp     e22
 
 E622			     e20a:
 E622  B8 0010				     mov     ax, 16
@@ -1599,7 +1598,7 @@ E680  B0 0A				     mov     al, 10
 E682  E8 0013				     call    prt_hex
 E685  1F				     pop     ds
 
-E686  E9 FD70				     jmp     e22
+E686  E9 FD5A				     jmp     e22
 
 E689			     e21a:
 E689  5B				     pop     bx
@@ -6898,9 +6897,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "11-14-21"
+??DATE				  Text	 "11-16-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "00:40:11"
+??TIME				  Text	 "21:42:02"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -7046,7 +7045,7 @@ E20A				  Near16 CODE:E622
 E20B				  Near16 CODE:E627
 E20C				  Near16 CODE:E637
 E21A				  Near16 CODE:E689
-E22				  Near16 CODE:E3F9
+E22				  Near16 CODE:E3E3
 E3				  Near16 CODE:E2FA
 E300				  Byte	 CODE:E69F
 E3A				  Near16 CODE:E305
@@ -7375,6 +7374,7 @@ PRI15				  Near16 CODE:FF8D
 PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
+PRN_HEX_BYTE			  Near16 CODE:E3E5
 PRT_DEC_LOOP			  Near16 CODE:E660
 PRT_HEX				  Near16 CODE:E698
 PRT_SIZ				  Near16 CODE:E64C
