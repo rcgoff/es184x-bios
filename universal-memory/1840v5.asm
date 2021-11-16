@@ -945,17 +945,17 @@ skip_size_det:
 
 
 osh:
- 	mov	ch,al	 	;
- 	mov	al,dh	 	; получить измененный адрес
+	mov	ch,al	 	;
+	mov	al,dh	 	; получить измененный адрес
 	call prn_hex_byte
- 	mov	al,ch	 	; получить следующий шаблон
+	mov	al,ch	 	; получить следующий шаблон
 	call prn_hex_byte
- 	mov	si,offset e1	; установить адрес поля сообщения
- 	 	 	 	; об ошибке
- 	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
- 	call	p_msg	 	; печать ошибки
+	mov	si,offset e1	; установить адрес поля сообщения
+	 	 	 	; об ошибке
+	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
+	call	p_msg	 	; печать ошибки
 e22:
- 	jmp	short tst12	 	; переход к следующему тесту
+	jmp	short tst12	 	; переход к следующему тесту
 prn_hex_byte proc near
 	push ax
 	mov	cl,4
@@ -965,7 +965,6 @@ prn_hex_byte proc near
 	and	al,0fh
 	call	xlat_print_cod	; преобразование и печать младшего разряда
 	ret
-	
 prn_hex_byte endp
 org	0e3fch
 ;_____________________

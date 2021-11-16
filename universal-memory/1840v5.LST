@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-16-21 21:42:02	    Page 1
+Turbo Assembler	 Version 5.0	    11-16-21 22:32:43	    Page 1
 1840v5.asm
 
 
@@ -1094,7 +1094,6 @@ E3EE  24 0F			     and     al,0fh
 E3F0  E8 0009			     call    xlat_print_cod  ; преобразование и печать    +
 			     младшего разряда
 E3F3  C3			     ret
-
 E3F4			     prn_hex_byte endp
 			     org     0e3fch
 			     ;_____________________
@@ -6899,7 +6898,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "11-16-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "21:42:02"
+??TIME				  Text	 "22:32:43"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
