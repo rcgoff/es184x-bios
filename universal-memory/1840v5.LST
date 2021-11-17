@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-17-21 21:39:41	    Page 1
+Turbo Assembler	 Version 5.0	    11-17-21 23:19:56	    Page 1
 1840v5.asm
 
 
@@ -1069,27 +1069,35 @@ E3CB  E9 0244			     jmp     e190
 
 
 E3CE			     osh:
-E3CE  50			     push ax	     ;
-E3CF  8A C6			     mov     al,dh	     ; получить	адрес (8 старших   +
+E3CE  50			     push ax
+E3CF  3D AAAA			     cmp ax,0aaaah	     ;rc проверка - это отсутствие+
+			     памяти?
+E3D2  74 0C			     je	adrtest
+E3D4			     usual:
+E3D4  8A C6			     mov     al,dh	     ; получить	адрес (8 старших   +
 			     разрядов)
-E3D1  E8 0007			     call prn_hex_byte
-E3D4  58			     pop ax	     ; получить	XOR записанного и	       +
+E3D6  E8 000F			     call prn_hex_byte
+E3D9  58			     pop ax	     ; получить	XOR записанного и	       +
 			     прочтенного
-E3D5  E8 0003			     call prn_hex_byte
-E3D8  E9 14D9			     jmp lo_hi
+E3DA  E8 000B			     call prn_hex_byte
+E3DD  E9 14D4			     jmp lo_hi
+E3E0			     adrtest:
+E3E0  F7 C2 0FFF		     test dx, 0fffh	     ;rc адрес кратен 64кб?
+E3E4  75 EE			     jne usual
+E3E6  EB 3F			     jmp short tst12
 
-E3DB			     prn_hex_byte proc near
-E3DB  50			     push ax
-E3DC  B1 04			     mov     cl,4
-E3DE  D2 E8			     shr     al,cl	     ;
-E3E0  E8 0019			     call    xlat_print_cod  ; преобразование и печать    +
+E3E8			     prn_hex_byte proc near
+E3E8  50			     push ax
+E3E9  B1 04			     mov     cl,4
+E3EB  D2 E8			     shr     al,cl	     ;
+E3ED  E8 000C			     call    xlat_print_cod  ; преобразование и печать    +
 			     старшего разряда
-E3E3  58			     pop ax
-E3E4  24 0F			     and     al,0fh
-E3E6  E8 0013			     call    xlat_print_cod  ; преобразование и печать    +
+E3F0  58			     pop ax
+E3F1  24 0F			     and     al,0fh
+E3F3  E8 0006			     call    xlat_print_cod  ; преобразование и печать    +
 			     младшего разряда
-E3E9  C3			     ret
-E3EA			     prn_hex_byte endp
+E3F6  C3			     ret
+E3F7			     prn_hex_byte endp
 			     org     0e3fch
 			     ;_____________________
 			     ;
@@ -6011,13 +6019,14 @@ F8B2  EE				     out     dx, al
 F8B3  C3				     ret
 F8B4			     bct     endp
 
-			     ;продолжение обработчика ошибки теста памяти
+			     ;rc продолжение	обработчика ошибки теста	       +
+			     памяти
 F8B4			     lo_hi:
 F8B4  32 C0			     xor al,al
 F8B6  D1 EF			     shr di,1
 F8B8  73 01			     jnc evn
 F8BA  40			     inc ax
-F8BB  E8 EB1D		     evn:    call prn_hex_byte
+F8BB  E8 EB2A		     evn:    call prn_hex_byte
 F8BE  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
 			     сообщения
 							     ; об ошибке
@@ -6911,7 +6920,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "11-17-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "21:39:41"
+??TIME				  Text	 "23:19:56"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -6921,6 +6930,7 @@ A5700051COPR_IB			  Byte	 CODE:E000
 ACTIVE_PAGE			  Byte	 DATA:0062
 ACT_DISP_PAGE			  Near16 CODE:F230
 ADDR_6845			  Word	 DATA:0063
+ADRTEST				  Near16 CODE:E3E0
 ALT_INPUT			  Byte	 DATA:0019
 ALT_KEY				  Number 0038
 ALT_SHIFT			  Number 0008
@@ -7388,7 +7398,7 @@ PRI15				  Near16 CODE:FF8D
 PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
-PRN_HEX_BYTE			  Near16 CODE:E3DB
+PRN_HEX_BYTE			  Near16 CODE:E3E8
 PRT_DEC_LOOP			  Near16 CODE:E65F
 PRT_HEX				  Near16 CODE:E696
 PRT_SIZ				  Near16 CODE:E64B
@@ -7513,6 +7523,7 @@ U6				  Near16 CODE:F780
 U7				  Near16 CODE:F782
 U8				  Near16 CODE:F786
 U9				  Near16 CODE:F78F
+USUAL				  Near16 CODE:E3D4
 V1				  Byte	 CODE:F7A1
 V2				  Near16 CODE:F7E8
 V3				  Near16 CODE:F80F

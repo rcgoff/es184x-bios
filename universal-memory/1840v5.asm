@@ -945,12 +945,19 @@ skip_size_det:
 
 
 osh:
-	push ax	 	;
+	push ax
+	cmp ax,0aaaah		;rc проверка - это отсутствие памяти?
+	je adrtest
+usual:
 	mov	al,dh	 	; получить адрес (8 старших разрядов)
 	call prn_hex_byte
 	pop ax	 	; получить XOR записанного и прочтенного
 	call prn_hex_byte
 	jmp lo_hi
+adrtest:
+	test dx, 0fffh		;rc адрес кратен 64кб?
+	jne usual
+	jmp short tst12
 
 prn_hex_byte proc near
 	push ax
@@ -5180,7 +5187,7 @@ bct2:	mov	al,cs:[si]
 		ret
 bct	endp
 
-;продолжение обработчика ошибки теста памяти
+;rc продолжение обработчика ошибки теста памяти
 lo_hi:
 	xor al,al
 	shr di,1
