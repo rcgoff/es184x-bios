@@ -945,11 +945,16 @@ skip_size_det:
 
 
 osh:
-	mov	ch,al	 	;
-	mov	al,dh	 	; получить измененный адрес
+	push ax	 	;
+	mov	al,dh	 	; получить адрес (8 старших разрядов)
 	call prn_hex_byte
-	mov	al,ch	 	; получить следующий шаблон
+	pop ax	 	; получить XOR записанного и прочтенного
 	call prn_hex_byte
+	xor al,al
+	shr di,1
+	jnc evn
+	inc ax
+evn:	call prn_hex_byte
 	mov	si,offset e1	; установить адрес поля сообщения
 	 	 	 	; об ошибке
 	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
