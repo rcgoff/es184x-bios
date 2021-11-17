@@ -950,16 +950,8 @@ osh:
 	call prn_hex_byte
 	pop ax	 	; получить XOR записанного и прочтенного
 	call prn_hex_byte
-	xor al,al
-	shr di,1
-	jnc evn
-	inc ax
-evn:	call prn_hex_byte
-	mov	si,offset e1	; установить адрес поля сообщения
-	 	 	 	; об ошибке
-	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
-	call	p_msg	 	; печать ошибки
-	jmp	short tst12	 	; переход к следующему тесту
+	jmp lo_hi
+
 prn_hex_byte proc near
 	push ax
 	mov	cl,4
@@ -5187,6 +5179,19 @@ bct2:	mov	al,cs:[si]
 		out	dx, al
 		ret
 bct	endp
+
+;продолжение обработчика ошибки теста памяти
+lo_hi:
+	xor al,al
+	shr di,1
+	jnc evn
+	inc ax
+evn:	call prn_hex_byte
+	mov	si,offset e1	; установить адрес поля сообщения
+	 	 	 	; об ошибке
+	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
+	call	p_msg	 	; печать ошибки
+	jmp	tst12	 	; переход к следующему тесту
 
 org	0f8cbh
 ;
