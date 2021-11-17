@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-17-21 20:50:40	    Page 1
+Turbo Assembler	 Version 5.0	    11-17-21 21:10:53	    Page 1
 1840v5.asm
 
 
@@ -1087,7 +1087,6 @@ E3E2  BE E2D0r			     mov     si,offset e1    ; установить адрес 
 E3E5  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
 			     сообщения	об ошибке
 E3E8  E8 020A			     call    p_msg	     ; печать ошибки
-E3EB			     e22:
 E3EB  EB 3A			     jmp     short tst12	     ; переход к следующему  +
 			     тесту
 E3ED			     prn_hex_byte proc near
@@ -1541,7 +1540,7 @@ E612  1E				     push    ds
 E613  B8 0010				     mov     ax, 16
 E616  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
 E61C  75 03				     jnz     e20a
-E61E  E9 FDCA				     jmp     e22
+E61E  E9 FE06				     jmp     tst12
 
 E621			     e20a:
 E621  B8 0010				     mov     ax, 16
@@ -1606,7 +1605,7 @@ E67E  B0 0A				     mov     al, 10
 E680  E8 0013				     call    prt_hex
 E683  1F				     pop     ds
 
-E684  E9 FD64				     jmp     e22
+E684  E9 FDA0				     jmp     tst12
 
 E687			     e21a:
 E687  5B				     pop     bx
@@ -1629,8 +1628,8 @@ E6A4  45 52 52 4F 52 20	28+  f39	     db	'ERROR (RESUME="F1" KEY)'
       52 45 53 55 4D 45	3D+
       22 46 31 22 20 4B	45+
       59 29
+E6BB  20 28		     brack	     db	' ('	     ;rc для	теста памяти
 
-			     org     0e6bdh
 			     ;	 Таблица	кодов русских больших букв	       +
 			     (заглавных)
 
@@ -6908,7 +6907,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "11-17-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "20:50:40"
+??TIME				  Text	 "21:10:53"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -6946,6 +6945,7 @@ BIOS_BREAK			  Byte	 DATA:0071
 BOOT_LOCN			  Far16	 ABS0:7C00
 BOOT_STRAP			  Near16 CODE:E6F7
 BOOT_VEC			  Dword	 ABS0:0064
+BRACK				  Byte	 CODE:E6BB
 BUFFER_END			  Word	 DATA:0082
 BUFFER_HEAD			  Word	 DATA:001A
 BUFFER_START			  Word	 DATA:0080
@@ -7054,7 +7054,6 @@ E20A				  Near16 CODE:E621
 E20B				  Near16 CODE:E626
 E20C				  Near16 CODE:E636
 E21A				  Near16 CODE:E687
-E22				  Near16 CODE:E3EB
 E3				  Near16 CODE:E2FA
 E300				  Byte	 CODE:E69D
 E3A				  Near16 CODE:E305

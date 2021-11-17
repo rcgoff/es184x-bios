@@ -959,7 +959,6 @@ evn:	call prn_hex_byte
 	 	 	 	; об ошибке
 	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
 	call	p_msg	 	; печать ошибки
-e22:
 	jmp	short tst12	 	; переход к следующему тесту
 prn_hex_byte proc near
 	push ax
@@ -1346,7 +1345,7 @@ e190:
 		mov	ax, 16
 		cmp	ds:reset_flag, 1234h
 		jnz	e20a
-		jmp	e22
+		jmp	tst12
 
 e20a:
 		mov	ax, 16
@@ -1411,7 +1410,7 @@ kb_ok:
 		call	prt_hex
 		pop	ds
 		
-		jmp	e22
+		jmp	tst12
 
 e21a:
 		pop	bx
@@ -1431,8 +1430,8 @@ prt_hex		endp
 
 e300		db ' Kb OK',0Dh
 f39		db 'ERROR (RESUME="F1" KEY)'
+brack		db ' ('		;rc для теста памяти
 
-org	0e6bdh
 ;   Таблица кодов русских больших букв (заглавных)
 
 rust2	label	byte
