@@ -1325,9 +1325,10 @@ p_msg	proc	near
  	mov	ax,dat
  	mov	ds,ax
  	mov	bp,si
+	cld
 g12:
- 	mov	al,cs:[si]	; поместить знак в AL
- 	inc	si	 	; указать следующий знак
+	db	2eh		;cs cegment prefix
+	lodsb	; поместить знак в AL
  	mov	bh,0	 	; установить страницу
  	mov	ah,14	 	; уст функцию записи знака
  	int	10h	 	; и записать знак
@@ -1392,10 +1393,11 @@ prt_dec_loop:
 		loop	prt_dec_loop
 		mov	cx, 7
 		mov	si, offset e300	; " Kb OK\r"
+		cld
 
 kb_ok:
-		mov	al, cs:[si]
-		inc	si
+		db	2eh		;cs segment prefix
+		lodsb
 		call	prt_hex
 		loop	kb_ok
 		pop	ax
@@ -1430,6 +1432,7 @@ prt_hex		endp
 e300		db ' Kb OK',0Dh
 f39		db 'ERROR (RESUME="F1" KEY)'
 
+org	0e6bdh
 ;   Таблица кодов русских больших букв (заглавных)
 
 rust2	label	byte
