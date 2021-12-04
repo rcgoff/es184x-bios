@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    11-17-21 23:19:56	    Page 1
+Turbo Assembler	 Version 5.0	    12-04-21 23:13:15	    Page 1
 1840v5.asm
 
 
@@ -1080,7 +1080,7 @@ E3D6  E8 000F			     call prn_hex_byte
 E3D9  58			     pop ax	     ; получить	XOR записанного и	       +
 			     прочтенного
 E3DA  E8 000B			     call prn_hex_byte
-E3DD  E9 14D4			     jmp lo_hi
+E3DD  E9 14C8			     jmp lo_hi
 E3E0			     adrtest:
 E3E0  F7 C2 0FFF		     test dx, 0fffh	     ;rc адрес кратен 64кб?
 E3E4  75 EE			     jne usual
@@ -5978,62 +5978,60 @@ F866  EE			     out     dx,al
 F867  33 FF			     xor     di,di
 F869  FC			     cld
 F86A  F3> AB			     rep     stosw
-F86C  BE FA6Er		     bct3:   mov     si,offset crt_char_gen
+F86C  BE FA6Er			     mov     si,offset crt_char_gen
 F86F  33 FF			     xor     di,di
-F871  33 C0			     xor     ax,ax
-F873  B1 80			     mov     cl,128
-F875			     bct1:
-F875  B3 08			     mov     bl,8
-F877  2E: 8A 04		     bct2:   mov     al,cs:[si]
-F87A  46			     inc     si
-F87B  26: 89 05			     mov     word ptr es:[di],ax
-F87E  47			     inc     di
-F87F  47			     inc     di
-F880  FE CB			     dec     bl
-F882  75 F3			     jnz     bct2
-F884  83 C7 10			     add     di,10h
-F887  FE C9			     dec     cl
-F889  75 EA				     jnz     bct1
-F88B  B0 01				     mov     al, 1
-F88D  EE				     out     dx, al
-F88E  B8 B800				     mov     ax, 0B800h
-F891  8E C0				     mov     es, ax
-F893  B0 01				     mov     al, 1
-F895  BA 03DF				     mov     dx, 3DFh
-F898  EE				     out     dx, al
-F899  B2 D8				     mov     dl, 0D8h
-F89B  B0 00				     mov     al, 0
-F89D  EE				     out     dx, al
-F89E  33 FF				     xor     di, di
-F8A0  B9 0400				     mov     cx, 1024
-F8A3  BE FA6Er				     mov     si, offset	crt_char_gen
-F8A6  33 FF				     xor     di, di
-F8A8  2E				     db	     02eh	     ;cs:  segment prefix (not handled by Turbo+
+F871  B1 80			     mov     cl,128
+F873			     bct1:
+F873  B3 08			     mov     bl,8
+F875  2E		     bct2:   db	     02eh	     ;cs:  segment prefix (not handled by Turbo	       +
 			     Assembler)
-F8A9  F3> A4				     rep movsb
-F8AB  B0 09				     mov     al, 00001001b
-F8AD  EE				     out     dx, al
-F8AE  B0 00				     mov     al,0
-F8B0  B2 DF				     mov     dl, 0DFh
-F8B2  EE				     out     dx, al
-F8B3  C3				     ret
-F8B4			     bct     endp
+F876  AC			     lodsb
+F877  AB			     stosw
+F878  4B			     dec     bx
+F879  75 FA			     jnz     bct2
+F87B  83 C7 10			     add     di,10h
+F87E  E2 F3			     loop    bct1
+F880  B0 01			     mov     al, 1
+F882  EE			     out     dx, al
+			     ;CGA loader
+F883  B8 B800				     mov     ax, 0B800h
+F886  8E C0				     mov     es, ax
+F888  B0 01				     mov     al, 1
+F88A  B2 DF				     mov     dl, 0DFh	     ;leading "3" (3DFh) already set before
+F88C  EE				     out     dx, al
+F88D  B2 D8				     mov     dl, 0D8h
+F88F  B0 00				     mov     al, 0
+F891  EE				     out     dx, al
+F892  33 FF				     xor     di, di
+F894  B9 0400				     mov     cx, 1024
+F897  BE FA6Er				     mov     si, offset	crt_char_gen
+F89A  33 FF				     xor     di, di
+F89C  2E				     db	     02eh	     ;cs:  segment prefix (not handled by Turbo+
+			     Assembler)
+F89D  F3> A4				     rep movsb
+F89F  B0 09				     mov     al, 00001001b
+F8A1  EE				     out     dx, al
+F8A2  B0 00				     mov     al,0
+F8A4  B2 DF				     mov     dl, 0DFh
+F8A6  EE				     out     dx, al
+F8A7  C3				     ret
+F8A8			     bct     endp
 
 			     ;rc продолжение	обработчика ошибки теста	       +
 			     памяти
-F8B4			     lo_hi:
-F8B4  32 C0			     xor al,al
-F8B6  D1 EF			     shr di,1
-F8B8  73 01			     jnc evn
-F8BA  40			     inc ax
-F8BB  E8 EB2A		     evn:    call prn_hex_byte
-F8BE  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
+F8A8			     lo_hi:
+F8A8  32 C0			     xor al,al
+F8AA  D1 EF			     shr di,1
+F8AC  73 01			     jnc evn
+F8AE  40			     inc ax
+F8AF  E8 EB36		     evn:    call prn_hex_byte
+F8B2  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
 			     сообщения
 							     ; об ошибке
-F8C1  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
+F8B5  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
 			     сообщения	об ошибке
-F8C4  E8 ED2E			     call    p_msg	     ; печать ошибки
-F8C7  E9 EB5D			     jmp     tst12	     ; переход к следующему тесту
+F8B8  E8 ED3A			     call    p_msg	     ; печать ошибки
+F8BB  E9 EB69			     jmp     tst12	     ; переход к следующему тесту
 
 			     org     0f8cbh
 			     ;
@@ -6918,9 +6916,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "11-17-21"
+??DATE				  Text	 "12-04-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "23:19:56"
+??TIME				  Text	 "23:13:15"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -6951,9 +6949,8 @@ BAD_DMA				  Number 0008
 BAD_NEC				  Number 0020
 BAD_SEEK			  Number 0040
 BCT				  Near16 CODE:F859
-BCT1				  Near16 CODE:F875
-BCT2				  Near16 CODE:F877
-BCT3				  Near16 CODE:F86C
+BCT1				  Near16 CODE:F873
+BCT2				  Near16 CODE:F875
 BEEP				  Near16 CODE:E5A9
 BIOS_BREAK			  Byte	 DATA:0071
 BOOT_LOCN			  Far16	 ABS0:7C00
@@ -7083,7 +7080,7 @@ ERR10				  Near16 CODE:FFBB
 ERROR_BEEP			  Near16 CODE:E768
 ERR_BEEP			  Near16 CODE:E580
 ERR_WAIT			  Near16 CODE:E4E0
-EVN				  Near16 CODE:F8BB
+EVN				  Near16 CODE:F8AF
 EXIT				  Near16 CODE:FFC5
 EXT_PTR				  Dword	 ABS0:007C
 F1				  Byte	 CODE:E40B
@@ -7315,7 +7312,7 @@ LAT_KEY				  Number 0057
 LAT_SHIFT			  Number 0001
 LEFT_KEY			  Number 0054
 LEFT_SHIFT			  Number 0002
-LO_HI				  Near16 CODE:F8B4
+LO_HI				  Near16 CODE:F8A8
 M1				  Word	 CODE:F045
 M10				  Near16 CODE:F144
 M11				  Near16 CODE:F16F

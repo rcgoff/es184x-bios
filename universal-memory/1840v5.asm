@@ -5147,28 +5147,25 @@ bct	proc	near
  	xor	di,di
  	cld
  	rep	stosw
-bct3:	mov	si,offset crt_char_gen
+ 	mov	si,offset crt_char_gen
  	xor	di,di
- 	xor	ax,ax
  	mov	cl,128
 bct1:
  	mov	bl,8
-bct2:	mov	al,cs:[si]
- 	inc	si
- 	mov	word ptr es:[di],ax
- 	inc	di
- 	inc	di
- 	dec	bl
+bct2:	db	02eh		;cs:  segment prefix (not handled by Turbo Assembler)
+	lodsb
+	stosw
+ 	dec	bx
  	jnz	bct2
  	add	di,10h
- 	dec	cl
-		jnz	bct1
-		mov	al, 1
-		out	dx, al
+	loop	bct1
+	mov	al, 1
+	out	dx, al
+;CGA loader
 		mov	ax, 0B800h
 		mov	es, ax
 		mov	al, 1
-		mov	dx, 3DFh
+		mov	dl, 0DFh	;leading "3" (3DFh) already set before
 		out	dx, al
 		mov	dl, 0D8h
 		mov	al, 0
