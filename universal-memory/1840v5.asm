@@ -1327,7 +1327,6 @@ p_msg	proc	near
 g12:
 	db	2eh		;cs cegment prefix
 	lodsb	; поместить знак в AL
- 	mov	bh,0	 	; установить страницу
  	mov	ah,14	 	; уст функцию записи знака
  	int	10h	 	; и записать знак
  	loop	g12	; продолжать до записи всего сообщения
@@ -1422,15 +1421,15 @@ e21a:
 
 prt_hex		proc near
 		mov	ah, 14
-		mov	bh, 0
 		int	10h
 		retn
 prt_hex		endp
 
 e300		db ' Kb OK',0Dh
 f39		db 'ERROR (RESUME="F1" KEY)'
-brack		db ' ('		;rc для теста памяти
+lowbank		db ' (0)'		;rc для теста памяти
 
+org 0e6bdh
 ;   Таблица кодов русских больших букв (заглавных)
 
 rust2	label	byte

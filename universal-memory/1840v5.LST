@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    12-04-21 23:13:15	    Page 1
+Turbo Assembler	 Version 5.0	    12-07-21 23:56:41	    Page 1
 1840v5.asm
 
 
@@ -1062,7 +1062,7 @@ E3C8  A3 0015r				     mov     ds:io_ram_size, ax
 			     ;	 Проверка любой действительной памяти
 			     ;	 на считывание и запись
 
-E3CB  E9 0244			     jmp     e190
+E3CB  E9 0242			     jmp     e190
 
 			     ;	 Печать адреса и эталона, если
 			     ;	 произошла ошибка данных
@@ -1290,7 +1290,7 @@ E4CC  83 FD 00			     cmp     bp,0000h
 E4CF  74 18			     jz	     dal
 E4D1  BA 0003			     mov     dx,3
 E4D4  E8 00A9			     call    err_beep
-E4D7  BE E6A4r			     mov     si,offset f39
+E4D7  BE E6A0r			     mov     si,offset f39
 E4DA  B9 0017				     mov     cx, 23
 E4DD  E8 0115			     call    p_msg
 E4E0			     err_wait:
@@ -1517,116 +1517,115 @@ E5FC  FC			     cld
 E5FD			     g12:
 E5FD  2E			     db	     2eh	     ;cs cegment prefix
 E5FE  AC			     lodsb   ; поместить знак в AL
-E5FF  B7 00			     mov     bh,0	     ; установить страницу
-E601  B4 0E			     mov     ah,14	     ; уст функцию записи знака
-E603  CD 10			     int     10h	     ; и записать знак
-E605  E2 F6			     loop    g12     ; продолжать до записи всего       +
+E5FF  B4 0E			     mov     ah,14	     ; уст функцию записи знака
+E601  CD 10			     int     10h	     ; и записать знак
+E603  E2 F8			     loop    g12     ; продолжать до записи всего       +
 			     сообщения
-E607  B8 0E0D			     mov     ax,0e0dh	; переместить курсор в начало  +
+E605  B8 0E0D			     mov     ax,0e0dh	; переместить курсор в начало  +
 			     строки
-E60A  CD 10			     int     10h
-E60C  B8 0E0A			     mov     ax,0e0ah  ; переместить	курсор на	       +
+E608  CD 10			     int     10h
+E60A  B8 0E0A			     mov     ax,0e0ah  ; переместить	курсор на	       +
 			     следующую	строку
-E60F  CD 10			     int     10h
-E611  C3			     ret
-E612			     p_msg   endp
+E60D  CD 10			     int     10h
+E60F  C3			     ret
+E610			     p_msg   endp
 
 
-E612			     e190:
-E612  1E				     push    ds
-E613  B8 0010				     mov     ax, 16
-E616  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
-E61C  75 03				     jnz     e20a
-E61E  E9 FE06				     jmp     tst12
+E610			     e190:
+E610  1E				     push    ds
+E611  B8 0010				     mov     ax, 16
+E614  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
+E61A  75 03				     jnz     e20a
+E61C  E9 FE08				     jmp     tst12
 
-E621			     e20a:
-E621  B8 0010				     mov     ax, 16
-E624  EB 25				     jmp     short prt_siz
+E61F			     e20a:
+E61F  B8 0010				     mov     ax, 16
+E622  EB 25				     jmp     short prt_siz
 
-E626			     e20b:
-E626  8B 1E 0013r			     mov     bx, ds:memory_size
-E62A  83 EB 10				     sub     bx, 16
-E62D  B1 04				     mov     cl, 4
-E62F  D3 EB				     shr     bx, cl
-E631  8B CB				     mov     cx, bx
-E633  BB 0400				     mov     bx, 400h
+E624			     e20b:
+E624  8B 1E 0013r			     mov     bx, ds:memory_size
+E628  83 EB 10				     sub     bx, 16
+E62B  B1 04				     mov     cl, 4
+E62D  D3 EB				     shr     bx, cl
+E62F  8B CB				     mov     cx, bx
+E631  BB 0400				     mov     bx, 400h
 
-E636			     e20c:
-E636  8E DB				     mov     ds, bx
+E634			     e20c:
+E634  8E DB				     mov     ds, bx
 
-E638  8E C3				     mov     es, bx
-E63A  81 C3 0400			     add     bx, 400h
-E63E  52				     push    dx
-E63F  51				     push    cx
-E640  53				     push    bx
-E641  50				     push    ax
-E642  E8 F9D5				     call    stgtst
-E645  75 40				     jnz     e21a
-E647  58				     pop     ax
-E648  05 0010				     add     ax, 16
+E636  8E C3				     mov     es, bx
+E638  81 C3 0400			     add     bx, 400h
+E63C  52				     push    dx
+E63D  51				     push    cx
+E63E  53				     push    bx
+E63F  50				     push    ax
+E640  E8 F9D7				     call    stgtst
+E643  75 40				     jnz     e21a
+E645  58				     pop     ax
+E646  05 0010				     add     ax, 16
 
-E64B			     prt_siz:
-E64B  50				     push    ax
-E64C  BB 000A				     mov     bx, 10
-E64F  B9 0003				     mov     cx, 3
+E649			     prt_siz:
+E649  50				     push    ax
+E64A  BB 000A				     mov     bx, 10
+E64D  B9 0003				     mov     cx, 3
 
-E652			     decimal_loop:
-E652  33 D2				     xor     dx, dx
-E654  F7 F3				     div     bx
-E656  80 CA 30				     or	     dl, 30h
-E659  52				     push    dx
-E65A  E2 F6				     loop    decimal_loop
-E65C  B9 0003				     mov     cx, 3
+E650			     decimal_loop:
+E650  33 D2				     xor     dx, dx
+E652  F7 F3				     div     bx
+E654  80 CA 30				     or	     dl, 30h
+E657  52				     push    dx
+E658  E2 F6				     loop    decimal_loop
+E65A  B9 0003				     mov     cx, 3
 
-E65F			     prt_dec_loop:
-E65F  58				     pop     ax
-E660  E8 0033				     call    prt_hex
-E663  E2 FA				     loop    prt_dec_loop
-E665  B9 0007				     mov     cx, 7
-E668  BE E69Dr				     mov     si, offset	e300 ; " Kb OK\r"
-E66B  FC				     cld
+E65D			     prt_dec_loop:
+E65D  58				     pop     ax
+E65E  E8 0033				     call    prt_hex
+E661  E2 FA				     loop    prt_dec_loop
+E663  B9 0007				     mov     cx, 7
+E666  BE E699r				     mov     si, offset	e300 ; " Kb OK\r"
+E669  FC				     cld
 
-E66C			     kb_ok:
-E66C  2E				     db	     2eh	     ;cs segment prefix
-E66D  AC				     lodsb
-E66E  E8 0025				     call    prt_hex
-E671  E2 F9				     loop    kb_ok
-E673  58				     pop     ax
-E674  3D 0010				     cmp     ax, 16
-E677  74 AD				     jz	     e20b
-E679  5B				     pop     bx
-E67A  59				     pop     cx
-E67B  5A				     pop     dx
-E67C  E2 B8				     loop    e20c
-E67E  B0 0A				     mov     al, 10
-E680  E8 0013				     call    prt_hex
-E683  1F				     pop     ds
+E66A			     kb_ok:
+E66A  2E				     db	     2eh	     ;cs segment prefix
+E66B  AC				     lodsb
+E66C  E8 0025				     call    prt_hex
+E66F  E2 F9				     loop    kb_ok
+E671  58				     pop     ax
+E672  3D 0010				     cmp     ax, 16
+E675  74 AD				     jz	     e20b
+E677  5B				     pop     bx
+E678  59				     pop     cx
+E679  5A				     pop     dx
+E67A  E2 B8				     loop    e20c
+E67C  B0 0A				     mov     al, 10
+E67E  E8 0013				     call    prt_hex
+E681  1F				     pop     ds
 
-E684  E9 FDA0				     jmp     tst12
+E682  E9 FDA2				     jmp     tst12
 
-E687			     e21a:
-E687  5B				     pop     bx
-E688  83 C4 06				     add     sp, 6
-E68B  8C C2				     mov     dx, es
-E68D  1F				     pop     ds
-E68E  1E				     push    ds
-E68F  89 1E 0013r			     mov     ds:memory_size, bx
-E693  E9 FD38				     jmp     osh
+E685			     e21a:
+E685  5B				     pop     bx
+E686  83 C4 06				     add     sp, 6
+E689  8C C2				     mov     dx, es
+E68B  1F				     pop     ds
+E68C  1E				     push    ds
+E68D  89 1E 0013r			     mov     ds:memory_size, bx
+E691  E9 FD3A				     jmp     osh
 
-E696			     prt_hex	     proc near
-E696  B4 0E				     mov     ah, 14
-E698  B7 00				     mov     bh, 0
-E69A  CD 10				     int     10h
-E69C  C3				     retn
-E69D			     prt_hex	     endp
+E694			     prt_hex	     proc near
+E694  B4 0E				     mov     ah, 14
+E696  CD 10				     int     10h
+E698  C3				     retn
+E699			     prt_hex	     endp
 
-E69D  20 4B 62 20 4F 4B	0D   e300	     db	' Kb OK',0Dh
-E6A4  45 52 52 4F 52 20	28+  f39	     db	'ERROR (RESUME="F1" KEY)'
+E699  20 4B 62 20 4F 4B	0D   e300	     db	' Kb OK',0Dh
+E6A0  45 52 52 4F 52 20	28+  f39	     db	'ERROR (RESUME="F1" KEY)'
       52 45 53 55 4D 45	3D+
       22 46 31 22 20 4B	45+
       59 29
-E6BB  20 28		     brack	     db	' ('	     ;rc для	теста памяти
+E6B7  20 28 30 29	     lowbank	     db	' (0)'		     ;rc для	теста памяти
 
+			     org 0e6bdh
 			     ;	 Таблица	кодов русских больших букв	       +
 			     (заглавных)
 
@@ -6916,9 +6915,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "12-04-21"
+??DATE				  Text	 "12-07-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "23:13:15"
+??TIME				  Text	 "23:56:41"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -6956,7 +6955,6 @@ BIOS_BREAK			  Byte	 DATA:0071
 BOOT_LOCN			  Far16	 ABS0:7C00
 BOOT_STRAP			  Near16 CODE:E6F7
 BOOT_VEC			  Dword	 ABS0:0064
-BRACK				  Byte	 CODE:E6BB
 BUFFER_END			  Word	 DATA:0082
 BUFFER_HEAD			  Word	 DATA:001A
 BUFFER_START			  Word	 DATA:0080
@@ -7025,7 +7023,7 @@ D8				  Near16 CODE:E27F
 D9				  Near16 CODE:E288
 DAL				  Near16 CODE:E4E9
 DAT				  Number 0040
-DECIMAL_LOOP			  Near16 CODE:E652
+DECIMAL_LOOP			  Near16 CODE:E650
 DEL_KEY				  Number 0053
 DISKETTE_IO			  Far16	 CODE:EC59
 DISKETTE_PARM			  Dword	 ABS0:0078
@@ -7058,15 +7056,15 @@ E16				  Near16 CODE:E398
 E17				  Near16 CODE:E3A0
 E18				  Near16 CODE:E3A6
 E19				  Near16 CODE:E3AB
-E190				  Near16 CODE:E612
+E190				  Near16 CODE:E610
 E1A				  Near16 CODE:E2E0
 E1L				  Number 0004
-E20A				  Near16 CODE:E621
-E20B				  Near16 CODE:E626
-E20C				  Near16 CODE:E636
-E21A				  Near16 CODE:E687
+E20A				  Near16 CODE:E61F
+E20B				  Near16 CODE:E624
+E20C				  Near16 CODE:E634
+E21A				  Near16 CODE:E685
 E3				  Near16 CODE:E2FA
-E300				  Byte	 CODE:E69D
+E300				  Byte	 CODE:E699
 E3A				  Near16 CODE:E305
 E7				  Near16 CODE:E313
 E8				  Near16 CODE:E323
@@ -7105,7 +7103,7 @@ F21				  Near16 CODE:E57A
 F23				  Near16 CODE:E57D
 F2L				  Number 0003
 F3				  Byte	 CODE:E412
-F39				  Byte	 CODE:E6A4
+F39				  Byte	 CODE:E6A0
 F3L				  Number 0003
 F4				  Word	 CODE:E415
 F4E				  Word	 CODE:E417
@@ -7304,7 +7302,7 @@ KB_DAT				  Number 0060
 KB_FLAG				  Byte	 DATA:0017
 KB_FLAG_1			  Byte	 DATA:0018
 KB_INT				  Far16	 CODE:E987
-KB_OK				  Near16 CODE:E66C
+KB_OK				  Near16 CODE:E66A
 KEYBOARD_IO			  Far16	 CODE:E82E
 LAST_VAL			  Byte	 DATA:006B
 LAT				  Number 0002
@@ -7312,6 +7310,7 @@ LAT_KEY				  Number 0057
 LAT_SHIFT			  Number 0001
 LEFT_KEY			  Number 0054
 LEFT_SHIFT			  Number 0002
+LOWBANK				  Byte	 CODE:E6B7
 LO_HI				  Near16 CODE:F8A8
 M1				  Word	 CODE:F045
 M10				  Near16 CODE:F144
@@ -7396,9 +7395,9 @@ PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
 PRN_HEX_BYTE			  Near16 CODE:E3E8
-PRT_DEC_LOOP			  Near16 CODE:E65F
-PRT_HEX				  Near16 CODE:E696
-PRT_SIZ				  Near16 CODE:E64B
+PRT_DEC_LOOP			  Near16 CODE:E65D
+PRT_HEX				  Near16 CODE:E694
+PRT_SIZ				  Near16 CODE:E649
 P_MSG				  Near16 CODE:E5F5
 R1				  Near16 CODE:F450
 R10				  Near16 CODE:F4E5
