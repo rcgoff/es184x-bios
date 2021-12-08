@@ -971,7 +971,7 @@ prn_hex_byte proc near
 	call	xlat_print_cod	; преобразование и печать младшего разряда
 	ret
 prn_hex_byte endp
-org	0e3fch
+org	0e401h
 ;_____________________
 ;
 ;   Процедура вывода на экран сообщения об ошибке в коде ASCII
@@ -985,7 +985,6 @@ xlat_print_cod proc near
  	mov	bx,offset f4e	; адрес таблицы кодов ASCII
  	xlatb
  	mov	ah,14
- 	mov	bh,0
  	int	10h
  	pop	ds
  	ret
@@ -1000,8 +999,6 @@ xlat_print_cod endp
  	assume	cs:code,ds:data
 f1	db	' 301'
 f1l	equ	4h	 	; сообщение клавиатуры
-f2	db	'131'
-f2l	equ	3h	 	; сообщение кассеты
 f3	db	'601'
 f3l	equ	3h	 	; сообщение НГМД
 

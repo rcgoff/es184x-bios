@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    12-08-21 22:32:56	    Page 1
+Turbo Assembler	 Version 5.0	    12-08-21 23:23:22	    Page 1
 1840v5.asm
 
 
@@ -1092,15 +1092,15 @@ E3EC			     prn_hex_byte proc near
 E3EC  50			     push ax
 E3ED  B1 04			     mov     cl,4
 E3EF  D2 E8			     shr     al,cl	     ;
-E3F1  E8 0008			     call    xlat_print_cod  ; преобразование и печать    +
+E3F1  E8 000D			     call    xlat_print_cod  ; преобразование и печать    +
 			     старшего разряда
 E3F4  58			     pop ax
 E3F5  24 0F			     and     al,0fh
-E3F7  E8 0002			     call    xlat_print_cod  ; преобразование и печать    +
+E3F7  E8 0007			     call    xlat_print_cod  ; преобразование и печать    +
 			     младшего разряда
 E3FA  C3			     ret
 E3FB			     prn_hex_byte endp
-			     org     0e3fch
+			     org     0e401h
 			     ;_____________________
 			     ;
 			     ;	 Процедура вывода на экран сообщения об       +
@@ -1108,18 +1108,17 @@ E3FB			     prn_hex_byte endp
 			     ;
 			     ;_______________________
 
-E3FC			     xlat_print_cod proc near
-E3FC  1E			     push    ds		     ; сохранить DS
-E3FD  0E			     push    cs
-E3FE  1F			     pop     ds
-E3FF  BB E417r			     mov     bx,offset f4e   ; адрес таблицы кодов ASCII
-E402  D7			     xlatb
-E403  B4 0E			     mov     ah,14
-E405  B7 00			     mov     bh,0
-E407  CD 10			     int     10h
-E409  1F			     pop     ds
-E40A  C3			     ret
-E40B			     xlat_print_cod endp
+E401			     xlat_print_cod proc near
+E401  1E			     push    ds		     ; сохранить DS
+E402  0E			     push    cs
+E403  1F			     pop     ds
+E404  BB E417r			     mov     bx,offset f4e   ; адрес таблицы кодов ASCII
+E407  D7			     xlatb
+E408  B4 0E			     mov     ah,14
+E40A  CD 10			     int     10h
+E40C  1F			     pop     ds
+E40D  C3			     ret
+E40E			     xlat_print_cod endp
 			     ;______________________
 			     ;	 Сброс системы - фаза 4
 			     ;______________________
@@ -1128,10 +1127,8 @@ E40B			     xlat_print_cod endp
 			     ;_______________________
 
 				     assume  cs:code,ds:data
-E40B  20 33 30 31	     f1	     db	     ' 301'
+E40E  20 33 30 31	     f1	     db	     ' 301'
       =0004		     f1l     equ     4h		     ; сообщение клавиатуры
-E40F  31 33 31		     f2	     db	     '131'
-      =0003		     f2l     equ     3h		     ; сообщение кассеты
 E412  36 30 31		     f3	     db	     '601'
       =0003		     f3l     equ     3h		     ; сообщение НГМД
 
@@ -1180,12 +1177,12 @@ E44C  8A E8			     mov     ch,al	     ; сохранить код		       +
 			     сканирования
 E44E  B1 04			     mov     cl,4
 E450  D2 E8			     shr     al,cl
-E452  E8 FFA7			     call    xlat_print_cod  ; преобразование и печать
+E452  E8 FFAC			     call    xlat_print_cod  ; преобразование и печать
 E455  8A C5			     mov     al,ch	     ; восстановить	код		       +
 			     сканирования
 E457  24 0F			     and     al,0fh	     ; выделить	младший байт
-E459  E8 FFA0			     call    xlat_print_cod  ; преобразование и печать
-E45C  BE E40Br		     f6:     mov     si,offset f1    ; получить	адрес поля	       +
+E459  E8 FFA5			     call    xlat_print_cod  ; преобразование и печать
+E45C  BE E40Er		     f6:     mov     si,offset f1    ; получить	адрес поля	       +
 			     сообщения	об
 							     ; ошибке
 E45F  B9 0004			     mov     cx,f1l	      ;	длина поля сообщения об    +
@@ -6923,7 +6920,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "12-08-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "22:32:56"
+??TIME				  Text	 "23:23:22"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -7087,7 +7084,7 @@ ERR_WAIT			  Near16 CODE:E4E0
 EVN				  Near16 CODE:F8B1
 EXIT				  Near16 CODE:FFC5
 EXT_PTR				  Dword	 ABS0:007C
-F1				  Byte	 CODE:E40B
+F1				  Byte	 CODE:E40E
 F10				  Near16 CODE:E490
 F11				  Near16 CODE:E4A5
 F12				  Near16 CODE:E4A7
@@ -7101,13 +7098,11 @@ F19				  Near16 CODE:E559
 F19A				  Near16 CODE:F96D
 F19B				  Near16 CODE:E55C
 F1L				  Number 0004
-F2				  Byte	 CODE:E40F
 F20				  Near16 CODE:E570
 F20A				  Near16 CODE:F980
 F20B				  Near16 CODE:E574
 F21				  Near16 CODE:E57A
 F23				  Near16 CODE:E57D
-F2L				  Number 0003
 F3				  Byte	 CODE:E412
 F39				  Byte	 CODE:E6A0
 F3L				  Number 0003
@@ -7549,7 +7544,7 @@ WRITE_TTY			  Near16 CODE:F722
 WRITE_TTY2			  Near16 CODE:F966
 X1				  Near16 CODE:ED8B
 X2				  Near16 CODE:ED87
-XLAT_PRINT_COD			  Near16 CODE:E3FC
+XLAT_PRINT_COD			  Near16 CODE:E401
 XXDAT				  Number 0050
 ZB				  Byte	 ABS0:0000
 ZW				  Word	 ABS0:0000
