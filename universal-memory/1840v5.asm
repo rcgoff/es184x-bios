@@ -953,7 +953,9 @@ usual:
 	call prn_hex_byte
 	pop ax	 	; получить XOR записанного и прочтенного
 	call prn_hex_byte
-	jmp lo_hi
+	mov si,offset membank
+	cld
+	jmp osh2
 adrtest:
 	test dx, 0fffh		;rc адрес кратен 64кб?
 	jne usual
@@ -1427,9 +1429,9 @@ prt_hex		endp
 
 e300		db ' Kb OK',0Dh
 f39		db 'ERROR (RESUME="F1" KEY)'
-lowbank		db ' (0)'		;rc для теста памяти
+membank		db ' (0'		;rc для теста памяти
+		db ' (1'
 
-org 0e6bdh
 ;   Таблица кодов русских больших букв (заглавных)
 
 rust2	label	byte
@@ -5173,7 +5175,7 @@ bct2:	db	02eh		;cs:  segment prefix (not handled by Turbo Assembler)
 		mov	cx, 1024
 		mov	si, offset crt_char_gen
 		xor	di, di
-		db	02eh		;cs:  segment prefix (not handled by Turbo Assembler)
+		db	02eh		;cs: segment prefix (not handled by Turbo Assembler)
 		rep movsb
 		mov	al, 00001001b
 		out	dx, al
@@ -5184,19 +5186,23 @@ bct2:	db	02eh		;cs:  segment prefix (not handled by Turbo Assembler)
 bct	endp
 
 ;rc продолжение обработчика ошибки теста памяти
-lo_hi:
-	xor al,al
+osh2:
+	mov cx,3
 	shr di,1
 	jnc evn
-	inc ax
-evn:	call prn_hex_byte
+	add si,cx
+evn:	db 2eh			;cs segment prefix
+	lodsb
+	call prt_hex
+	loop evn
+	mov al, cs:f39+22
+	call prt_hex
 	mov	si,offset e1	; установить адрес поля сообщения
 	 	 	 	; об ошибке
 	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
 	call	p_msg	 	; печать ошибки
 	jmp	tst12	 	; переход к следующему тесту
 
-org	0f8cbh
 ;
 ;   Таблица кодов русских маленьких букв (строчных)
 ;
