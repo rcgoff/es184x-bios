@@ -1318,16 +1318,8 @@ kbd_reset	endp
 ;
 ;______________________
 p_msg	proc	near
- 	mov	ax,dat
- 	mov	ds,ax
  	mov	bp,si
-	cld
-g12:
-	db	2eh		;cs cegment prefix
-	lodsb	; поместить знак в AL
- 	mov	ah,14	 	; уст функцию записи знака
- 	int	10h	 	; и записать знак
- 	loop	g12	; продолжать до записи всего сообщения
+	call prt_str
  	mov	ax,0e0dh   ; переместить курсор в начало строки
  	int	10h
  	mov	ax,0e0ah  ; переместить курсор на следующую строку
