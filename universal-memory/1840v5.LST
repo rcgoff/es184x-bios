@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    12-08-21 23:23:22	    Page 1
+Turbo Assembler	 Version 5.0	    12-09-21 20:59:53	    Page 1
 1840v5.asm
 
 
@@ -1072,35 +1072,34 @@ E3CE			     osh:
 E3CE  50			     push ax
 E3CF  3D AAAA			     cmp ax,0aaaah	     ;rc проверка - это отсутствие+
 			     памяти?
-E3D2  74 10			     je	adrtest
+E3D2  74 0C			     je	adrtest
 E3D4			     usual:
 E3D4  8A C6			     mov     al,dh	     ; получить	адрес (8 старших   +
 			     разрядов)
-E3D6  E8 0013			     call prn_hex_byte
+E3D6  E8 0019			     call prn_hex_byte
 E3D9  58			     pop ax	     ; получить	XOR записанного и	       +
 			     прочтенного
-E3DA  E8 000F			     call prn_hex_byte
-E3DD  BE E6B7r			     mov si,offset membank
-E3E0  FC			     cld
-E3E1  E9 14C4			     jmp osh2
-E3E4			     adrtest:
-E3E4  F7 C2 0FFF		     test dx, 0fffh	     ;rc адрес кратен 64кб?
-E3E8  75 EA			     jne usual
-E3EA  EB 3B			     jmp short tst12
+E3DA  E8 0015			     call prn_hex_byte
+E3DD  E9 14C8			     jmp osh2
+E3E0			     adrtest:
+E3E0  F7 C2 0FFF		     test dx, 0fffh	     ;rc адрес кратен 64кб?
+E3E4  75 EE			     jne usual
+E3E6  EB 3F			     jmp short tst12
 
-E3EC			     prn_hex_byte proc near
-E3EC  50			     push ax
-E3ED  B1 04			     mov     cl,4
-E3EF  D2 E8			     shr     al,cl	     ;
-E3F1  E8 000D			     call    xlat_print_cod  ; преобразование и печать    +
-			     старшего разряда
-E3F4  58			     pop ax
-E3F5  24 0F			     and     al,0fh
+			     org     0e3f2h
+E3F2			     prn_hex_byte proc near
+E3F2  50			     push ax
+E3F3  B1 04			     mov     cl,4
+E3F5  D2 E8			     shr     al,cl	     ;
 E3F7  E8 0007			     call    xlat_print_cod  ; преобразование и печать    +
+			     старшего разряда
+E3FA  58			     pop ax
+E3FB  24 0F			     and     al,0fh
+E3FD  E8 0001			     call    xlat_print_cod  ; преобразование и печать    +
 			     младшего разряда
-E3FA  C3			     ret
-E3FB			     prn_hex_byte endp
-			     org     0e401h
+E400  C3			     ret
+E401			     prn_hex_byte endp
+
 			     ;_____________________
 			     ;
 			     ;	 Процедура вывода на экран сообщения об       +
@@ -1289,7 +1288,7 @@ E4CC  83 FD 00			     cmp     bp,0000h
 E4CF  74 18			     jz	     dal
 E4D1  BA 0003			     mov     dx,3
 E4D4  E8 00A9			     call    err_beep
-E4D7  BE E6A0r			     mov     si,offset f39
+E4D7  BE E69Br			     mov     si,offset f39
 E4DA  B9 0017				     mov     cx, 23
 E4DD  E8 0115			     call    p_msg
 E4E0			     err_wait:
@@ -1559,7 +1558,7 @@ E63D  51				     push    cx
 E63E  53				     push    bx
 E63F  50				     push    ax
 E640  E8 F9D7				     call    stgtst
-E643  75 40				     jnz     e21a
+E643  75 3B				     jnz     e21a
 E645  58				     pop     ax
 E646  05 0010				     add     ax, 16
 
@@ -1578,56 +1577,58 @@ E65A  B9 0003				     mov     cx, 3
 
 E65D			     prt_dec_loop:
 E65D  58				     pop     ax
-E65E  E8 0033				     call    prt_hex
+E65E  E8 002E				     call    prt_hex
 E661  E2 FA				     loop    prt_dec_loop
 E663  B9 0007				     mov     cx, 7
-E666  BE E699r				     mov     si, offset	e300 ; " Kb OK\r"
-E669  FC				     cld
+E666  BE E694r				     mov     si, offset	e300 ; " Kb OK\r"
+E669  E8 0046				     call prt_str
+E66C  58				     pop     ax
+E66D  3D 0010				     cmp     ax, 16
+E670  74 B2				     jz	     e20b
+E672  5B				     pop     bx
+E673  59				     pop     cx
+E674  5A				     pop     dx
+E675  E2 BD				     loop    e20c
+E677  B0 0A				     mov     al, 10
+E679  E8 0013				     call    prt_hex
+E67C  1F				     pop     ds
 
-E66A			     kb_ok:
-E66A  2E				     db	     2eh	     ;cs segment prefix
-E66B  AC				     lodsb
-E66C  E8 0025				     call    prt_hex
-E66F  E2 F9				     loop    kb_ok
-E671  58				     pop     ax
-E672  3D 0010				     cmp     ax, 16
-E675  74 AD				     jz	     e20b
-E677  5B				     pop     bx
-E678  59				     pop     cx
-E679  5A				     pop     dx
-E67A  E2 B8				     loop    e20c
-E67C  B0 0A				     mov     al, 10
-E67E  E8 0013				     call    prt_hex
-E681  1F				     pop     ds
+E67D  E9 FDA7				     jmp     tst12
 
-E682  E9 FDA2				     jmp     tst12
+E680			     e21a:
+E680  5B				     pop     bx
+E681  83 C4 06				     add     sp, 6
+E684  8C C2				     mov     dx, es
+E686  1F				     pop     ds
+E687  1E				     push    ds
+E688  89 1E 0013r			     mov     ds:memory_size, bx
+E68C  E9 FD3F				     jmp     osh
 
-E685			     e21a:
-E685  5B				     pop     bx
-E686  83 C4 06				     add     sp, 6
-E689  8C C2				     mov     dx, es
-E68B  1F				     pop     ds
-E68C  1E				     push    ds
-E68D  89 1E 0013r			     mov     ds:memory_size, bx
-E691  E9 FD3A				     jmp     osh
+E68F			     prt_hex	     proc near
+E68F  B4 0E				     mov     ah, 14
+E691  CD 10				     int     10h
+E693  C3				     retn
+E694			     prt_hex	     endp
 
-E694			     prt_hex	     proc near
-E694  B4 0E				     mov     ah, 14
-E696  CD 10				     int     10h
-E698  C3				     retn
-E699			     prt_hex	     endp
-
-E699  20 4B 62 20 4F 4B	0D   e300	     db	' Kb OK',0Dh
-E6A0  45 52 52 4F 52 20	28+  f39	     db	'ERROR (RESUME="F1" KEY)'
+E694  20 4B 62 20 4F 4B	0D   e300	     db	' Kb OK',0Dh
+E69B  45 52 52 4F 52 20	28+  f39	     db	'ERROR (RESUME="F1" KEY)'
       52 45 53 55 4D 45	3D+
       22 46 31 22 20 4B	45+
       59 29
-E6B7  20 28 30		     membank	     db	' (0'		     ;rc для	теста памяти
-E6BA  20 28 31				     db	' (1'
+
+E6B2			     prt_str	     proc near
+E6B2  FC				     cld
+E6B3  2E				     db	     2eh	     ;cs segment prefix
+E6B4  AC				     lodsb
+E6B5  E8 FFD7				     call    prt_hex
+E6B8  E2 F8				     loop    prt_str
+E6BA  C3				     ret
+E6BB			     prt_str	     endp
 
 			     ;	 Таблица	кодов русских больших букв	       +
 			     (заглавных)
 
+			     org     0e6bdh
 E6BD			     rust2   label   byte
 E6BD  1B 21 40 23 24 25	5E+	     db	     1bh,'!@#$',37,05eh,'&*()_+'
       26 2A 28 29 5F 2B
@@ -6018,23 +6019,22 @@ F8A8			     bct     endp
 			     ;rc продолжение	обработчика ошибки теста	       +
 			     памяти
 F8A8			     osh2:
-F8A8  B9 0003			     mov cx,3
-F8AB  D1 EF			     shr di,1
-F8AD  73 02			     jnc evn
-F8AF  03 F1			     add si,cx
-F8B1  2E		     evn:    db	2eh		     ;cs segment prefix
-F8B2  AC			     lodsb
-F8B3  E8 EDDE			     call prt_hex
-F8B6  E2 F9			     loop evn
-F8B8  2E: A0 E6B6r		     mov al, cs:f39+22
-F8BC  E8 EDD5			     call prt_hex
-F8BF  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
+F8A8  BE F8C3r			     mov si,offset membank
+F8AB  B9 0004			     mov cx,4
+F8AE  D1 EF			     shr di,1
+F8B0  73 02			     jnc evn
+F8B2  03 F1			     add si,cx
+F8B4  E8 EDFB		     evn:    call prt_str
+F8B7  BE E2D0r			     mov     si,offset e1    ; установить адрес поля	       +
 			     сообщения
 							     ; об ошибке
-F8C2  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
+F8BA  B9 0004			     mov     cx,e1l	     ; получить	счетчик поля	       +
 			     сообщения	об ошибке
-F8C5  E8 ED2D			     call    p_msg	     ; печать ошибки
-F8C8  E9 EB5C			     jmp     tst12	     ; переход к следующему тесту
+F8BD  E8 ED35			     call    p_msg	     ; печать ошибки
+F8C0  E9 EB64			     jmp     tst12	     ; переход к следующему тесту
+
+F8C3  20 28 30 29	     membank	     db	' (0)'		     ;rc для	теста памяти
+F8C7  20 28 31 29			     db	' (1)'
 
 			     ;
 			     ;	 Таблица	кодов русских маленьких букв	       +
@@ -6918,9 +6918,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "12-08-21"
+??DATE				  Text	 "12-09-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "23:23:22"
+??TIME				  Text	 "20:59:53"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -6930,7 +6930,7 @@ A5700051COPR_IB			  Byte	 CODE:E000
 ACTIVE_PAGE			  Byte	 DATA:0062
 ACT_DISP_PAGE			  Near16 CODE:F230
 ADDR_6845			  Word	 DATA:0063
-ADRTEST				  Near16 CODE:E3E4
+ADRTEST				  Near16 CODE:E3E0
 ALT_INPUT			  Byte	 DATA:0019
 ALT_KEY				  Number 0038
 ALT_SHIFT			  Number 0008
@@ -7065,9 +7065,9 @@ E1L				  Number 0004
 E20A				  Near16 CODE:E61F
 E20B				  Near16 CODE:E624
 E20C				  Near16 CODE:E634
-E21A				  Near16 CODE:E685
+E21A				  Near16 CODE:E680
 E3				  Near16 CODE:E2FA
-E300				  Byte	 CODE:E699
+E300				  Byte	 CODE:E694
 E3A				  Near16 CODE:E305
 E7				  Near16 CODE:E313
 E8				  Near16 CODE:E323
@@ -7081,7 +7081,7 @@ ERR10				  Near16 CODE:FFBB
 ERROR_BEEP			  Near16 CODE:E768
 ERR_BEEP			  Near16 CODE:E580
 ERR_WAIT			  Near16 CODE:E4E0
-EVN				  Near16 CODE:F8B1
+EVN				  Near16 CODE:F8B4
 EXIT				  Near16 CODE:FFC5
 EXT_PTR				  Dword	 ABS0:007C
 F1				  Byte	 CODE:E40E
@@ -7104,7 +7104,7 @@ F20B				  Near16 CODE:E574
 F21				  Near16 CODE:E57A
 F23				  Near16 CODE:E57D
 F3				  Byte	 CODE:E412
-F39				  Byte	 CODE:E6A0
+F39				  Byte	 CODE:E69B
 F3L				  Number 0003
 F4				  Word	 CODE:E415
 F4E				  Word	 CODE:E417
@@ -7303,7 +7303,6 @@ KB_DAT				  Number 0060
 KB_FLAG				  Byte	 DATA:0017
 KB_FLAG_1			  Byte	 DATA:0018
 KB_INT				  Far16	 CODE:E987
-KB_OK				  Near16 CODE:E66A
 KEYBOARD_IO			  Far16	 CODE:E82E
 LAST_VAL			  Byte	 DATA:006B
 LAT				  Number 0002
@@ -7333,7 +7332,7 @@ M7				  Byte	 CODE:F0F4
 M8				  Near16 CODE:F10D
 M9				  Near16 CODE:F141
 MAX_PERIOD			  Number 0540
-MEMBANK				  Byte	 CODE:E6B7
+MEMBANK				  Byte	 CODE:F8C3
 MEMORY_SIZE			  Word	 DATA:0013
 MEMORY_SIZE_DETERMINE		  Far16	 CODE:F841
 MEM_SIZ				  Word	 ABS0:0413
@@ -7395,10 +7394,11 @@ PRI15				  Near16 CODE:FF8D
 PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
-PRN_HEX_BYTE			  Near16 CODE:E3EC
+PRN_HEX_BYTE			  Near16 CODE:E3F2
 PRT_DEC_LOOP			  Near16 CODE:E65D
-PRT_HEX				  Near16 CODE:E694
+PRT_HEX				  Near16 CODE:E68F
 PRT_SIZ				  Near16 CODE:E649
+PRT_STR				  Near16 CODE:E6B2
 P_MSG				  Near16 CODE:E5F5
 R1				  Near16 CODE:F450
 R10				  Near16 CODE:F4E5

@@ -953,14 +953,13 @@ usual:
 	call prn_hex_byte
 	pop ax	 	; получить XOR записанного и прочтенного
 	call prn_hex_byte
-	mov si,offset membank
-	cld
 	jmp osh2
 adrtest:
 	test dx, 0fffh		;rc адрес кратен 64кб?
 	jne usual
 	jmp short tst12
 
+org	0e3f2h
 prn_hex_byte proc near
 	push ax
 	mov	cl,4
@@ -971,7 +970,7 @@ prn_hex_byte proc near
 	call	xlat_print_cod	; преобразование и печать младшего разряда
 	ret
 prn_hex_byte endp
-org	0e401h
+
 ;_____________________
 ;
 ;   Процедура вывода на экран сообщения об ошибке в коде ASCII
@@ -1389,13 +1388,7 @@ prt_dec_loop:
 		loop	prt_dec_loop
 		mov	cx, 7
 		mov	si, offset e300	; " Kb OK\r"
-		cld
-
-kb_ok:
-		db	2eh		;cs segment prefix
-		lodsb
-		call	prt_hex
-		loop	kb_ok
+		call prt_str
 		pop	ax
 		cmp	ax, 16
 		jz	e20b
@@ -1426,11 +1419,19 @@ prt_hex		endp
 
 e300		db ' Kb OK',0Dh
 f39		db 'ERROR (RESUME="F1" KEY)'
-membank		db ' (0'		;rc для теста памяти
-		db ' (1'
+
+prt_str		proc near
+		cld
+		db	2eh		;cs segment prefix
+		lodsb
+		call	prt_hex
+		loop	prt_str
+		ret
+prt_str		endp
 
 ;   Таблица кодов русских больших букв (заглавных)
 
+org	0e6bdh
 rust2	label	byte
  	db	1bh,'!@#$',37,05eh,'&*()_+'
 
@@ -5184,21 +5185,20 @@ bct	endp
 
 ;rc продолжение обработчика ошибки теста памяти
 osh2:
-	mov cx,3
+	mov si,offset membank
+	mov cx,4
 	shr di,1
 	jnc evn
 	add si,cx
-evn:	db 2eh			;cs segment prefix
-	lodsb
-	call prt_hex
-	loop evn
-	mov al, cs:f39+22
-	call prt_hex
+evn:	call prt_str
 	mov	si,offset e1	; установить адрес поля сообщения
 	 	 	 	; об ошибке
 	mov	cx,e1l	 	; получить счетчик поля сообщения об ошибке
 	call	p_msg	 	; печать ошибки
 	jmp	tst12	 	; переход к следующему тесту
+
+membank		db ' (0)'		;rc для теста памяти
+		db ' (1)'
 
 ;
 ;   Таблица кодов русских маленьких букв (строчных)
