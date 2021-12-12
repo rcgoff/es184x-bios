@@ -959,7 +959,7 @@ adrtest:
 	jne usual
 	jmp short tst12
 
-org	0e3f2h
+org	0e3ffh
 prn_hex_byte proc near
 	push ax
 	mov	cl,4
@@ -971,23 +971,6 @@ prn_hex_byte proc near
 	ret
 prn_hex_byte endp
 
-;_____________________
-;
-;   Процедура вывода на экран сообщения об ошибке в коде ASCII
-;
-;_______________________
-
-xlat_print_cod proc near
- 	push	ds	 	; сохранить DS
- 	push	cs
- 	pop	ds
- 	mov	bx,offset f4e	; адрес таблицы кодов ASCII
- 	xlatb
- 	mov	ah,14
- 	int	10h
- 	pop	ds
- 	ret
-xlat_print_cod endp
 ;______________________
 ;   Сброс системы - фаза 4
 ;______________________
@@ -1380,7 +1363,7 @@ prt_dec_loop:
 		loop	prt_dec_loop
 		mov	cx, 7
 		mov	si, offset e300	; " Kb OK\r"
-		call prt_str
+		call	prt_str
 		pop	ax
 		cmp	ax, 16
 		jz	e20b
@@ -1421,9 +1404,27 @@ prt_str		proc near
 		ret
 prt_str		endp
 
+;_____________________
+;
+;   Процедура вывода на экран сообщения об ошибке в коде ASCII
+;
+;_______________________
+
+xlat_print_cod proc near
+ 	push	ds	 	; сохранить DS
+ 	push	cs
+ 	pop	ds
+ 	mov	bx,offset f4e	; адрес таблицы кодов ASCII
+ 	xlatb
+ 	mov	ah,14
+ 	int	10h
+ 	pop	ds
+ 	ret
+xlat_print_cod endp
+
+
 ;   Таблица кодов русских больших букв (заглавных)
 
-org	0e6bdh
 rust2	label	byte
  	db	1bh,'!@#$',37,05eh,'&*()_+'
 

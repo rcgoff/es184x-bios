@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    12-09-21 21:38:20	    Page 1
+Turbo Assembler	 Version 5.0	    12-12-21 17:38:41	    Page 1
 1840v5.asm
 
 
@@ -1076,48 +1076,30 @@ E3D2  74 0C			     je	adrtest
 E3D4			     usual:
 E3D4  8A C6			     mov     al,dh	     ; получить	адрес (8 старших   +
 			     разрядов)
-E3D6  E8 0019			     call prn_hex_byte
+E3D6  E8 0026			     call prn_hex_byte
 E3D9  58			     pop ax	     ; получить	XOR записанного и	       +
 			     прочтенного
-E3DA  E8 0015			     call prn_hex_byte
+E3DA  E8 0022			     call prn_hex_byte
 E3DD  E9 14C8			     jmp osh2
 E3E0			     adrtest:
 E3E0  F7 C2 0FFF		     test dx, 0fffh	     ;rc адрес кратен 64кб?
 E3E4  75 EE			     jne usual
 E3E6  EB 3F			     jmp short tst12
 
-			     org     0e3f2h
-E3F2			     prn_hex_byte proc near
-E3F2  50			     push ax
-E3F3  B1 04			     mov     cl,4
-E3F5  D2 E8			     shr     al,cl	     ;
-E3F7  E8 0007			     call    xlat_print_cod  ; преобразование и печать    +
+			     org     0e3ffh
+E3FF			     prn_hex_byte proc near
+E3FF  50			     push ax
+E400  B1 04			     mov     cl,4
+E402  D2 E8			     shr     al,cl	     ;
+E404  E8 02A9			     call    xlat_print_cod  ; преобразование и печать    +
 			     старшего разряда
-E3FA  58			     pop ax
-E3FB  24 0F			     and     al,0fh
-E3FD  E8 0001			     call    xlat_print_cod  ; преобразование и печать    +
+E407  58			     pop ax
+E408  24 0F			     and     al,0fh
+E40A  E8 02A3			     call    xlat_print_cod  ; преобразование и печать    +
 			     младшего разряда
-E400  C3			     ret
-E401			     prn_hex_byte endp
-
-			     ;_____________________
-			     ;
-			     ;	 Процедура вывода на экран сообщения об       +
-			     ошибке в коде ASCII
-			     ;
-			     ;_______________________
-
-E401			     xlat_print_cod proc near
-E401  1E			     push    ds		     ; сохранить DS
-E402  0E			     push    cs
-E403  1F			     pop     ds
-E404  BB E417r			     mov     bx,offset f4e   ; адрес таблицы кодов ASCII
-E407  D7			     xlatb
-E408  B4 0E			     mov     ah,14
-E40A  CD 10			     int     10h
-E40C  1F			     pop     ds
 E40D  C3			     ret
-E40E			     xlat_print_cod endp
+E40E			     prn_hex_byte endp
+
 			     ;______________________
 			     ;	 Сброс системы - фаза 4
 			     ;______________________
@@ -1176,11 +1158,11 @@ E44C  8A E8			     mov     ch,al	     ; сохранить код		       +
 			     сканирования
 E44E  B1 04			     mov     cl,4
 E450  D2 E8			     shr     al,cl
-E452  E8 FFAC			     call    xlat_print_cod  ; преобразование и печать
+E452  E8 025B			     call    xlat_print_cod  ; преобразование и печать
 E455  8A C5			     mov     al,ch	     ; восстановить	код		       +
 			     сканирования
 E457  24 0F			     and     al,0fh	     ; выделить	младший байт
-E459  E8 FFA5			     call    xlat_print_cod  ; преобразование и печать
+E459  E8 0254			     call    xlat_print_cod  ; преобразование и печать
 E45C  BE E40Er		     f6:     mov     si,offset f1    ; получить	адрес поля	       +
 			     сообщения	об
 							     ; ошибке
@@ -1572,7 +1554,7 @@ E653  E8 002E				     call    prt_hex
 E656  E2 FA				     loop    prt_dec_loop
 E658  B9 0007				     mov     cx, 7
 E65B  BE E689r				     mov     si, offset	e300 ; " Kb OK\r"
-E65E  E8 0046				     call prt_str
+E65E  E8 0046				     call    prt_str
 E661  58				     pop     ax
 E662  3D 0010				     cmp     ax, 16
 E665  74 B2				     jz	     e20b
@@ -1616,10 +1598,29 @@ E6AD  E2 F8				     loop    prt_str
 E6AF  C3				     ret
 E6B0			     prt_str	     endp
 
+			     ;_____________________
+			     ;
+			     ;	 Процедура вывода на экран сообщения об       +
+			     ошибке в коде ASCII
+			     ;
+			     ;_______________________
+
+E6B0			     xlat_print_cod proc near
+E6B0  1E			     push    ds		     ; сохранить DS
+E6B1  0E			     push    cs
+E6B2  1F			     pop     ds
+E6B3  BB E417r			     mov     bx,offset f4e   ; адрес таблицы кодов ASCII
+E6B6  D7			     xlatb
+E6B7  B4 0E			     mov     ah,14
+E6B9  CD 10			     int     10h
+E6BB  1F			     pop     ds
+E6BC  C3			     ret
+E6BD			     xlat_print_cod endp
+
+
 			     ;	 Таблица	кодов русских больших букв	       +
 			     (заглавных)
 
-			     org     0e6bdh
 E6BD			     rust2   label   byte
 E6BD  1B 21 40 23 24 25	5E+	     db	     1bh,'!@#$',37,05eh,'&*()_+'
       26 2A 28 29 5F 2B
@@ -6909,9 +6910,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "12-09-21"
+??DATE				  Text	 "12-12-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "21:38:20"
+??TIME				  Text	 "17:38:41"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -7384,7 +7385,7 @@ PRI15				  Near16 CODE:FF8D
 PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
-PRN_HEX_BYTE			  Near16 CODE:E3F2
+PRN_HEX_BYTE			  Near16 CODE:E3FF
 PRT_DEC_LOOP			  Near16 CODE:E652
 PRT_HEX				  Near16 CODE:E684
 PRT_SIZ				  Near16 CODE:E63E
@@ -7534,7 +7535,7 @@ WRITE_TTY			  Near16 CODE:F722
 WRITE_TTY2			  Near16 CODE:F966
 X1				  Near16 CODE:ED8B
 X2				  Near16 CODE:ED87
-XLAT_PRINT_COD			  Near16 CODE:E401
+XLAT_PRINT_COD			  Near16 CODE:E6B0
 XXDAT				  Number 0050
 ZB				  Byte	 ABS0:0000
 ZW				  Word	 ABS0:0000
