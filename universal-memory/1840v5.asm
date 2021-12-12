@@ -1,9 +1,19 @@
-;This source code made by Gleb Larionov, Prague.
-;Changed by Leonid Yadrennikov, Tyumen.
-;v1 - 05.10.2021 - ros_checksum removed, ES1841 memory switching-on added
-;v2 - 13.10.2021 - int vector table loader and table itself shortened (like in PCBIOSv3),
-;		   BX register in STGTST is free
-;___________________	 	 	 	
+;ES1840 bios v.5
+;Modified by Leonid Yadrennikov, Tyumen.
+;05.10.2021-12.12.2021.
+;Based on ES1840 bios v.4 source code made by Gleb Larionov, Prague.
+
+;New features are:
+;-this BIOS can work with both ES1840 and ES1841 memory boards;
+;-this BIOS can work with both ES1840 and ES1841 CPU boards with no errors;
+;-if jumpers set to RAM size bigger then real amount, or BIOS is running on
+;	ES1841, RAM size if auto-detected;
+;-power-on memory test is twice as fast then in ES1840 BIOS v.4;
+;-improved memory diagnostics:
+;	--this BIOS can detect bank (0/1) where RAM error occured (like ES-1841)
+;	--in addition and unlike ES1841, this BIOS also can detect bank where
+;	  parity chip error ocured.
+;___________________
 ; v4 - ??/??/???? (Other version than 24/04/1981) новая клавиатура
  PAGE 55,120
 ;  БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА (БСУВВ)
@@ -310,7 +320,7 @@ c3:
 		lodsw
 		xor	ax, bx
 		jnz	c4			;rc if error, make it 8bit compartible
-		in	al, 62h
+		in	al, port_c
 		and	al, 40h
 		mov	al, 0
 		jnz	c7x
@@ -943,21 +953,43 @@ skip_size_det:
 ;   Печать адреса и эталона, если
 ;   произошла ошибка данных
 
-
 osh:
 	push ax
-	cmp ax,0aaaah		;rc проверка - это отсутствие памяти?
-	je adrtest
+	cmp ax,0		;rc это ошибка четности?
+	je parity
+	cmp ax,0aaaah		;rc это отсутствие памяти?
+	je tst12		;rc отсутствие, значит - не ошибка
+;	test dx, 0fffh		;rc отсутствие, адрес кратен 64кб?
+;	je tst12		;rc да - это не ошибка
+
 usual:
 	mov	al,dh	 	; получить адрес (8 старших разрядов)
 	call prn_hex_byte
 	pop ax	 	; получить XOR записанного и прочтенного
 	call prn_hex_byte
 	jmp osh2
-adrtest:
-	test dx, 0fffh		;rc адрес кратен 64кб?
-	jne usual
-	jmp short tst12
+
+parity:
+;checking L-byte
+	mov si,di		;restore SI independently of D-flag
+	xchg ax,bx		;pattern for test in al (from bl)
+	stosb
+;clear parity flip-flop on CPU module
+	in al,port_b
+	push ax
+	or al,00100000b		;clear parity flip-flop (bit5=1)
+	out port_b,al
+	pop ax
+	out port_b,al		;restore initial value of port_b
+;check parity for L-byte
+	db 26h			;es seg prefix
+	lodsb
+	in	al, port_c	;read parity checker
+	and	al, 40h
+	jz h_parity		;Z means: L-byte wasn't erroneous
+	dec di			;since DI was incremented by stosb, for L-error we should restore it
+h_parity:
+	jmp short usual
 
 org	0e3ffh
 prn_hex_byte proc near
@@ -1378,12 +1410,12 @@ prt_dec_loop:
 		jmp	tst12
 
 e21a:
-		pop	bx
+		pop	cx
 		add	sp, 6
 		mov	dx, es
 		pop	ds
 		push	ds
-		mov	ds:memory_size,	bx
+		mov	ds:memory_size,	cx
 		jmp	osh
 
 prt_hex		proc near
