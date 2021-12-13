@@ -954,7 +954,6 @@ skip_size_det:
 ;   произошла ошибка данных
 
 osh:
-	push ax
 	cmp ax,0		;rc это ошибка четности?
 	je parity
 	cmp ax,0aaaah		;rc это отсутствие памяти?
@@ -963,9 +962,10 @@ osh:
 ;	je tst12		;rc да - это не ошибка
 
 usual:
-	mov	al,dh	 	; получить адрес (8 старших разрядов)
+	mov ax,es
+	mov al,ah		; получить адрес (8 старших разрядов) в AL
 	call prn_hex_byte
-	pop ax	 	; получить XOR записанного и прочтенного
+	pop ax			; получить XOR записанного и прочтенного
 	call prn_hex_byte
 	jmp osh2
 
@@ -991,7 +991,6 @@ parity:
 h_parity:
 	jmp short usual
 
-org	0e3ffh
 prn_hex_byte proc near
 	push ax
 	mov	cl,4
@@ -1363,8 +1362,6 @@ e20b:
 		mov	bx, 400h
 
 e20c:
-		mov	ds, bx
-		
 		mov	es, bx
 		add	bx, 400h
 		push	dx
@@ -1410,14 +1407,15 @@ prt_dec_loop:
 		jmp	tst12
 
 e21a:
-		pop	cx
+		pop	cx		;restore memory size before last STGTST call
 		add	sp, 6
-		mov	dx, es
-		pop	ds
-		push	ds
+		pop	ds		;restore pointer to BIOS data area
+					;from the very beginning of e190
 		mov	ds:memory_size,	cx
+		push	ax
 		jmp	osh
 
+org 0e684h
 prt_hex		proc near
 		mov	ah, 14
 		int	10h
