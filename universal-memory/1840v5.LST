@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    12-13-21 21:24:23	    Page 1
+Turbo Assembler	 Version 5.0	    12-15-21 22:48:06	    Page 1
 1840v5.asm
 
 
@@ -1539,75 +1539,74 @@ E605			     e190:
 E605  1E				     push    ds
 E606  B8 0010				     mov     ax, 16
 E609  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
-E60F  75 03				     jnz     e20a
+E60F  75 24				     jnz     prt_siz
 E611  E9 FE13				     jmp     tst12
 
-E614			     e20a:
-E614  B8 0010				     mov     ax, 16
-E617  EB 23				     jmp     short prt_siz
+E614			     e20b:
+E614  8B 1E 0013r			     mov     bx, ds:memory_size
+E618  2B D8				     sub     bx, ax	     ;ax stores	16d, subtract tested bytes so  +
+			     bytes to test are in bx
+E61A  93				     xchg    bx,ax	     ;order for	div command format
+E61B  F7 F3				     div     bx		     ;now ax stores amount of 16K-fragments to +
+			     test
+E61D  91				     xchg    cx,ax	     ;now cx has that amount
+E61E  93				     xchg    bx,ax	     ;ax stores	16d back
+E61F  BB 0400				     mov     bx, 400h
 
-E619			     e20b:
-E619  8B 1E 0013r			     mov     bx, ds:memory_size
-E61D  83 EB 10				     sub     bx, 16
-E620  B1 04				     mov     cl, 4
-E622  D3 EB				     shr     bx, cl
-E624  8B CB				     mov     cx, bx
-E626  BB 0400				     mov     bx, 400h
+E622			     e20c:
+E622  8E C3				     mov     es, bx
+E624  81 C3 0400			     add     bx, 400h
+E628  52				     push    dx
+E629  51				     push    cx
+E62A  53				     push    bx
+E62B  50				     push    ax
+E62C  E8 F9EB				     call    stgtst
+E62F  75 3B				     jnz     e21a
+E631  58				     pop     ax
+E632  05 0010				     add     ax, 16
 
-E629			     e20c:
-E629  8E C3				     mov     es, bx
-E62B  81 C3 0400			     add     bx, 400h
-E62F  52				     push    dx
-E630  51				     push    cx
-E631  53				     push    bx
-E632  50				     push    ax
-E633  E8 F9E4				     call    stgtst
-E636  75 3B				     jnz     e21a
-E638  58				     pop     ax
-E639  05 0010				     add     ax, 16
+E635			     prt_siz:
+E635  50				     push    ax
+E636  BB 000A				     mov     bx, 10
+E639  B9 0003				     mov     cx, 3
 
-E63C			     prt_siz:
-E63C  50				     push    ax
-E63D  BB 000A				     mov     bx, 10
-E640  B9 0003				     mov     cx, 3
+E63C			     decimal_loop:
+E63C  33 D2				     xor     dx, dx
+E63E  F7 F3				     div     bx
+E640  80 CA 30				     or	     dl, 30h
+E643  52				     push    dx
+E644  E2 F6				     loop    decimal_loop
+E646  B9 0003				     mov     cx, 3
 
-E643			     decimal_loop:
-E643  33 D2				     xor     dx, dx
-E645  F7 F3				     div     bx
-E647  80 CA 30				     or	     dl, 30h
-E64A  52				     push    dx
-E64B  E2 F6				     loop    decimal_loop
-E64D  B9 0003				     mov     cx, 3
+E649			     prt_dec_loop:
+E649  58				     pop     ax
+E64A  E8 0037				     call    prt_hex
+E64D  E2 FA				     loop    prt_dec_loop
+E64F  B9 0007				     mov     cx, 7
+E652  BE E689r				     mov     si, offset	e300 ; " Kb OK\r"
+E655  E8 004F				     call    prt_str
+E658  58				     pop     ax
+E659  3D 0010				     cmp     ax, 16
+E65C  74 B6				     jz	     e20b
+E65E  5B				     pop     bx
+E65F  59				     pop     cx
+E660  5A				     pop     dx
+E661  E2 BF				     loop    e20c
+E663  B0 0A				     mov     al, 10
+E665  E8 001C				     call    prt_hex
+E668  1F				     pop     ds
 
-E650			     prt_dec_loop:
-E650  58				     pop     ax
-E651  E8 0030				     call    prt_hex
-E654  E2 FA				     loop    prt_dec_loop
-E656  B9 0007				     mov     cx, 7
-E659  BE E689r				     mov     si, offset	e300 ; " Kb OK\r"
-E65C  E8 0048				     call    prt_str
-E65F  58				     pop     ax
-E660  3D 0010				     cmp     ax, 16
-E663  74 B4				     jz	     e20b
-E665  5B				     pop     bx
-E666  59				     pop     cx
-E667  5A				     pop     dx
-E668  E2 BF				     loop    e20c
-E66A  B0 0A				     mov     al, 10
-E66C  E8 0015				     call    prt_hex
-E66F  1F				     pop     ds
+E669  E9 FDBB				     jmp     tst12
 
-E670  E9 FDB4				     jmp     tst12
-
-E673			     e21a:
-E673  59				     pop     cx		     ;restore memory size before last STGTST   +
+E66C			     e21a:
+E66C  59				     pop     cx		     ;restore memory size before last STGTST   +
 			     call
-E674  83 C4 06				     add     sp, 6
-E677  1F				     pop     ds		     ;restore pointer to BIOS data area
+E66D  83 C4 06				     add     sp, 6
+E670  1F				     pop     ds		     ;restore pointer to BIOS data area
 								     ;from the very beginning of e190
-E678  89 0E 0013r			     mov     ds:memory_size, cx
-E67C  50				     push    ax
-E67D  E9 FD4E				     jmp     osh
+E671  89 0E 0013r			     mov     ds:memory_size, cx
+E675  50				     push    ax
+E676  E9 FD55				     jmp     osh
 
 			     org 0e684h
 E684			     prt_hex	     proc near
@@ -6943,9 +6942,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "12-13-21"
+??DATE				  Text	 "12-15-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "21:24:23"
+??TIME				  Text	 "22:48:06"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -7050,7 +7049,7 @@ D8				  Near16 CODE:E27F
 D9				  Near16 CODE:E288
 DAL				  Near16 CODE:E4E9
 DAT				  Number 0040
-DECIMAL_LOOP			  Near16 CODE:E643
+DECIMAL_LOOP			  Near16 CODE:E63C
 DEL_KEY				  Number 0053
 DISKETTE_IO			  Far16	 CODE:EC59
 DISKETTE_PARM			  Dword	 ABS0:0078
@@ -7086,10 +7085,9 @@ E19				  Near16 CODE:E3AB
 E190				  Near16 CODE:E605
 E1A				  Near16 CODE:E2E0
 E1L				  Number 0004
-E20A				  Near16 CODE:E614
-E20B				  Near16 CODE:E619
-E20C				  Near16 CODE:E629
-E21A				  Near16 CODE:E673
+E20B				  Near16 CODE:E614
+E20C				  Near16 CODE:E622
+E21A				  Near16 CODE:E66C
 E3				  Near16 CODE:E2FA
 E300				  Byte	 CODE:E689
 E3A				  Near16 CODE:E305
@@ -7420,9 +7418,9 @@ PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
 PRN_HEX_BYTE			  Near16 CODE:E3FF
-PRT_DEC_LOOP			  Near16 CODE:E650
+PRT_DEC_LOOP			  Near16 CODE:E649
 PRT_HEX				  Near16 CODE:E684
-PRT_SIZ				  Near16 CODE:E63C
+PRT_SIZ				  Near16 CODE:E635
 PRT_STR				  Near16 CODE:E6A7
 P_MSG				  Near16 CODE:E5F5
 R1				  Near16 CODE:F450

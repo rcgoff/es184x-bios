@@ -1346,19 +1346,16 @@ e190:
 		push	ds
 		mov	ax, 16
 		cmp	ds:reset_flag, 1234h
-		jnz	e20a
+		jnz	prt_siz
 		jmp	tst12
-
-e20a:
-		mov	ax, 16
-		jmp	short prt_siz
 
 e20b:
 		mov	bx, ds:memory_size
-		sub	bx, 16
-		mov	cl, 4
-		shr	bx, cl
-		mov	cx, bx
+		sub	bx, ax		;ax stores 16d, subtract tested bytes so bytes to test are in bx
+		xchg	bx,ax		;order for div command format
+		div	bx		;now ax stores amount of 16K-fragments to test
+		xchg	cx,ax		;now cx has that amount
+		xchg	bx,ax		;ax stores 16d back
 		mov	bx, 400h
 
 e20c:
