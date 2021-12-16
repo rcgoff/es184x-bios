@@ -1347,8 +1347,9 @@ e190:
 	mov	si,offset infostr	;адрес поля информации о BIOS
 	infoend	equ	offset c1
 	infobeg	equ	offset infostr
- 	mov	cx, infoend-infobeg	 		; длина информации
+ 	mov	cl, infoend-infobeg	 		; длина информации
  	call	p_msg	 		; вывод на экран
+	xor	bp,bp
 	push	ds
 	mov	ax, 16
 	jmp short prt_siz
@@ -1384,7 +1385,7 @@ decimal_loop:
 	or	dl, 30h
 	push	dx
 	loop	decimal_loop
-	mov	cx, 3
+	mov	cl, 3
 
 prt_dec_loop:
 	pop	ax
