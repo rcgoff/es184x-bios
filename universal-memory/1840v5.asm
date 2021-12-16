@@ -1,6 +1,6 @@
 ;ES1840 bios v.5
 ;Modified by Leonid Yadrennikov, Tyumen.
-;05.10.2021-12.12.2021.
+;05.10.2021-16.12.2021.
 ;Based on ES1840 bios v.4 source code made by Gleb Larionov, Prague.
 
 ;New features are:
@@ -8,6 +8,7 @@
 ;-this BIOS can work with both ES1840 and ES1841 CPU boards with no errors;
 ;-if jumpers set to RAM size bigger then real amount, or BIOS is running on
 ;	ES1841, RAM size if auto-detected;
+;-upper bound for RAM in any case is 704 Kb;
 ;-power-on memory test is twice as fast then in ES1840 BIOS v.4;
 ;-improved memory diagnostics:
 ;	--this BIOS can detect bank (0/1) where RAM error occured (like ES-1841)
@@ -287,7 +288,7 @@ code segment para
 
 		org 0E000h
 
-a5700051Copr_Ib	db '5700051 copr. ibm 1981'
+infostr		db '1840v5 16.12.21 RCgoff'
 c1		dw offset c11		; адрес	возврата
 caw		dw offset ca3
  	assume cs:code,ss:code,es:abs0,ds:data
@@ -1343,11 +1344,14 @@ p_msg	endp
 
 
 e190:
+	mov	si,offset infostr	;адрес поля информации о BIOS
+	infoend	equ	offset c1
+	infobeg	equ	offset infostr
+ 	mov	cx, infoend-infobeg	 		; длина информации
+ 	call	p_msg	 		; вывод на экран
 	push	ds
 	mov	ax, 16
-	cmp	ds:reset_flag, 1234h
-	jnz	prt_siz
-	jmp	tst12
+	jmp short prt_siz
 
 e20b:
 	mov	bx, ds:memory_size
@@ -1416,7 +1420,6 @@ e21a:
 	je	pre12		;rc отсутствие, значит - не ошибка
 	jmp	osh
 
-org 0e684h
 prt_hex		proc near
 		mov	ah, 14
 		int	10h
