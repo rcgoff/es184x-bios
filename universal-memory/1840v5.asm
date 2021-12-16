@@ -927,21 +927,24 @@ e18:
 ;   ТЕСТ.11
 ;	 Дополнительный тест памяти
 ;______________________
- 	assume	ds:data
+	assume	ds:data
 e19:
- 	mov	ax,dat
- 	mov	ds,ax
-	 	cmp	reset_flag,1234h
-		je	skip_size_det
-		in	al, port_c
-		and	al, 0Fh
-		inc	al
-		mov	ah, 80h
-		mul	ah
-		mov	ds:memory_size,	ax
+	mov	ax,dat
+	mov	ds,ax
+	cmp	reset_flag,1234h
+	pushf
+	je	skip_size_det
+	in	al, port_c
+	and	al, 0Fh
+	inc	al
+	mov	ah, 80h
+	mul	ah
+	mov	ds:memory_size,	ax
 skip_size_det:
-		mov	ax,ds:memory_size		;restore if reboot and no damages if power-on
-		mov	ds:io_ram_size,	ax
+	mov	ax,ds:memory_size		;restore if reboot and no damages if power-on
+	mov	ds:io_ram_size,	ax
+	popf
+	je	tst12				;skip memtest on reboot
 
 
 
@@ -954,12 +957,9 @@ skip_size_det:
 ;   произошла ошибка данных
 
 osh:
+	push	ax
 	cmp ax,0		;rc это ошибка четности?
 	je parity
-	cmp ax,0aaaah		;rc это отсутствие памяти?
-	je tst12		;rc отсутствие, значит - не ошибка
-;	test dx, 0fffh		;rc отсутствие, адрес кратен 64кб?
-;	je tst12		;rc да - это не ошибка
 
 usual:
 	mov ax,es
@@ -1343,74 +1343,78 @@ p_msg	endp
 
 
 e190:
-		push	ds
-		mov	ax, 16
-		cmp	ds:reset_flag, 1234h
-		jnz	prt_siz
-		jmp	tst12
+	push	ds
+	mov	ax, 16
+	cmp	ds:reset_flag, 1234h
+	jnz	prt_siz
+	jmp	tst12
 
 e20b:
-		mov	bx, ds:memory_size
-		sub	bx, ax		;ax stores 16d, subtract tested bytes so bytes to test are in bx
-		xchg	bx,ax		;order for div command format
-		div	bx		;now ax stores amount of 16K-fragments to test
-		xchg	cx,ax		;now cx has that amount
-		xchg	bx,ax		;ax stores 16d back
-		mov	bx, 400h
+	mov	bx, ds:memory_size
+	sub	bx, ax		;ax stores 16d, subtract tested bytes so bytes to test are in bx
+	xchg	bx,ax		;order for div command format
+	div	bx		;now ax stores amount of 16K-fragments to test
+	xchg	cx,ax		;now cx has that amount
+	xchg	bx,ax		;ax stores 16d back
+	mov	bx, 400h
 
 e20c:
-		mov	es, bx
-		add	bx, 400h
-		push	dx
-		push	cx
-		push	bx
-		push	ax
-		call	stgtst
-		jnz	e21a
-		pop	ax
-		add	ax, 16
+	mov	es, bx
+	push	dx
+	push	cx
+	push	bx
+	push	ax
+	call	stgtst
+	jnz	e21a
+	pop	ax
+	add	ax, 16
 
 prt_siz:
-		push	ax
-		mov	bx, 10
-		mov	cx, 3
+	push	ax
+	mov	bx, 10
+	mov	cx, 3
 
 decimal_loop:
-		xor	dx, dx
-		div	bx
-		or	dl, 30h
-		push	dx
-		loop	decimal_loop
-		mov	cx, 3
+	xor	dx, dx
+	div	bx
+	or	dl, 30h
+	push	dx
+	loop	decimal_loop
+	mov	cx, 3
 
 prt_dec_loop:
-		pop	ax
-		call	prt_hex
-		loop	prt_dec_loop
-		mov	cx, 7
-		mov	si, offset e300	; " Kb OK\r"
-		call	prt_str
-		pop	ax
-		cmp	ax, 16
-		jz	e20b
-		pop	bx
-		pop	cx
-		pop	dx
-		loop	e20c
-		mov	al, 10
-		call	prt_hex
-		pop	ds
-		
-		jmp	tst12
+	pop	ax
+	call	prt_hex
+	loop	prt_dec_loop
+	mov	cx, 7
+	mov	si, offset e300	; " Kb OK\r"
+	call	prt_str
+	pop	ax
+	cmp	ax, 16
+	jz	e20b
+	pop	bx
+	pop	cx
+	pop	dx
+	add	bh, 4		;next 16k-block
+	cmp	bh,0b0h		;b000 (704kb) is mda-display buffer beginning
+	je	stoptst
+	loop	e20c
+stoptst:pop	ds
+	mov	ds:memory_size,	ax	;if break from loop occured
+pre12:	mov	al, 10		;line feed
+	call	prt_hex
+	jmp	tst12
+
 
 e21a:
-		pop	cx		;restore memory size before last STGTST call
-		add	sp, 6
-		pop	ds		;restore pointer to BIOS data area
-					;from the very beginning of e190
-		mov	ds:memory_size,	cx
-		push	ax
-		jmp	osh
+	pop	cx		;restore memory size before last STGTST call
+	add	sp, 6
+	pop	ds		;restore pointer to BIOS data area
+				;from the very beginning of e190
+	mov	ds:memory_size,	cx
+	cmp	ax,0aaaah	;rc это отсутствие памяти?
+	je	pre12		;rc отсутствие, значит - не ошибка
+	jmp	osh
 
 org 0e684h
 prt_hex		proc near

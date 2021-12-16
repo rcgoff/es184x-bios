@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    12-15-21 22:48:06	    Page 1
+Turbo Assembler	 Version 5.0	    12-16-21 23:26:19	    Page 1
 1840v5.asm
 
 
@@ -1054,38 +1054,36 @@ E3A9  CD 10			     int     10h
 E3AB			     e19:
 E3AB  B8 0040			     mov     ax,dat
 E3AE  8E D8			     mov     ds,ax
-E3B0  81 3E 0072r 1234			     cmp     reset_flag,1234h
-E3B6  74 0D				     je	     skip_size_det
-E3B8  E4 62				     in	     al, port_c
-E3BA  24 0F				     and     al, 0Fh
-E3BC  FE C0				     inc     al
-E3BE  B4 80				     mov     ah, 80h
-E3C0  F6 E4				     mul     ah
-E3C2  A3 0013r				     mov     ds:memory_size, ax
-E3C5			     skip_size_det:
-E3C5  A1 0013r				     mov     ax,ds:memory_size		     ;restore if reboot	and no +
-			     damages if	power-on
-E3C8  A3 0015r				     mov     ds:io_ram_size, ax
+E3B0  81 3E 0072r 1234		     cmp     reset_flag,1234h
+E3B6  9C			     pushf
+E3B7  74 0D			     je	     skip_size_det
+E3B9  E4 62			     in	     al, port_c
+E3BB  24 0F			     and     al, 0Fh
+E3BD  FE C0			     inc     al
+E3BF  B4 80			     mov     ah, 80h
+E3C1  F6 E4			     mul     ah
+E3C3  A3 0013r			     mov     ds:memory_size, ax
+E3C6			     skip_size_det:
+E3C6  A1 0013r			     mov     ax,ds:memory_size		     ;restore if reboot	and no damages +
+			     if	power-on
+E3C9  A3 0015r			     mov     ds:io_ram_size, ax
+E3CC  9D			     popf
+E3CD  74 58			     je	     tst12			     ;skip memtest on reboot
 
 
 
 			     ;	 Проверка любой действительной памяти
 			     ;	 на считывание и запись
 
-E3CB  E9 0237			     jmp     e190
+E3CF  E9 0233			     jmp     e190
 
 			     ;	 Печать адреса и эталона, если
 			     ;	 произошла ошибка данных
 
-E3CE			     osh:
-E3CE  3D 0000			     cmp ax,0		     ;rc это	ошибка четности?
-E3D1  74 13			     je	parity
-E3D3  3D AAAA			     cmp ax,0aaaah	     ;rc это	отсутствие памяти?
-E3D6  74 4F			     je	tst12		     ;rc отсутствие, значит - не     +
-			     ошибка
-			     ;	     test dx, 0fffh	     ;rc отсутствие, адрес кратен +
-			     64кб?
-			     ;	     je	tst12		     ;rc да -	это не ошибка
+E3D2			     osh:
+E3D2  50			     push    ax
+E3D3  3D 0000			     cmp ax,0		     ;rc это	ошибка четности?
+E3D6  74 0E			     je	parity
 
 E3D8			     usual:
 E3D8  8C C0			     mov ax,es
@@ -1536,77 +1534,80 @@ E605			     p_msg   endp
 
 
 E605			     e190:
-E605  1E				     push    ds
-E606  B8 0010				     mov     ax, 16
-E609  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
-E60F  75 24				     jnz     prt_siz
-E611  E9 FE13				     jmp     tst12
+E605  1E			     push    ds
+E606  B8 0010			     mov     ax, 16
+E609  81 3E 0072r 1234		     cmp     ds:reset_flag, 1234h
+E60F  75 20			     jnz     prt_siz
+E611  E9 FE13			     jmp     tst12
 
 E614			     e20b:
-E614  8B 1E 0013r			     mov     bx, ds:memory_size
-E618  2B D8				     sub     bx, ax	     ;ax stores	16d, subtract tested bytes so  +
-			     bytes to test are in bx
-E61A  93				     xchg    bx,ax	     ;order for	div command format
-E61B  F7 F3				     div     bx		     ;now ax stores amount of 16K-fragments to +
-			     test
-E61D  91				     xchg    cx,ax	     ;now cx has that amount
-E61E  93				     xchg    bx,ax	     ;ax stores	16d back
-E61F  BB 0400				     mov     bx, 400h
+E614  8B 1E 0013r		     mov     bx, ds:memory_size
+E618  2B D8			     sub     bx, ax	     ;ax stores	16d, subtract tested bytes so bytes to +
+			     test are in bx
+E61A  93			     xchg    bx,ax	     ;order for	div command format
+E61B  F7 F3			     div     bx		     ;now ax stores amount of 16K-fragments to test
+E61D  91			     xchg    cx,ax	     ;now cx has that amount
+E61E  93			     xchg    bx,ax	     ;ax stores	16d back
+E61F  BB 0400			     mov     bx, 400h
 
 E622			     e20c:
-E622  8E C3				     mov     es, bx
-E624  81 C3 0400			     add     bx, 400h
-E628  52				     push    dx
-E629  51				     push    cx
-E62A  53				     push    bx
-E62B  50				     push    ax
-E62C  E8 F9EB				     call    stgtst
-E62F  75 3B				     jnz     e21a
-E631  58				     pop     ax
-E632  05 0010				     add     ax, 16
+E622  8E C3			     mov     es, bx
+E624  52			     push    dx
+E625  51			     push    cx
+E626  53			     push    bx
+E627  50			     push    ax
+E628  E8 F9EF			     call    stgtst
+E62B  75 46			     jnz     e21a
+E62D  58			     pop     ax
+E62E  05 0010			     add     ax, 16
 
-E635			     prt_siz:
-E635  50				     push    ax
-E636  BB 000A				     mov     bx, 10
-E639  B9 0003				     mov     cx, 3
+E631			     prt_siz:
+E631  50			     push    ax
+E632  BB 000A			     mov     bx, 10
+E635  B9 0003			     mov     cx, 3
 
-E63C			     decimal_loop:
-E63C  33 D2				     xor     dx, dx
-E63E  F7 F3				     div     bx
-E640  80 CA 30				     or	     dl, 30h
-E643  52				     push    dx
-E644  E2 F6				     loop    decimal_loop
-E646  B9 0003				     mov     cx, 3
+E638			     decimal_loop:
+E638  33 D2			     xor     dx, dx
+E63A  F7 F3			     div     bx
+E63C  80 CA 30			     or	     dl, 30h
+E63F  52			     push    dx
+E640  E2 F6			     loop    decimal_loop
+E642  B9 0003			     mov     cx, 3
 
-E649			     prt_dec_loop:
-E649  58				     pop     ax
-E64A  E8 0037				     call    prt_hex
-E64D  E2 FA				     loop    prt_dec_loop
-E64F  B9 0007				     mov     cx, 7
-E652  BE E689r				     mov     si, offset	e300 ; " Kb OK\r"
-E655  E8 004F				     call    prt_str
-E658  58				     pop     ax
-E659  3D 0010				     cmp     ax, 16
-E65C  74 B6				     jz	     e20b
-E65E  5B				     pop     bx
-E65F  59				     pop     cx
-E660  5A				     pop     dx
-E661  E2 BF				     loop    e20c
-E663  B0 0A				     mov     al, 10
-E665  E8 001C				     call    prt_hex
-E668  1F				     pop     ds
+E645			     prt_dec_loop:
+E645  58			     pop     ax
+E646  E8 003B			     call    prt_hex
+E649  E2 FA			     loop    prt_dec_loop
+E64B  B9 0007			     mov     cx, 7
+E64E  BE E689r			     mov     si, offset	e300 ; " Kb OK\r"
+E651  E8 0053			     call    prt_str
+E654  58			     pop     ax
+E655  3D 0010			     cmp     ax, 16
+E658  74 BA			     jz	     e20b
+E65A  5B			     pop     bx
+E65B  59			     pop     cx
+E65C  5A			     pop     dx
+E65D  80 C7 04			     add     bh, 4	     ;next 16k-block
+E660  80 FF B0			     cmp     bh,0b0h	     ;b000 (704kb) is mda-display buffer beginning
+E663  74 02			     je	     stoptst
+E665  E2 BB			     loop    e20c
+E667  1F		     stoptst:pop     ds
+E668  A3 0013r			     mov     ds:memory_size, ax	     ;if break from loop occured
+E66B  B0 0A		     pre12:  mov     al, 10	     ;line feed
+E66D  E8 0014			     call    prt_hex
+E670  E9 FDB4			     jmp     tst12
 
-E669  E9 FDBB				     jmp     tst12
 
-E66C			     e21a:
-E66C  59				     pop     cx		     ;restore memory size before last STGTST   +
-			     call
-E66D  83 C4 06				     add     sp, 6
-E670  1F				     pop     ds		     ;restore pointer to BIOS data area
-								     ;from the very beginning of e190
-E671  89 0E 0013r			     mov     ds:memory_size, cx
-E675  50				     push    ax
-E676  E9 FD55				     jmp     osh
+E673			     e21a:
+E673  59			     pop     cx		     ;restore memory size before last STGTST call
+E674  83 C4 06			     add     sp, 6
+E677  1F			     pop     ds		     ;restore pointer to BIOS data area
+							     ;from the very beginning of e190
+E678  89 0E 0013r		     mov     ds:memory_size, cx
+E67C  3D AAAA			     cmp     ax,0aaaah	     ;rc это	отсутствие памяти?
+E67F  74 EA			     je	     pre12	     ;rc отсутствие, значит - не     +
+			     ошибка
+E681  E9 FD4E			     jmp     osh
 
 			     org 0e684h
 E684			     prt_hex	     proc near
@@ -6942,9 +6943,9 @@ FFFF  00				     db	   0 ;
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "12-15-21"
+??DATE				  Text	 "12-16-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "22:48:06"
+??TIME				  Text	 "23:26:19"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -7049,7 +7050,7 @@ D8				  Near16 CODE:E27F
 D9				  Near16 CODE:E288
 DAL				  Near16 CODE:E4E9
 DAT				  Number 0040
-DECIMAL_LOOP			  Near16 CODE:E63C
+DECIMAL_LOOP			  Near16 CODE:E638
 DEL_KEY				  Number 0053
 DISKETTE_IO			  Far16	 CODE:EC59
 DISKETTE_PARM			  Dword	 ABS0:0078
@@ -7087,7 +7088,7 @@ E1A				  Near16 CODE:E2E0
 E1L				  Number 0004
 E20B				  Near16 CODE:E614
 E20C				  Near16 CODE:E622
-E21A				  Near16 CODE:E66C
+E21A				  Near16 CODE:E673
 E3				  Near16 CODE:E2FA
 E300				  Byte	 CODE:E689
 E3A				  Near16 CODE:E305
@@ -7389,7 +7390,7 @@ NUM_SHIFT			  Number 0020
 NUM_STATE			  Number 0020
 NUM_TRANS			  Near16 CODE:EFB0
 ORG_VECTOR			  Dword	 ABS0:004C
-OSH				  Near16 CODE:E3CE
+OSH				  Near16 CODE:E3D2
 OSH2				  Near16 CODE:F8A8
 P1				  Near16 CODE:F38A
 P10				  Near16 CODE:F403
@@ -7412,15 +7413,16 @@ PORT_C				  Number 0062
 PORT_OFF			  Byte	 DATA:0077
 POSITION			  Near16 CODE:F28B
 POST				  Near16 CODE:FFF0
+PRE12				  Near16 CODE:E66B
 PRI10				  Near16 CODE:FF7F
 PRI15				  Near16 CODE:FF8D
 PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
 PRN_HEX_BYTE			  Near16 CODE:E3FF
-PRT_DEC_LOOP			  Near16 CODE:E649
+PRT_DEC_LOOP			  Near16 CODE:E645
 PRT_HEX				  Near16 CODE:E684
-PRT_SIZ				  Near16 CODE:E635
+PRT_SIZ				  Near16 CODE:E631
 PRT_STR				  Near16 CODE:E6A7
 P_MSG				  Near16 CODE:E5F5
 R1				  Near16 CODE:F450
@@ -7499,7 +7501,7 @@ SET_COLOR			  Near16 CODE:F254
 SET_CPOS			  Near16 CODE:F1F0
 SET_CTYPE			  Near16 CODE:F1CF
 SET_MODE			  Near16 CODE:F0FC
-SKIP_SIZE_DET			  Near16 CODE:E3C5
+SKIP_SIZE_DET			  Near16 CODE:E3C6
 SP_TEST				  Near16 CODE:E5D8
 STA				  Number 0030
 START				  Near16 CODE:E06C
@@ -7508,6 +7510,7 @@ STAT_OFFSET			  Byte	 DATA:007C
 STGTST				  Near16 CODE:E01A
 STGTST_CNT			  Near16 CODE:E01D
 STG_LOC0			  Byte	 ABS0:0000
+STOPTST				  Near16 CODE:E667
 T1				  Near16 CODE:FE7F
 T2				  Near16 CODE:FE82
 T3				  Near16 CODE:FE95
