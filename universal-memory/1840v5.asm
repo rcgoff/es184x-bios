@@ -1,6 +1,6 @@
 ;ES1840 bios v.5
 ;Modified by Leonid Yadrennikov, Tyumen.
-;05.10.2021-16.12.2021.
+;05.10.2021-17.12.2021.
 ;Based on ES1840 bios v.4 source code made by Gleb Larionov, Prague.
 
 ;New features are:
@@ -288,7 +288,7 @@ code segment para
 
 		org 0E000h
 
-infostr		db '1840v5 16.12.21 RCgoff'
+infostr		db '1840v5 17.12.21 RCgoff'
 c1		dw offset c11		; адрес	возврата
 caw		dw offset ca3
  	assume cs:code,ss:code,es:abs0,ds:data
@@ -1334,6 +1334,7 @@ kbd_reset	endp
 ;______________________
 p_msg	proc	near
  	mov	bp,si
+p_msg_noerr:
 	call prt_str
  	mov	ax,0e0dh   ; переместить курсор в начало строки
  	int	10h
@@ -1347,9 +1348,8 @@ e190:
 	mov	si,offset infostr	;адрес поля информации о BIOS
 	infoend	equ	offset c1
 	infobeg	equ	offset infostr
- 	mov	cl, infoend-infobeg	 		; длина информации
- 	call	p_msg	 		; вывод на экран
-	xor	bp,bp
+ 	mov	cx, infoend-infobeg	; длина информации
+ 	call	p_msg_noerr 		; вывод на экран
 	push	ds
 	mov	ax, 16
 	jmp short prt_siz
@@ -1377,7 +1377,7 @@ e20c:
 prt_siz:
 	push	ax
 	mov	bx, 10
-	mov	cx, 3
+	mov	cl, 3		;after normal STGTST end CX=0, so we can set only CL
 
 decimal_loop:
 	xor	dx, dx
@@ -1385,13 +1385,13 @@ decimal_loop:
 	or	dl, 30h
 	push	dx
 	loop	decimal_loop
-	mov	cl, 3
+	mov	cl, 3		;after decimal_loop end CX=0, so we can set only CL
 
 prt_dec_loop:
 	pop	ax
 	call	prt_hex
 	loop	prt_dec_loop
-	mov	cx, 7
+	mov	cl, 7		;after prt_dec_loop end CX=0, so we can set only CL
 	mov	si, offset e300	; " Kb OK\r"
 	call	prt_str
 	pop	ax
@@ -1421,6 +1421,7 @@ e21a:
 	je	pre12		;rc отсутствие, значит - не ошибка
 	jmp	osh
 
+org	0e684h
 prt_hex		proc near
 		mov	ah, 14
 		int	10h

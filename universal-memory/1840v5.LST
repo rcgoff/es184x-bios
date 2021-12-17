@@ -1,11 +1,11 @@
-Turbo Assembler	 Version 5.0	    12-17-21 00:23:28	    Page 1
+Turbo Assembler	 Version 5.0	    12-17-21 21:58:39	    Page 1
 1840v5.asm
 
 
 
 			     ;ES1840 bios v.5
 			     ;Modified by Leonid Yadrennikov, Tyumen.
-			     ;05.10.2021-16.12.2021.
+			     ;05.10.2021-17.12.2021.
 			     ;Based on ES1840 bios v.4 source code made	by Gleb	Larionov, Prague.
 
 			     ;New features are:
@@ -294,8 +294,8 @@ Turbo Assembler	 Version 5.0	    12-17-21 00:23:28	    Page 1
 
 					     org 0E000h
 
-E000  31 38 34 30 76 35	20+  infostr	     db	'1840v5	16.12.21 RCgoff'
-      31 36 2E 31 32 2E	32+
+E000  31 38 34 30 76 35	20+  infostr	     db	'1840v5	17.12.21 RCgoff'
+      31 37 2E 31 32 2E	32+
       31 20 52 43 67 6F	66+
       66
 E016  E0EAr		     c1		     dw	offset c11	     ; адрес    возврата
@@ -1523,6 +1523,7 @@ E5F5			     kbd_reset	     endp
 			     ;______________________
 E5F5			     p_msg   proc    near
 E5F5  8B EE			     mov     bp,si
+E5F7			     p_msg_noerr:
 E5F7  E8 00AD			     call prt_str
 E5FA  B8 0E0D			     mov     ax,0e0dh	; переместить курсор в начало  +
 			     строки
@@ -1539,83 +1540,83 @@ E605  BE E000r			     mov     si,offset infostr	     ;адрес поля инф
 			     о	BIOS
       =	offset c1		     infoend equ     offset c1
       =	offset infostr		     infobeg equ     offset infostr
-E608  B1 16			     mov     cl, infoend-infobeg		     ; длина	       +
-			     информации
-E60A  E8 FFE8			     call    p_msg		     ; вывод на экран
-E60D  33 ED			     xor     bp,bp
-E60F  1E			     push    ds
-E610  B8 0010			     mov     ax, 16
-E613  EB 1D			     jmp short prt_siz
+E608  B9 0016			     mov     cx, infoend-infobeg     ; длина информации
+E60B  E8 FFE9			     call    p_msg_noerr	     ; вывод на экран
+E60E  1E			     push    ds
+E60F  B8 0010			     mov     ax, 16
+E612  EB 1D			     jmp short prt_siz
 
-E615			     e20b:
-E615  8B 1E 0013r		     mov     bx, ds:memory_size
-E619  2B D8			     sub     bx, ax	     ;ax stores	16d, subtract tested bytes so bytes to +
+E614			     e20b:
+E614  8B 1E 0013r		     mov     bx, ds:memory_size
+E618  2B D8			     sub     bx, ax	     ;ax stores	16d, subtract tested bytes so bytes to +
 			     test are in bx
-E61B  93			     xchg    bx,ax	     ;order for	div command format
-E61C  F7 F3			     div     bx		     ;now ax stores amount of 16K-fragments to test
-E61E  91			     xchg    cx,ax	     ;now cx has that amount
-E61F  93			     xchg    bx,ax	     ;ax stores	16d back
-E620  BB 0400			     mov     bx, 400h
+E61A  93			     xchg    bx,ax	     ;order for	div command format
+E61B  F7 F3			     div     bx		     ;now ax stores amount of 16K-fragments to test
+E61D  91			     xchg    cx,ax	     ;now cx has that amount
+E61E  93			     xchg    bx,ax	     ;ax stores	16d back
+E61F  BB 0400			     mov     bx, 400h
 
-E623			     e20c:
-E623  8E C3			     mov     es, bx
-E625  52			     push    dx
-E626  51			     push    cx
-E627  53			     push    bx
-E628  50			     push    ax
-E629  E8 F9EE			     call    stgtst
-E62C  75 45			     jnz     e21a
-E62E  58			     pop     ax
-E62F  05 0010			     add     ax, 16
+E622			     e20c:
+E622  8E C3			     mov     es, bx
+E624  52			     push    dx
+E625  51			     push    cx
+E626  53			     push    bx
+E627  50			     push    ax
+E628  E8 F9EF			     call    stgtst
+E62B  75 43			     jnz     e21a
+E62D  58			     pop     ax
+E62E  05 0010			     add     ax, 16
 
-E632			     prt_siz:
-E632  50			     push    ax
-E633  BB 000A			     mov     bx, 10
-E636  B9 0003			     mov     cx, 3
+E631			     prt_siz:
+E631  50			     push    ax
+E632  BB 000A			     mov     bx, 10
+E635  B1 03			     mov     cl, 3	     ;after normal STGTST end CX=0, so we can set only +
+			     CL
 
-E639			     decimal_loop:
-E639  33 D2			     xor     dx, dx
-E63B  F7 F3			     div     bx
-E63D  80 CA 30			     or	     dl, 30h
-E640  52			     push    dx
-E641  E2 F6			     loop    decimal_loop
-E643  B1 03			     mov     cl, 3
+E637			     decimal_loop:
+E637  33 D2			     xor     dx, dx
+E639  F7 F3			     div     bx
+E63B  80 CA 30			     or	     dl, 30h
+E63E  52			     push    dx
+E63F  E2 F6			     loop    decimal_loop
+E641  B1 03			     mov     cl, 3	     ;after decimal_loop end CX=0, so we can set only CL
 
-E645			     prt_dec_loop:
-E645  58			     pop     ax
-E646  E8 003B			     call    prt_hex
-E649  E2 FA			     loop    prt_dec_loop
-E64B  B9 0007			     mov     cx, 7
-E64E  BE E689r			     mov     si, offset	e300 ; " Kb OK\r"
-E651  E8 0053			     call    prt_str
-E654  58			     pop     ax
-E655  3D 0010			     cmp     ax, 16
-E658  74 BB			     jz	     e20b
-E65A  5B			     pop     bx
-E65B  59			     pop     cx
-E65C  5A			     pop     dx
-E65D  80 C7 04			     add     bh, 4	     ;next 16k-block
-E660  80 FF B0			     cmp     bh,0b0h	     ;b000 (704kb) is mda-display buffer beginning
-E663  74 02			     je	     stoptst
-E665  E2 BC			     loop    e20c
-E667  1F		     stoptst:pop     ds
-E668  A3 0013r			     mov     ds:memory_size, ax	     ;if break from loop occured
-E66B  B0 0A		     pre12:  mov     al, 10	     ;line feed
-E66D  E8 0014			     call    prt_hex
-E670  E9 FDB4			     jmp     tst12
+E643			     prt_dec_loop:
+E643  58			     pop     ax
+E644  E8 003D			     call    prt_hex
+E647  E2 FA			     loop    prt_dec_loop
+E649  B1 07			     mov     cl, 7	     ;after prt_dec_loop end CX=0, so we can set only CL
+E64B  BE E689r			     mov     si, offset	e300 ; " Kb OK\r"
+E64E  E8 0056			     call    prt_str
+E651  58			     pop     ax
+E652  3D 0010			     cmp     ax, 16
+E655  74 BD			     jz	     e20b
+E657  5B			     pop     bx
+E658  59			     pop     cx
+E659  5A			     pop     dx
+E65A  80 C7 04			     add     bh, 4	     ;next 16k-block
+E65D  80 FF B0			     cmp     bh,0b0h	     ;b000 (704kb) is mda-display buffer beginning
+E660  74 02			     je	     stoptst
+E662  E2 BE			     loop    e20c
+E664  1F		     stoptst:pop     ds
+E665  A3 0013r			     mov     ds:memory_size, ax	     ;if break from loop occured
+E668  B0 0A		     pre12:  mov     al, 10	     ;line feed
+E66A  E8 0017			     call    prt_hex
+E66D  E9 FDB7			     jmp     tst12
 
 
-E673			     e21a:
-E673  59			     pop     cx		     ;restore memory size before last STGTST call
-E674  83 C4 06			     add     sp, 6
-E677  1F			     pop     ds		     ;restore pointer to BIOS data area
+E670			     e21a:
+E670  59			     pop     cx		     ;restore memory size before last STGTST call
+E671  83 C4 06			     add     sp, 6
+E674  1F			     pop     ds		     ;restore pointer to BIOS data area
 							     ;from the very beginning of e190
-E678  89 0E 0013r		     mov     ds:memory_size, cx
-E67C  3D AAAA			     cmp     ax,0aaaah	     ;rc это	отсутствие памяти?
-E67F  74 EA			     je	     pre12	     ;rc отсутствие, значит - не     +
+E675  89 0E 0013r		     mov     ds:memory_size, cx
+E679  3D AAAA			     cmp     ax,0aaaah	     ;rc это	отсутствие памяти?
+E67C  74 EA			     je	     pre12	     ;rc отсутствие, значит - не     +
 			     ошибка
-E681  E9 FD4E			     jmp     osh
+E67E  E9 FD51			     jmp     osh
 
+			     org     0e684h
 E684			     prt_hex	     proc near
 E684  B4 0E				     mov     ah, 14
 E686  CD 10				     int     10h
@@ -6951,7 +6952,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "12-17-21"
 ??FILENAME			  Text	 "1840v5  "
-??TIME				  Text	 "00:23:28"
+??TIME				  Text	 "21:58:39"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -7055,7 +7056,7 @@ D8				  Near16 CODE:E27F
 D9				  Near16 CODE:E288
 DAL				  Near16 CODE:E4E9
 DAT				  Number 0040
-DECIMAL_LOOP			  Near16 CODE:E639
+DECIMAL_LOOP			  Near16 CODE:E637
 DEL_KEY				  Number 0053
 DISKETTE_IO			  Far16	 CODE:EC59
 DISKETTE_PARM			  Dword	 ABS0:0078
@@ -7091,9 +7092,9 @@ E19				  Near16 CODE:E3AB
 E190				  Near16 CODE:E605
 E1A				  Near16 CODE:E2E0
 E1L				  Number 0004
-E20B				  Near16 CODE:E615
-E20C				  Near16 CODE:E623
-E21A				  Near16 CODE:E673
+E20B				  Near16 CODE:E614
+E20C				  Near16 CODE:E622
+E21A				  Near16 CODE:E670
 E3				  Near16 CODE:E2FA
 E300				  Byte	 CODE:E689
 E3A				  Near16 CODE:E305
@@ -7421,18 +7422,19 @@ PORT_C				  Number 0062
 PORT_OFF			  Byte	 DATA:0077
 POSITION			  Near16 CODE:F28B
 POST				  Near16 CODE:FFF0
-PRE12				  Near16 CODE:E66B
+PRE12				  Near16 CODE:E668
 PRI10				  Near16 CODE:FF7F
 PRI15				  Near16 CODE:FF8D
 PRINTER_BASE			  Word	 DATA:0008
 PRINTER_IO			  Far16	 CODE:EFD2
 PRINT_SCREEN			  Far16	 CODE:FF54
 PRN_HEX_BYTE			  Near16 CODE:E3FF
-PRT_DEC_LOOP			  Near16 CODE:E645
+PRT_DEC_LOOP			  Near16 CODE:E643
 PRT_HEX				  Near16 CODE:E684
-PRT_SIZ				  Near16 CODE:E632
+PRT_SIZ				  Near16 CODE:E631
 PRT_STR				  Near16 CODE:E6A7
 P_MSG				  Near16 CODE:E5F5
+P_MSG_NOERR			  Near16 CODE:E5F7
 R1				  Near16 CODE:F450
 R10				  Near16 CODE:F4E5
 R11				  Near16 CODE:F4F3
@@ -7518,7 +7520,7 @@ STAT_OFFSET			  Byte	 DATA:007C
 STGTST				  Near16 CODE:E01A
 STGTST_CNT			  Near16 CODE:E01D
 STG_LOC0			  Byte	 ABS0:0000
-STOPTST				  Near16 CODE:E667
+STOPTST				  Near16 CODE:E664
 T1				  Near16 CODE:FE7F
 T2				  Near16 CODE:FE82
 T3				  Near16 CODE:FE95
