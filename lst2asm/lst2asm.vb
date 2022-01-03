@@ -16,6 +16,7 @@ Option Explicit
 '             реструктуризация программы с выделением проходов в отдельные функции
 '07.11.2021 - возможность отключения генерации ASM-файла;
 '             возможность удаления номеров строк из листинга
+'03.01.2022 - возможность перезаписи исходных LST-файлов
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: ListBox выбора формата и вообще интерфейс
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: сохранение файлов с LF вместо CR-LF под другим именем (а не перезапись)
@@ -48,6 +49,7 @@ End Type
 Private Type Permissions
     DeleteLineNumbers As Boolean
     CreateASMFile As Boolean
+    RewriteLSTfile As Boolean
 End Type
 
 
@@ -71,6 +73,7 @@ LstFormatName = "TASM5 with line numbers"
 '=====================================================================
 filePermissions.CreateASMFile = False
 filePermissions.DeleteLineNumbers = True
+filePermissions.RewriteLSTfile = True
 '=====================================================================
 
 Select Case LstFormatName
@@ -252,6 +255,7 @@ Dim asmString As String
 Dim codeSection As String
 Dim PrevLineEndDup As Boolean       'предыдущая строка - последняя в DUP (закр. квадр. скобка)
 Dim FileExsistAnswer As Integer     'ответ пользователя, если файл существует
+Dim AllowLSTrewrite As Integer      'подтверждение затирания LST-файла
 
 
 lstcnt = 0
@@ -282,6 +286,13 @@ If SecondPass.ok = True Then
         FileExsistAnswer = 0
     End If
 End If
+
+If filePermissions.RewriteLSTfile = True Then
+    AllowLSTrewrite = MsgBox(flname & ": file will be rewritten, proceed?", vbQuestion + vbYesNo + vbDefaultButton2, _
+    "Allow LST rewriting?")
+    If AllowLSTrewrite = vbNo Then SecondPass.ok = False
+End If
+
 
 If SecondPass.ok = True Then
     Open flname For Input As #1
@@ -379,6 +390,10 @@ Loop
 Close #1
 Close #2
 Close #3
+If AllowLSTrewrite = vbYes Then
+    Kill flname
+    Name Left(flname, Len(flname) - 4) + "_clean" + Right(flname, 4) As flname
+End If
 End Function
 
 
