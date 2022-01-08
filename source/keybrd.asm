@@ -73,227 +73,229 @@ INCLUDE DSEG40.inc
 ;
 ;------------------------------
 code	segment	byte public
- 	assume	cs:code,ds:data
+	assume	cs:code,ds:data
 
 k4	proc	near
- 	add	bx,2
+	add	bx,2
 ;1841 	cmp  bx,buffer_end	 	 ; конец буфера ?
 	cmp  bx,offset kb_buffer_end 	 ; конец буфера ?
- 	jne	k5	 	 	 ; нет - продолжить
+	jne	k5	 	 	 ; нет - продолжить
 ;1841 	mov	bx,buffer_start 	 ; да - уст начала буфера
- 	mov	bx,offset kb_buffer 	 ; да - уст начала буфера
+	mov	bx,offset kb_buffer 	 ; да - уст начала буфера
 k5:
- 	ret
+	ret
 k4	endp
 
 error_beep proc near
- 	push	ax
- 	push	bx
- 	push	cx
- 	mov	bx,0c0h
- 	in	al,kb_ctl
- 	push	ax
+	push	ax
+	push	bx
+	push	cx
+	mov	bx,0c0h
+	in	al,kb_ctl
+	push	ax
 k65:
- 	and	al,0fch
- 	out	kb_ctl,al
- 	mov	cx,48h
+	and	al,0fch
+	out	kb_ctl,al
+	mov	cx,48h
 k66:	loop	k66
- 	or	al,2
- 	out	kb_ctl,al
- 	mov	cx,48h
+	or	al,2
+	out	kb_ctl,al
+	mov	cx,48h
 k67:	loop	k67
- 	dec	bx
- 	jnz	k65
- 	pop	ax
- 	out	kb_ctl,al
- 	pop	cx
- 	pop	bx
- 	pop	ax
- 	ret
+	dec	bx
+	jnz	k65
+	pop	ax
+	out	kb_ctl,al
+	pop	cx
+	pop	bx
+	pop	ax
+	ret
 error_beep	endp
 
-;---
+;------ PLAIN OLD LOWER CASE
 
 k54:					;rc обычный нижний регистр
- 	cmp	al,59
- 	jb	k55
- 	mov	al,0
- 	jmp	 k57
+	cmp	al,59                   ; TEST FOR FUNCTION KEYS
+	jb	k55                     ; NOT-LOWER-FUNCTION
+	mov	al,0                    ; SCAN CODE IN AH ALREADY
+	jmp	 k57                    ; BUFFER_FILL
 
 k55:	mov	bx,offset k10
- 	test	kb_flag_1,lat
- 	jz	k99			;rc переход по отсутствию флага ЛАТ
+	test	kb_flag_1,lat
+	jz	k99			;rc переход по отсутствию флага ЛАТ
 
-;---
+;------TRANSLATE THE CHARACTER
 
-k56:
- 	dec	al
- 	xlat	cs:k11
+k56:                                    ; TRANSLATE-CHAR
+	dec	al                      ; CONVERT ORIGIN
+	xlat	cs:k11                  ; CONVERT THE SCAN CODE TO ASCII
 
-;---
+;------ PUT CHARACTER INTO BUFFER
 
-k57:
- 	cmp	al,-1
- 	je	k59
- 	cmp	ah,-1
- 	je	k59
-;---
+k57:                                    ; BUFFER-FILL
+	cmp	al,-1                   ; IS THIS AN IGNORE CHAR
+	je	k59                     ; YES, DO NOTHING WITH IT
+	cmp	ah,-1                   ; LOOK FOR -1 PSEUDO SCAN
+	je	k59                     ; NEAR_INTERRUPT_RETURN
 
-k58:
- 	test	kb_flag,caps_state
- 	jz	k61
+;------ HANDLE THE CAPS LOCK PROBLEM
 
-;---
- 	test	kb_flag_1,lat
- 	jnz	k88
- 	jmp	k89
+k58:                                    ; BUFFER-FILL-NOTEST
+	test	kb_flag,caps_state      ; ARE WE IN CAPS LOCK STATE
+	jz	k61                     ; SKIP IF NOT
+
+;------ IN CAPS LOCK STATE
+	test	kb_flag_1,lat
+	jnz	k88
+	jmp	k89
 k88:
- 	test	kb_flag,left_shift+right_shift
- 	jz	k60
+	test	kb_flag,left_shift+right_shift	; TEST FOR SHIFT STATE
+	jz	k60                     ; IF NOT SHIFT, CONVERT LOWER TO UPPER
 
-;----------
+;------ CONVERT ANY UPPER CASE TO LOWER CASE
 
- 	cmp	al,'A'
- 	jb	k61
- 	cmp	al,'Z'
- 	ja	k61
- 	add	al,'a'-'A'
- 	jmp	 k61
+	cmp	al,'A'                  ; FIND OUT IF ALPHABETIC
+	jb	k61                     ; NOT_CAPS_STATE
+	cmp	al,'Z'
+	ja	k61                     ; NOT_CAPS_STATE
+	add	al,'a'-'A'              ; CONVERT TO LOWER CASE
+	jmp	 k61                    ; NOT_CAPS_STATE
 
-k59:
- 	jmp	k26
+k59:                                    ; NEAR-INTERRUPT-RETURN
+	jmp	k26                     ; INTERRUPT_RETURN
 
+;------ CONVERT ANY LOWER CASE TO UPPER CASE
 
-k60:
- 	cmp	al,'a'
- 	jb	k61
- 	cmp	al,'z'
- 	ja	k61
- 	sub	al,'a'-'A'
+k60:                                    ; LOWER-TO-UPPER
+	cmp	al,'a'                  ; FIND OUT IF ALPHABETIC
+	jb	k61                     ; NOT_CAPS_STATE
+	cmp	al,'z'
+	ja	k61                     ; NOT_CAPS_STATE
+	sub	al,'a'-'A'              ; CONVERT TO UPPER CASE
 
-k61:
- 	mov	bx,buffer_tail
- 	mov	si,bx
- 	call   k4
- 	cmp	bx,buffer_head
- 	je	k62
- 	mov	word ptr [si],ax
- 	mov	buffer_tail,bx
- 	jmp	k26
+k61:                                    ; NOT-CAPS-STATE
+	mov	bx,buffer_tail          ; GET THE END POINTER TO THE BUFFER
+	mov	si,bx                   ; SAVE THE VALUE
+	call   k4                       ; ADVANCE THE TAIL
+	cmp	bx,buffer_head          ; HAS THE BUFFER WRAPPED AROUND
+	je	k62                     ; BUFFER_FULL_BEEP
+	mov	word ptr [si],ax        ; STORE THE VALUE
+	mov	buffer_tail,bx          ; MOVE THE POINTER UP
+	jmp	k26                     ; INTERRUPT_RETURN
 k99:	mov	bx,offset rust			;rc маленькие рус буквы (kb_flag_1.lat=0)
- 	jmp k56
+	jmp k56
 
-;---
+;------ BUFFER IS FULL, SOUND THE BEEPER
 
-k62:
- 	call	error_beep
- 	jmp	k26
+k62:                                    ; BUFFER-FULL-BEEP
+	call	error_beep
+	jmp	k26                     ; INTERRUPT_RETURN
 
-;---
+;------ TRANSLATE SCAN FOR PSEUDO SCAN CODES
 
-k63:
- 	sub	al,59
-k64:
- 	xlat	cs:k9
- 	mov	ah,al
- 	mov	al,0
- 	jmp	 k57
+k63:                                    ; TRANSLATE-SCAN
+	sub	al,59                   ; CONVERT ORIGIN TO FUNCTION KEYS
+k64:                                    ; TRANSLATE-SCAN-ORGD
+	xlat	cs:k9                   ; CTL TABLE SCAN
+	mov	ah,al                   ; PUT VALUE INTO AH
+	mov	al,0                    ; ZERO ASCII CODE
+	jmp	 k57                    ; PUT IT INTO THE BUFFER
 
 
 ;---
 	db	34 dup (0)
 ;1841 	org	0e82eh
 keyboard_io proc	far
- 	sti	 	 	;
- 	push	ds
- 	push	bx
- 	mov	bx,data
- 	mov	ds,bx	 	; установить сегмент данных
- 	or	ah,ah	 	; AH=0
- 	jz	k1	     ; переход к считыванию следующего символа
- 	dec	ah	 	; AH=1
- 	jz	k2	     ; переход к считыванию кода ASCII
- 	dec	ah	 	     ; AH=2
- 	jz	k3	     ; переход к получению байта состояния
- 	pop	bx	 	     ; восстановить регистр
- 	pop	ds
- 	iret
+	sti	 	 	;
+	push	ds
+	push	bx
+	mov	bx,data
+	mov	ds,bx	 	; установить сегмент данных
+	or	ah,ah	 	; AH=0
+	jz	k1	     ; переход к считыванию следующего символа
+	dec	ah	 	; AH=1
+	jz	k2	     ; переход к считыванию кода ASCII
+	dec	ah	 	     ; AH=2
+	jz	k3	     ; переход к получению байта состояния
+	pop	bx	 	     ; восстановить регистр
+	pop	ds
+	iret
 
 ;   Считывание кода сканирования и кода ASCII из буфера клавиатуры
 ;
 k1:
- 	sti	 	; уст признака разрешения прерывания
- 	nop	 	 	; задержка
- 	cli	 	; сброс признака разрешения прерывания
- 	mov	bx,buffer_head	; уст вершину буфера по чтению
- 	cmp	bx,buffer_tail	; сравнить с вершиной буфера по записи
- 	jz	k1
- 	mov	ax,word ptr [bx] ; получить код сканирования и код ASCII
- 	call	k4
- 	mov	buffer_head,bx	; запомнить вершину буфера по чтению
- 	pop	bx	 	; восстановить регистр
- 	pop	ds	 	; восстановить сегмент
- 	iret	 	 	; возврат к программе
+	sti	 	; уст признака разрешения прерывания
+	nop	 	 	; задержка
+	cli	 	; сброс признака разрешения прерывания
+	mov	bx,buffer_head	; уст вершину буфера по чтению
+	cmp	bx,buffer_tail	; сравнить с вершиной буфера по записи
+	jz	k1
+	mov	ax,word ptr [bx] ; получить код сканирования и код ASCII
+	call	k4
+	mov	buffer_head,bx	; запомнить вершину буфера по чтению
+	pop	bx	 	; восстановить регистр
+	pop	ds	 	; восстановить сегмент
+	iret	 	 	; возврат к программе
 
 ;   Считать код ASCII
 
 k2:
- 	cli	 	; Сброс признака разрешения прерывания
- 	mov	bx,buffer_head	; получить указатель вершины буфера
- 	 	 	 	; по чтению
- 	cmp	bx,buffer_tail	; сравнить с вершиной буфера по записи
- 	mov	ax,word ptr [bx]
- 	sti	 	 	; уст признак разрешения прерывания
- 	pop	bx	 	; восстановить регистр
- 	pop	ds	 	; восстановить сегмент
- 	ret	2
+	cli	 	; Сброс признака разрешения прерывания
+	mov	bx,buffer_head	; получить указатель вершины буфера
+	 	 	 	; по чтению
+	cmp	bx,buffer_tail	; сравнить с вершиной буфера по записи
+	mov	ax,word ptr [bx]
+	sti	 	 	; уст признак разрешения прерывания
+	pop	bx	 	; восстановить регистр
+	pop	ds	 	; восстановить сегмент
+	ret	2
 
 ;   Получение младшего байта состояния (флажков)
 
 k3:
- 	mov	al,kb_flag	; получить младший байт состояния     на
- 	pop	bx	 	; восстановить регистр
- 	pop	ds	 	; восстановить сегмент
- 	iret	 	 	; возврат к программе
+	mov	al,kb_flag	; получить младший байт состояния     на
+	pop	bx	 	; восстановить регистр
+	pop	ds	 	; восстановить сегмент
+	iret	 	 	; возврат к программе
 keyboard_io	endp
 
 ;   Таблица кодов сканирования управляющих клавиш
 
 k6	label	byte
- 	db	ins_key
- 	db	caps_key,num_key,scroll_key,alt_key,ctl_key
- 	db	left_key,right_key
- 	db	inv_key_l
- 	db	inv_key_r,lat_key,rus_key
+	db	ins_key
+	db	caps_key,num_key,scroll_key,alt_key,ctl_key
+	db	left_key,right_key
+	db	inv_key_l
+	db	inv_key_r,lat_key,rus_key
 k6l	equ	0ch
 
 ;   Таблица масок нажатых управляющих клавиш
 
 k7	label	byte
- 	db	ins_shift
- 	db	caps_shift,num_shift,scroll_shift,alt_shift,ctl_shift
- 	db	left_shift,right_shift
+	db	ins_shift
+	db	caps_shift,num_shift,scroll_shift,alt_shift,ctl_shift
+	db	left_shift,right_shift
 
 
 ;   Таблица кодов сканирования при нажатой клавише УПР для
 ; кодов сканирования клавиш меньше 59
 
 k8	db	27,-1,0,-1,-1,-1,30,-1
- 	db	-1,-1,-1,31,-1,127,-1,17
- 	db	23,5,18,20,25,21,9,15
- 	db	16,27,29,10,-1,1,19
- 	db	4,6,7,8,10,11,12,-1,-1
- 	db	-1,-1,28,26,24,3,22,2
- 	db	14,13,-1,-1,-1,-1,-1,-1
- 	db	' ',-1
+	db	-1,-1,-1,31,-1,127,-1,17
+	db	23,5,18,20,25,21,9,15
+	db	16,27,29,10,-1,1,19
+	db	4,6,7,8,10,11,12,-1,-1
+	db	-1,-1,28,26,24,3,22,2
+	db	14,13,-1,-1,-1,-1,-1,-1
+	db	' ',-1
 
 ;   Таблица кодов сканирования при нажатой клавише УПР для
 ; кодов сканирования клавиш больше 59
 k9	label	byte
- 	db	94,95,96,97,98,99,100,101
- 	db	102,103,-1,-1,119,-1,132,-1
- 	db	115,-1,116,-1,117,-1,118,-1
- 	db	-1
+	db	94,95,96,97,98,99,100,101
+	db	102,103,-1,-1,119,-1,132,-1
+	db	115,-1,116,-1,117,-1,118,-1
+	db	-1
 
 ;   Таблица кодов ASCII нижнего регистра клавиатуры
 
@@ -323,28 +325,28 @@ k11	label	byte
 ; регистре Ф1 - Ф10)
 
 k12	label	byte
- 	db	84,85,86,87,88,89,90
- 	db	91,92,93
+	db	84,85,86,87,88,89,90
+	db	91,92,93
 
 ;   Таблица кодов сканирования одновременно нажатых клавиш
 ; ДОП и Ф1 - Ф10
 
 k13	label byte
- 	db	104,105,106,107,108
- 	db	109,110,111,112,113
+	db	104,105,106,107,108
+	db	109,110,111,112,113
 
 ;   Таблица кодов правого пятнадцатиклавишного поля на верхнем
 ; регистре
 
 k14	label	byte
- 	db	'789-456+1230.'
+	db	'789-456+1230.'
 
 ;   Таблица кодов правого пятнадцатиклавишного поля на нижнем
 ; регистре
 
 k15	label byte
- 	db	71,72,73,-1,75,-1,77
- 	db	-1,79,80,81,82,83
+	db	71,72,73,-1,75,-1,77
+	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
 	db	9 dup (0)
@@ -364,214 +366,214 @@ k15	label byte
 ;-----------------------------------
 
 kb_int proc far
- 	sti	 	   ; установка признака разрешения прерывания
- 	push	ax
- 	push	bx
- 	push	cx
- 	push	dx
- 	push	si
- 	push	di
- 	push	ds
- 	push	es
- 	cld	 	       ; установить признак направления вперед
- 	mov	ax,data	       ; установить адресацию
- 	mov	ds,ax
- 	in	al,kb_dat      ; считать код сканирования
- 	push	ax
- 	in	al,kb_ctl      ; считать значение порта 61
- 	mov	ah,al	       ; сохранить считанное значение
- 	or	al,80h	       ; установить бит 7 порта 61
- 	out	kb_ctl,al      ; для работы с клавиатурой
- 	xchg	ah,al	       ; восстановить значение порта 61
- 	out	kb_ctl,al
- 	pop	ax	       ; восстановить код сканирования
- 	mov	ah,al	       ; и сохранить его в AH
+	sti	 	   ; установка признака разрешения прерывания
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+	push	di
+	push	ds
+	push	es
+	cld	 	       ; установить признак направления вперед
+	mov	ax,data	       ; установить адресацию
+	mov	ds,ax
+	in	al,kb_dat      ; считать код сканирования
+	push	ax
+	in	al,kb_ctl      ; считать значение порта 61
+	mov	ah,al	       ; сохранить считанное значение
+	or	al,80h	       ; установить бит 7 порта 61
+	out	kb_ctl,al      ; для работы с клавиатурой
+	xchg	ah,al	       ; восстановить значение порта 61
+	out	kb_ctl,al
+	pop	ax	       ; восстановить код сканирования
+	mov	ah,al	       ; и сохранить его в AH
 
 ;---
 
- 	cmp	al,0ffh  ; сравнение с кодом заполнения буфера
- 	 	 	 ; клавиатуры
- 	jnz	k16	 	; продолжить
- 	jmp	k62	; переход на звуковой сигнал по заполнению
- 	 	 	; буфера клавиатуры
+	cmp	al,0ffh  ; сравнение с кодом заполнения буфера
+	 	 	 ; клавиатуры
+	jnz	k16	 	; продолжить
+	jmp	k62	; переход на звуковой сигнал по заполнению
+	 	 	; буфера клавиатуры
 
 k16:
- 	and	al,07fh 	; сброс бита отжатия клавиши
- 	push	cs
- 	pop	es
- 	mov	di,offset k6  ; установить адрес таблицы сканирования
- 	 	 	      ; управляющих клавиш
- 	mov	cx,k6l
- 	repne 	scasb	; сравнение полученного кода сканирования с содержимым таблицы
- 	mov	al,ah	 	; запомнить код сканирования
- 	je	k17	 	; переход по совпадению
- 	jmp	k25	 	; переход по несовпадению
+	and	al,07fh 	; сброс бита отжатия клавиши
+	push	cs
+	pop	es
+	mov	di,offset k6  ; установить адрес таблицы сканирования
+	 	 	      ; управляющих клавиш
+	mov	cx,k6l
+	repne 	scasb	; сравнение полученного кода сканирования с содержимым таблицы
+	mov	al,ah	 	; запомнить код сканирования
+	je	k17	 	; переход по совпадению
+	jmp	k25	 	; переход по несовпадению
 
 k406:           			;rc это обработчик клавиши Ё
- 	test	kb_flag_1,lat
- 	jnz	k26a                    ;rc в ЛАТ-режиме клавиша не генерирует ничего, выход
- 	test	kb_flag,left_shift+right_shift
- 	mov	ax,5cf1h		;rc ё
- 	jz	k407
- 	mov	ax,5cf0h                ;rc Ё
+	test	kb_flag_1,lat
+	jnz	k26a                    ;rc в ЛАТ-режиме клавиша не генерирует ничего, выход
+	test	kb_flag,left_shift+right_shift
+	mov	ax,5cf1h		;rc ё
+	jz	k407
+	mov	ax,5cf0h                ;rc Ё
 k407:					;rc передвинул сюда, двумя строками выше  (это ж не получение маски)
- 	jmp	k57
+	jmp	k57
 
 ;   Получение маски нажатой управляющей клавиши
 
 
 k17:	sub	di,offset k6+1		;rc получить индекс упр клавиши в табл k6, начиная с 0
- 	cmp	di,8
- 	jb	k300                    ;rc меньше 8 (это совместимые клавиши) обрабатываются как в IBM
- 	mov	ah,6                    ;rc маска 0b00000110 для руслат  (inv_shift + lat)
- 	cmp	di,0ah
- 	jb	k301                    ;rc если inv_key (Р/Л)
- 	test	al,80h                  
- 	jz	k26a                    ;rc если не отпускание РУС или ЛАТ -> вых (борьба с автоповтором?)
+	cmp	di,8
+	jb	k300                    ;rc меньше 8 (это совместимые клавиши) обрабатываются как в IBM
+	mov	ah,6                    ;rc маска 0b00000110 для руслат  (inv_shift + lat)
+	cmp	di,0ah
+	jb	k301                    ;rc если inv_key (Р/Л)
+	test	al,80h
+	jz	k26a                    ;rc если не отпускание РУС или ЛАТ -> вых (борьба с автоповтором?)
 
 				;rc здесь мы после отпускания РУС или ЛАТ
- 	and	kb_flag_1,not lat+lat_shift   ;rc not действует на оба, сбрасываем lat и "светодиодный" lat
- 	cmp	di,0bh
- 	je	k401                    ;rc переход, если РУС
+	and	kb_flag_1,not lat+lat_shift   ;rc not действует на оба, сбрасываем lat и "светодиодный" lat
+	cmp	di,0bh
+	je	k401                    ;rc переход, если РУС
 				;rc если ЛАТ:
- 	test	kb_flag_1,inv_shift
- 	jz	k400                    ;rc переход по ненажатию Р/Л
- 	or	kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
- 	jmp	k26a
+	test	kb_flag_1,inv_shift
+	jz	k400                    ;rc переход по ненажатию Р/Л
+	or	kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
+	jmp	k26a
 k400:	or	kb_flag_1,lat+lat_shift ;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
- 	jmp	k26a
+	jmp	k26a
 
 				;РУС:
 k401:	test	kb_flag_1,inv_shift
- 	jz	k26a                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
- 	or	kb_flag_1,lat           ;rc нажата Р/Л и отпущена РУС: включить lat ///???
- 	jmp	k26a
+	jz	k26a                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
+	or	kb_flag_1,lat           ;rc нажата Р/Л и отпущена РУС: включить lat ///???
+	jmp	k26a
 
 				;rc далее IBM-ский код				
 k300:	mov	ah,cs:k7[di]            ;rc аналогично IBM считыаем маску из k7 для совместимых упр клавиш
 k301:
- 	test	al,80h	 	; клавиша отжата ?
- 	jnz	k23	; переход, если клавиша отжата
+	test	al,80h	 	; клавиша отжата ?
+	jnz	k23	; переход, если клавиша отжата
 
 ;   Управляющая клавиша нажата
 
- 	cmp	ah,scroll_shift ; нажата управляющая клавиша с
- 	 	 	 	;  запоминанием ?
- 	jae	k18	 	; переход, если да
+	cmp	ah,scroll_shift ; нажата управляющая клавиша с
+	 	 	 	;  запоминанием ?
+	jae	k18	 	; переход, если да
 
 ;---
- 	cmp	ah,6            
- 	je	k302            ; rc нажата Р/Л
+	cmp	ah,6
+	je	k302            ; rc нажата Р/Л
 
- 	or	kb_flag,ah	; установка масок управляющих клавиш
- 	 	 	 	; без запоминания
- 	jmp	k26	 	; к выходу из прерывания
+	or	kb_flag,ah	; установка масок управляющих клавиш
+	 	 	 	; без запоминания
+	jmp	k26	 	; к выходу из прерывания
 
 k302:	or	kb_flag_1,inv_shift+lat ;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
- 	test	kb_flag_1,lat_shift	;rc светодиодный ЛАТ есть?
- 	jz	k26a                    ;rc нет -> выходим
- 	and	kb_flag_1,not lat       ;rc есть -> сбрасываем латиницу
+	test	kb_flag_1,lat_shift	;rc светодиодный ЛАТ есть?
+	jz	k26a                    ;rc нет -> выходим
+	and	kb_flag_1,not lat       ;rc есть -> сбрасываем латиницу
 k26a:
- 	jmp	k26
+	jmp	k26
 
 ;   Опрос нажатия клавиши с запоминанием
 
 k18:
- 	test	kb_flag,ctl_shift	  ; опрос клавиши УПР
- 	jnz	k25
- 	cmp	al,ins_key	 	  ; опрос клавиши ВСТ
- 	jnz	k22
- 	test	kb_flag,alt_shift	  ; опрос клавиши ДОП
- 	jz	k19
- 	jmp	k25
+	test	kb_flag,ctl_shift	  ; опрос клавиши УПР
+	jnz	k25
+	cmp	al,ins_key	 	  ; опрос клавиши ВСТ
+	jnz	k22
+	test	kb_flag,alt_shift	  ; опрос клавиши ДОП
+	jz	k19
+	jmp	k25
 k19:	test	kb_flag,num_state  ; опрос клавиши ЦИФ
- 	jnz	k21
- 	test	kb_flag,left_shift+right_shift ; опрос клавиш левого
- 	 	 	     ; и правого переключения регистров
- 	jz	k22
+	jnz	k21
+	test	kb_flag,left_shift+right_shift ; опрос клавиш левого
+	 	 	     ; и правого переключения регистров
+	jz	k22
 
 k20:
- 	mov	ax,5230h
- 	jmp	k57	      ; установка кода нуля
+	mov	ax,5230h
+	jmp	k57	      ; установка кода нуля
 k21:
- 	test	kb_flag,left_shift+right_shift
- 	jz	k20
+	test	kb_flag,left_shift+right_shift
+	jz	k20
 
 k22:
- 	test	ah,kb_flag_1
- 	jnz	k26
- 	or	kb_flag_1,ah
- 	xor	kb_flag,ah
- 	cmp	al,ins_key
- 	jne	k26
- 	mov	ax,ins_key*256
- 	jmp	k57
+	test	ah,kb_flag_1
+	jnz	k26
+	or	kb_flag_1,ah
+	xor	kb_flag,ah
+	cmp	al,ins_key
+	jne	k26
+	mov	ax,ins_key*256
+	jmp	k57
 
 k303:						;rc отжатие Р/Л
- 	and	kb_flag_1,not inv_shift         ;rc сброс флажка нажатия Р/Л
- 	xor	kb_flag_1,lat                   ;rc переключение раскладки
- 	jmp	short k304
+	and	kb_flag_1,not inv_shift         ;rc сброс флажка нажатия Р/Л
+	xor	kb_flag_1,lat                   ;rc переключение раскладки
+	jmp	short k304
 
 ;   Управляющая клавиша отжата
 			;rc если сюда попали при нажатии ЕС-клавиши Р/Л, то ah=6
 k23:
 
- 	cmp	ah,scroll_shift
- 	jae	k24				;rc это были переключатели с фиксацией?
- 	not	ah                              ;rc да - переходим к ним
- 	cmp	ah,0f9h				;rc было ah=6? Р/Л?
- 	je	k303                            ;rc да->обрабатываем
- 	and	kb_flag,ah                      ;rc это и далее - продолжение IBM-ского кода
+	cmp	ah,scroll_shift
+	jae	k24				;rc это были переключатели с фиксацией?
+	not	ah                              ;rc да - переходим к ним
+	cmp	ah,0f9h				;rc было ah=6? Р/Л?
+	je	k303                            ;rc да->обрабатываем
+	and	kb_flag,ah                      ;rc это и далее - продолжение IBM-ского кода
 k304:						
- 	cmp	al,alt_key+80h
- 	jne	k26
+	cmp	al,alt_key+80h
+	jne	k26
 
 ;---
 
- 	mov	al,alt_input
- 	mov	ah,0
- 	mov	alt_input,ah
- 	cmp	al,0
- 	je	k26
- 	jmp	k58
+	mov	al,alt_input
+	mov	ah,0
+	mov	alt_input,ah
+	cmp	al,0
+	je	k26
+	jmp	k58
 
 k24:
- 	not	ah
- 	and	kb_flag_1,ah
- 	jmp	 k26
+	not	ah
+	and	kb_flag_1,ah
+	jmp	 k26
 ;---
 
 k25:						;rc как и в IBM, здесь мы, если не управляющая клавиша
 						;rc (т.е. ее код не в k6) или если мы нажали ins-num-caps-scroll,
-						;rc когда ранее была зажата ctrl или alt 
- 	cmp	al,80h
- 	jae	k26
- 	cmp	al,inf_key
- 	je	k307  				;rc обработчик клавиши ИНФ (выдает 0a00h расшир код)
- 	cmp	al,92
- 	jne	k406b
- 	jmp	k406				;rc обработчик клавиши Ё (выдает ASCII F0h/F1h в режиме РУС)
+						;rc когда ранее была зажата ctrl или alt
+	cmp	al,80h
+	jae	k26
+	cmp	al,inf_key
+	je	k307  				;rc обработчик клавиши ИНФ (выдает 0a00h расшир код)
+	cmp	al,92
+	jne	k406b
+	jmp	k406				;rc обработчик клавиши Ё (выдает ASCII F0h/F1h в режиме РУС)
 k406b:                                          ;rc далее как в IBM
- 	test	kb_flag_1,hold_state
- 	jz	k28
- 	cmp	al,num_key
- 	je	k26
- 	and	kb_flag_1,not hold_state
+	test	kb_flag_1,hold_state
+	jz	k28
+	cmp	al,num_key
+	je	k26
+	and	kb_flag_1,not hold_state
 
 k26:
- 	cli
- 	mov	al,eoi
- 	out	020h,al
+	cli
+	mov	al,eoi
+	out	020h,al
 k27:
- 	pop	es
- 	pop	ds
- 	pop	di
- 	pop	si
- 	pop	dx
- 	pop	cx
- 	pop	bx
- 	pop	ax
- 	iret
+	pop	es
+	pop	ds
+	pop	di
+	pop	si
+	pop	dx
+	pop	cx
+	pop	bx
+	pop	ax
+	iret
 
 k307:	mov	ax,0a000h			;rc клавиша ИНФ, расширенный скан-код
 ;1841 	jmp	inf_rc	 	    ;rc обработаем смену кодовой таблицы, если Ctrl-Инф
@@ -581,22 +583,22 @@ k307:	mov	ax,0a000h			;rc клавиша ИНФ, расширенный скан
 ;---
 
 k28:
- 	test	kb_flag,alt_shift
- 	jnz	k29
- 	jmp	k38
+	test	kb_flag,alt_shift
+	jnz	k29
+	jmp	k38
 
 ;---
 
 k29:
- 	test	kb_flag,ctl_shift
- 	jz	k31
- 	cmp	al,del_key
- 	jne	k31
+	test	kb_flag,ctl_shift
+	jz	k31
+	cmp	al,del_key
+	jne	k31
 
 ;---
 k306:
- 	mov	reset_flag,1234h
- 	db	0eah
+	mov	reset_flag,1234h
+	db	0eah
 	dw	offset reset,cod
 ;---
 
@@ -604,197 +606,197 @@ k306:
 
 
 k31:
- 	cmp	al,57
- 	jne	k32
- 	mov	al,' '
- 	jmp	k57
+	cmp	al,57
+	jne	k32
+	mov	al,' '
+	jmp	k57
 
 ;---
 
 k32:
- 	mov	di,offset k30
- 	mov	cx,10
+	mov	di,offset k30
+	mov	cx,10
 	repne scasb
- 	jne	k33
- 	sub	di,offset k30+1
- 	mov	al,alt_input
- 	mov	ah,10
- 	mul	ah
- 	add	ax,di
- 	mov	alt_input,al
- 	jmp	 k26
+	jne	k33
+	sub	di,offset k30+1
+	mov	al,alt_input
+	mov	ah,10
+	mul	ah
+	add	ax,di
+	mov	alt_input,al
+	jmp	 k26
 
 ;---
 
 k33:
- 	mov	alt_input,00h
- 	mov	cx,0026
+	mov	alt_input,00h
+	mov	cx,0026
 	repne scasb
- 	jne	k34
- 	mov	al,0
- 	jmp	k57
+	jne	k34
+	mov	al,0
+	jmp	k57
 
 ;---
 
 k34:
- 	cmp	al,2
- 	jb	k35
- 	cmp	al,14
- 	jae	k35
- 	add	ah,118
- 	mov	al,0
- 	jmp	k57
+	cmp	al,2
+	jb	k35
+	cmp	al,14
+	jae	k35
+	add	ah,118
+	mov	al,0
+	jmp	k57
 
 ;---
 
 k35:
- 	cmp	al,59
- 	jae	k37
+	cmp	al,59
+	jae	k37
 k36:
- 	jmp	short k26	;в 1841 masm автоматически поставил короткий переход
+	jmp	short k26	;в 1841 masm автоматически поставил короткий переход
 k37:
- 	cmp	al,71
- 	jae	k36
- 	mov	bx,offset k13
- 	jmp	k63
+	cmp	al,71
+	jae	k36
+	mov	bx,offset k13
+	jmp	k63
 
 ;---
 
 k38:
- 	test	kb_flag,ctl_shift
- 	jz	k44
+	test	kb_flag,ctl_shift
+	jz	k44
 
 ;---
 ;---
 
- 	cmp	al,scroll_key
- 	jne	k39
- 	mov	bx,offset kb_buffer
- 	mov	buffer_head,bx
- 	mov	buffer_tail,bx
- 	mov	bios_break,80h
- 	int	1bh
- 	mov	ax,0
- 	jmp	k57
+	cmp	al,scroll_key
+	jne	k39
+	mov	bx,offset kb_buffer
+	mov	buffer_head,bx
+	mov	buffer_tail,bx
+	mov	bios_break,80h
+	int	1bh
+	mov	ax,0
+	jmp	k57
 
 k39:
- 	cmp	al,num_key
- 	jne	k41
- 	or	kb_flag_1,hold_state
- 	mov	al,eoi
- 	out	020h,al
+	cmp	al,num_key
+	jne	k41
+	or	kb_flag_1,hold_state
+	mov	al,eoi
+	out	020h,al
 
 ;---
 
- 	cmp	crt_mode,7
- 	je	k40
- 	mov	dx,03d8h
- 	mov	al,crt_mode_set
- 	out	dx,al
+	cmp	crt_mode,7
+	je	k40
+	mov	dx,03d8h
+	mov	al,crt_mode_set
+	out	dx,al
 k40:
- 	test	kb_flag_1,hold_state
- 	jnz	k40
- 	jmp	k27
+	test	kb_flag_1,hold_state
+	jnz	k40
+	jmp	k27
 k41:
 
 ;---
 
- 	cmp	al,55
- 	jne	k42
- 	mov	ax,114*256
- 	jmp	k57
+	cmp	al,55
+	jne	k42
+	mov	ax,114*256
+	jmp	k57
 
 ;---
 
 k42:
- 	mov	bx,offset k8
- 	cmp	al,59
- 	jae	k43
- 	jmp	k56
+	mov	bx,offset k8
+	cmp	al,59
+	jae	k43
+	jmp	k56
 k43:
- 	mov	bx,offset k9
- 	jmp	k63
+	mov	bx,offset k9
+	jmp	k63
 
-;---
+;------ NOT IN CONTROL SHIFT
 
-k44:
+k44:					; NOT-CTL-SHIFT
 
- 	cmp	al,71
- 	jae	k48
- 	test	kb_flag,left_shift+right_shift
- 	jz	k54a
+	cmp	al,71                   ; TEST FOR KEYPAD REGION
+	jae	k48                     ; HANDLE KEYPAD REGION
+	test	kb_flag,left_shift+right_shift
+	jz	k54a                    ; TEST FOR SHIFT STATE
 
-;---
+;------ UPPER CASE, HANDLE SPECIAL CASES
 
- 	cmp	al,15
- 	jne	k45
- 	mov	ax,15*256
- 	jmp	k57
+	cmp	al,15                   ; BACK TAB KEY
+	jne	k45                     ; NOT-BACK-TAB
+	mov	ax,15*256               ; SET PSEUDO SCAN CODE
+	jmp	k57                     ; BUFFER_FILL
 
 k54a:
- 	jmp k54
+	jmp k54
 
-k45:
- 	cmp	al,55
- 	jne	k46
+k45:                                    ; NOT-BACK-TAB
+	cmp	al,55                   ; PRINT SCREEN KEY
+	jne	k46                     ; NOT-PRINT-SCREEN
 
-;---
+;------ ISSUE INTERRUPT TO INDICATE PRINT SCREEN FUNCTION
 
- 	mov	al,eoi
- 	out	020h,al
- 	int	5h
- 	jmp	k27
-
-k46:
- 	cmp	al,59
- 	jb	k47
- 	mov	bx,offset k12
- 	jmp	k63
-
-k47:
- 	test	kb_flag_1,lat
- 	jz	k98
- 	mov	bx,offset k11
- 	jmp	 k56
+	mov	al,eoi                  ; END OF CURRENT INTERRUPT
+	out	020h,al                 ;  SO FURTHER THINGS CAN HAPPEN
+	int	5h                      ; ISSUE PRINT SCREEN INTERRUPT
+	jmp	k27                     ; GO BACK WITHOUT EOI OCCURRING
+	
+k46:                                    ; NOT-PRINT-SCREEN
+	cmp	al,59                   ; FUNCTION KEYS
+	jb	k47                     ; NOT-UPPER-FUNCTION
+	mov	bx,offset k12           ; UPPER CASE PSEUDO SCAN CODES
+	jmp	k63                     ; TRANSLATE_SCAN
+	
+k47:                                    ; NOT-UPPER-FUNCTION
+	test	kb_flag_1,lat
+	jz	k98
+	mov	bx,offset k11           ; POINT TO UPPER CASE TABLE
+	jmp	 k56                    ; OK, TRANSLATE THE CHAR
 k98:	mov	bx,offset rust2
- 	jmp	k56
+	jmp	k56
 
-;---
+;------ KEYPAD KEYS, MUST TEST NUM LOCK FOR DETERMINATION
 
-k48:
- 	test	kb_flag,num_state
- 	jnz	k52
- 	test	kb_flag,left_shift+right_shift
- 	jnz	k53
+k48:                                    ; KEYPAD-REGION
+	test	kb_flag,num_state       ; ARE WE IN NUM_LOCK
+	jnz	k52                     ; TEST FOR SURE
+	test	kb_flag,left_shift+right_shift ; ARE WE IN SHIFT STATE
+	jnz	k53                     ; IF SHIFTED, REALLY NUM STATE
 
-;---
+;------ BASE CASE FOR KEYPAD
 
-k49:
+k49:                                    ; BASE-CASE
 
- 	cmp	al,74
- 	je	k50
- 	cmp	al,78
- 	je	k51
- 	sub	al,71
- 	mov	bx,offset k15
- 	jmp	  k64
+	cmp	al,74                   ; SPECIAL CASE FOR A COUPLE OF KEYS
+	je	k50                     ; MINUS
+	cmp	al,78
+	je	k51
+	sub	al,71                   ; CONVERT ORIGIN
+	mov	bx,offset k15           ; BASE CASE TABLE
+	jmp	  k64                   ; CONVERT TO PSEUDO SCAN
+	
+k50:	mov	ax,74*256+'-'           ; MINUS
+	jmp	 k57                    ; BUFFER_FILL
+	
+k51:	mov	ax,78*256+'+'           ; PLUS
+	jmp	 k57                    ; BUFFER_FILL
 
-k50:	mov	ax,74*256+'-'
- 	jmp	 k57
+;------ MIGHT BE NUM LOCK, TEST SHIFT STATUS
 
-k51:	mov	ax,78*256+'+'
- 	jmp	 k57
-
-;---
-
-k52:
- 	test	kb_flag,left_shift+right_shift
- 	jnz	k49
-
-k53:
- 	sub	al,70
- 	mov	bx,offset k14
- 	jmp	 k56
+k52:                                    ; ALMOST-NUM-STATE
+	test	kb_flag,left_shift+right_shift
+	jnz	k49                     ; SHIFTED TEMP OUT OF NUM STATE
+	
+k53:                                    ; REALLY_NUM_STATE
+	sub	al,70                   ; CONVERT ORIGIN
+	mov	bx,offset k14           ; NUM STATE TABLE
+	jmp	 k56                    ; TRANSLATE_CHAR
 kb_int	endp
 
 code	ends
