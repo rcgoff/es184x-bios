@@ -1,5 +1,5 @@
-Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
-keybrd.asm
+Turbo Assembler	 Version 5.0	    01-08-22 13:16:40	    Page 1
+keybrd.ASM
 
 
 
@@ -334,31 +334,40 @@ keybrd.asm
 			     ;	 Таблица	кодов ASCII нижнего	регистра клавиатуры
 
 0181			     k10     label   byte
-0181  1B 31 32 33 34 35	36+	     db	     27,'1234567890-='
-      37 38 39 30 2D 3D
-018E  08 09			     db	     08h,09h
-0190  71 77 65 72 74 79	75+	     db	     'qwertyuiop[]',0dh,-1,'asdfghjkl;:',60h,7eh
-      69 6F 70 5B 5D 0D	FF+
-      61 73 64 66 67 68	6A+
-      6B 6C 3B 3A 60 7E
-01AB  5C 7A 78 63 76 62	6E+	     db	     05ch,'zxcvbnm',',./{'
-      6D 2C 2E 2F 7B
-01B7  2A FF 20 7D		     db	     '*',-1,' }'
+0181  1B 31 32 33 34 35	36+	     db	     27,'1234567'	     ;byte1
+      37
+0189  38 39 30 2D 3D 08	09+	     db	     '890-=',08h,09h,'q'     ;byte2
+      71
+0191  77 65 72 74 79 75	69+	     db	     'wertyuio'		     ;byte3
+      6F
+0199  70 5B 5D 0D FF 61	73+	     db	     'p[]',0dh,-1,'asd'	     ;byte4
+      64
+01A1  66 67 68 6A 6B 6C	3B+	     db	     'fghjkl;:'		     ;byte5
+      3A
+01A9  60 7E 5C 7A 78 63	76+	     db	     60h,7eh,05ch,'zxcvb'    ;byte6
+      62
+01B1  6E 6D 2C 2E 2F 7B	2A+	     db	     'nm,./{*',-1	     ;byte7
+      FF
+01B9  20 7D			     db	     ' }'		     ;byte8
 
 			     ;	 Таблица	кодов ASCII верхнего регистра клавиатуры
 
 01BB			     k11     label   byte
-01BB  1B 21 40 23 24 25	5E+	     db	     27,'!@#$',37,05eh,'&*()_+'
-      26 2A 28 29 5F 2B
-01C8  08 00			     db	     08h,0
-01CA  51 57 45 52 54 59	55+	     db	     'QWERTYUIOP',-1,-1,0dh,-1
-      49 4F 50 FF FF 0D	FF
-01D8  41 53 44 46 47 48	4A+	     db	     'ASDFGHJKL'
-      4B 4C
-01E1  27 22 FF FF 7C		     db	     027h,'"',-1,-1,7ch
-01E6  5A 58 43 56 42 4E	4D	     db	     'ZXCVBNM'
-01ED  3C 3E 3F FF 00 FF	20+	     db	     '<>?',-1,0,-1,' ',-1
+01BB  1B 21 40 23 24 25	5E+	     db	     27,'!@#$',37,05eh,'&'   ;byte1
+      26
+01C3  2A 28 29 5F 2B 08	00+	     db	     '*()_+',08h,0,'Q'	     ;byte2
+      51
+01CB  57 45 52 54 59 55	49+	     db	     'WERTYUIO'		     ;byte3
+      4F
+01D3  50 FF FF 0D FF 41	53+	     db	     'P',-1,-1,0dh,-1,'ASD'  ;byte4
+      44
+01DB  46 47 48 4A 4B 4C	27+	     db	     'FGHJKL',027h,'"'	     ;byte5
+      22
+01E3  FF FF 7C 5A 58 43	56+	     db	     -1,-1,7ch,'ZXCVB'	     ;byte6
+      42
+01EB  4E 4D 3C 3E 3F FF	00+	     db	     'NM<>?',-1,0,-1	     ;byte7
       FF
+01F3  20 FF			     db	     ' ',-1		     ;byte8
 
 			     ;	 Таблица	кодов сканирования клавиш Ф11 -	Ф20 (на	    +
 			     верхнем
@@ -696,7 +705,7 @@ keybrd.asm
 03CD			     k32:
 03CD  BF 0000e			     mov     di,offset k30
 03D0  B9 000A			     mov     cx,10
-03D3  F2 AE			     db	     0f2h,0aeh
+03D3  F2> AE			     repne scasb
 03D5  75 12			     jne     k33
 03D7  81 EF 0001e		     sub     di,offset k30+1
 03DB  A0 0019r			     mov     al,alt_input
@@ -711,7 +720,7 @@ keybrd.asm
 03E9			     k33:
 03E9  C6 06 0019r 00		     mov     alt_input,00h
 03EE  B9 001A			     mov     cx,0026
-03F1  F2 AE			     db	 0f2h,0aeh
+03F1  F2> AE			     repne scasb
 03F3  75 05			     jne     k34
 03F5  B0 00			     mov     al,0
 03F7  E9 FC4F			     jmp     k57
@@ -885,9 +894,9 @@ keybrd.asm
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "01-03-22"
+??DATE				  Text	 "01-08-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "14:39:49"
+??TIME				  Text	 "13:16:40"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE

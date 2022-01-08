@@ -298,22 +298,26 @@ k9	label	byte
 ;   Таблица кодов ASCII нижнего регистра клавиатуры
 
 k10	label	byte
- 	db	27,'1234567890-='
- 	db	08h,09h
- 	db	'qwertyuiop[]',0dh,-1,'asdfghjkl;:',60h,7eh
- 	db	05ch,'zxcvbnm',',./{'
- 	db	'*',-1,' }'
+	db	27,'1234567'		;byte1
+	db	'890-=',08h,09h,'q'	;byte2
+	db	'wertyuio'		;byte3
+	db	'p[]',0dh,-1,'asd'	;byte4
+	db	'fghjkl;:'		;byte5
+	db	60h,7eh,05ch,'zxcvb'	;byte6
+	db	'nm,./{*',-1		;byte7
+	db	' }'			;byte8
 
 ;   Таблица кодов ASCII верхнего регистра клавиатуры
 
 k11	label	byte
- 	db	27,'!@#$',37,05eh,'&*()_+'
- 	db	08h,0
- 	db	'QWERTYUIOP',-1,-1,0dh,-1
- 	db	'ASDFGHJKL'
- 	db	027h,'"',-1,-1,7ch
- 	db	'ZXCVBNM'
- 	db	'<>?',-1,0,-1,' ',-1
+	db	27,'!@#$',37,05eh,'&'	;byte1
+	db	'*()_+',08h,0,'Q'	;byte2
+	db	'WERTYUIO'		;byte3
+	db	'P',-1,-1,0dh,-1,'ASD'	;byte4
+	db	'FGHJKL',027h,'"'	;byte5
+	db	-1,-1,7ch,'ZXCVB'	;byte6
+	db	'NM<>?',-1,0,-1		;byte7
+	db	' ',-1			;byte8
 
 ;   Таблица кодов сканирования клавиш Ф11 - Ф20 (на верхнем
 ; регистре Ф1 - Ф10)
@@ -610,7 +614,7 @@ k31:
 k32:
  	mov	di,offset k30
  	mov	cx,10
- 	db	0f2h,0aeh
+	repne scasb
  	jne	k33
  	sub	di,offset k30+1
  	mov	al,alt_input
@@ -625,7 +629,7 @@ k32:
 k33:
  	mov	alt_input,00h
  	mov	cx,0026
- 	db  0f2h,0aeh
+	repne scasb
  	jne	k34
  	mov	al,0
  	jmp	k57
