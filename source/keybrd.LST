@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    01-08-22 15:09:25	    Page 1
+Turbo Assembler	 Version 5.0	    02-17-22 22:06:34	    Page 1
 keybrd.ASM
 
 
@@ -148,9 +148,9 @@ keybrd.ASM
 
 0049			     k57:				     ; BUFFER-FILL
 0049  3C FF			     cmp     al,-1		     ; IS THIS AN IGNORE CHAR
-004B  74 2A			     je	     k59		     ; YES, DO NOTHING WITH IT
+004B  74 34			     je	     k59		     ; YES, DO NOTHING WITH IT
 004D  80 FC FF			     cmp     ah,-1		     ; LOOK FOR	-1 PSEUDO SCAN
-0050  74 25			     je	     k59		     ; NEAR_INTERRUPT_RETURN
+0050  74 2F			     je	     k59		     ; NEAR_INTERRUPT_RETURN
 
 			     ;------ HANDLE THE	CAPS LOCK PROBLEM
 
@@ -158,34 +158,15 @@ keybrd.ASM
 0052  F6 06 0017r 40		     test    kb_flag,caps_state	     ; ARE WE IN CAPS LOCK STATE
 0057  74 2B			     jz	     k61		     ; SKIP IF NOT
 
+
 			     ;------ IN	CAPS LOCK STATE
 0059  F6 06 0018r 02		     test    kb_flag_1,lat
-005E  75 03			     jnz     k88
+005E  75 24			     jnz     k61		     ;lat mode - skip caps conversion
 0060  E9 0000e			     jmp     k89
-0063			     k88:
-0063  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift  ; TEST FOR	SHIFT STATE
-0068  74 10			     jz	     k60		     ; IF NOT SHIFT, CONVERT LOWER TO UPPER
 
-			     ;------ CONVERT ANY UPPER CASE TO LOWER CASE
-
-006A  3C 41			     cmp     al,'A'		     ; FIND OUT	IF ALPHABETIC
-006C  72 16			     jb	     k61		     ; NOT_CAPS_STATE
-006E  3C 5A			     cmp     al,'Z'
-0070  77 12			     ja	     k61		     ; NOT_CAPS_STATE
-0072  04 20			     add     al,'a'-'A'		     ; CONVERT TO LOWER	CASE
-0074  EB 0E 90			     jmp      k61		     ; NOT_CAPS_STATE
-
-0077			     k59:				     ; NEAR-INTERRUPT-RETURN
-0077  E9 0316			     jmp     k26		     ; INTERRUPT_RETURN
-
-			     ;------ CONVERT ANY LOWER CASE TO UPPER CASE
-
-007A			     k60:				     ; LOWER-TO-UPPER
-007A  3C 61			     cmp     al,'a'		     ; FIND OUT	IF ALPHABETIC
-007C  72 06			     jb	     k61		     ; NOT_CAPS_STATE
-007E  3C 7A			     cmp     al,'z'
-0080  77 02			     ja	     k61		     ; NOT_CAPS_STATE
-0082  2C 20			     sub     al,'a'-'A'		     ; CONVERT TO UPPER	CASE
+			     org     0081h
+0081			     k59:				     ; NEAR-INTERRUPT-RETURN
+0081  E9 030C			     jmp     k26		     ; INTERRUPT_RETURN
 
 0084			     k61:				     ; NOT-CAPS-STATE
 0084  8B 1E 001Cr		     mov     bx,buffer_tail	     ; GET THE END POINTER TO THE BUFFER
@@ -896,9 +877,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "01-08-22"
+??DATE				  Text	 "02-17-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "15:09:25"
+??TIME				  Text	 "22:06:34"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -1046,9 +1027,8 @@ K55				  Near16 CODE:003B
 K56				  Near16 CODE:0045
 K57				  Near16 CODE:0049
 K58				  Near16 CODE:0052
-K59				  Near16 CODE:0077
+K59				  Near16 CODE:0081
 K6				  Byte	 CODE:011A
-K60				  Near16 CODE:007A
 K61				  Near16 CODE:0084
 K62				  Near16 CODE:00A1
 K63				  Near16 CODE:00A7
@@ -1059,7 +1039,6 @@ K67				  Near16 CODE:0026
 K6L				  Number 000C
 K7				  Byte	 CODE:0126
 K8				  Byte	 CODE:012E
-K88				  Near16 CODE:0063
 K89				  Near16 ----:---- Extern
 K9				  Byte	 CODE:0168
 K98				  Near16 CODE:04B8

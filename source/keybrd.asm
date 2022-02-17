@@ -144,34 +144,15 @@ k58:                                    ; BUFFER-FILL-NOTEST
 	test	kb_flag,caps_state      ; ARE WE IN CAPS LOCK STATE
 	jz	k61                     ; SKIP IF NOT
 
+
 ;------ IN CAPS LOCK STATE
 	test	kb_flag_1,lat
-	jnz	k88
+	jnz	k61			;lat mode - skip caps conversion
 	jmp	k89
-k88:
-	test	kb_flag,left_shift+right_shift	; TEST FOR SHIFT STATE
-	jz	k60                     ; IF NOT SHIFT, CONVERT LOWER TO UPPER
 
-;------ CONVERT ANY UPPER CASE TO LOWER CASE
-
-	cmp	al,'A'                  ; FIND OUT IF ALPHABETIC
-	jb	k61                     ; NOT_CAPS_STATE
-	cmp	al,'Z'
-	ja	k61                     ; NOT_CAPS_STATE
-	add	al,'a'-'A'              ; CONVERT TO LOWER CASE
-	jmp	 k61                    ; NOT_CAPS_STATE
-
+org	0081h
 k59:                                    ; NEAR-INTERRUPT-RETURN
 	jmp	k26                     ; INTERRUPT_RETURN
-
-;------ CONVERT ANY LOWER CASE TO UPPER CASE
-
-k60:                                    ; LOWER-TO-UPPER
-	cmp	al,'a'                  ; FIND OUT IF ALPHABETIC
-	jb	k61                     ; NOT_CAPS_STATE
-	cmp	al,'z'
-	ja	k61                     ; NOT_CAPS_STATE
-	sub	al,'a'-'A'              ; CONVERT TO UPPER CASE
 
 k61:                                    ; NOT-CAPS-STATE
 	mov	bx,buffer_tail          ; GET THE END POINTER TO THE BUFFER
