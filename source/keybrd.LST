@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    02-19-22 14:12:59	    Page 1
+Turbo Assembler	 Version 5.0	    02-19-22 18:20:04	    Page 1
 keybrd.ASM
 
 
@@ -181,7 +181,7 @@ keybrd.ASM
 
 			     ;------ set keyb boolean value: 0=lower, 1=upper case
 
-0074  E8 0022		     caps:   call    decode				     ;CY = /caps_able
+0074  E8 0039		     caps:   call    decode				     ;CY = /caps_able
 0077  B1 02			     mov     cl,2
 0079  D2 DB			     rcr     bl,cl				     ;bl = /caps_able in Z position (bit 6)
 007B  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift	     ;z	flag=0 if SHIFT
@@ -199,10 +199,22 @@ keybrd.ASM
 			     answer
 008D  D2 D4			     rcl     ah,cl				     ;now CY contains answer
 			     ;select keyboard table
-008F  BB 018Fr			     mov     bx,offset k10			     ;lower case (CY=0)
-0092  73 03			     jnc     both
-0094  BB 01C9r			     mov     bx,offset k11			     ;upper case (CY=1)
-0097  EB A1		     both:   jmp     short k56
+008F  BB 0000			     mov     bx,0
+0092  73 03			     jnc     ruslat
+0094  83 C3 02			     add     bx,2				     ;offset in	bytes for upper	case
+0097  F6 06 0018r 02	     ruslat: test    kb_flag_1,lat			     ;z	flag=RUS
+009C  75 03			     jnz     setbl
+009E  83 C3 04			     add     bx,4				     ;offset in	bytes for russian tables
+00A1  2E 8B 9F		     setbl:  db	     2eh,8bh,9fh
+00A4  00A8r			     dw	     scode_tbl_sel
+			     ;setbl: mov     bx,[offset	scode_tbl_sel+bx]
+00A6  EB 92			     jmp     short k56
+
+00A8			     scode_tbl_sel label word
+00A8  018Fr			     dw	     k10		     ;LAT LCASE
+00AA  01C9r			     dw	     k11		     ;LAT UCSASE
+00AC  0000e			     dw	     rust		     ;RUS ISO LCASE
+00AE  0000e			     dw	     rust2		     ;RUS ISO UCASE
 
 			     ;------ decode necessary byte in array
 			     ;and position in the byte
@@ -211,30 +223,30 @@ keybrd.ASM
 			     ;is this code CapsLock-influenced (CY=0) or not (CY=1)
 			     ;bx and cx	will be	destroyed
 
-0099			     decode:
-0099  50			     push ax
-009A  B4 00			     mov ah,0
-009C  48			     dec ax	     ;dec because scancodes starts from	1 (not 0). ax (not al) i.e. 1 byte  +
+00B0			     decode:
+00B0  50			     push ax
+00B1  B4 00			     mov ah,0
+00B3  48			     dec ax	     ;dec because scancodes starts from	1 (not 0). ax (not al) i.e. 1 byte  +
 			     instead of	2
-009D  B5 00			     mov ch,0
-009F  B3 08			     mov bl,8
-00A1  F6 F3			     div bl	     ;now quotient (byte nr) is	in AL and the remainder	(index in byte)	is  +
+00B4  B5 00			     mov ch,0
+00B6  B3 08			     mov bl,8
+00B8  F6 F3			     div bl	     ;now quotient (byte nr) is	in AL and the remainder	(index in byte)	is  +
 			     in	AH
 			     ;get byte from table
-00A3  8A CC			     mov cl,ah	     ;remainder	(index in byte)
-00A5  BB 0203r			     mov bx,offset capst
-00A8  2E: D7			     xlat cs:capst
+00BA  8A CC			     mov cl,ah	     ;remainder	(index in byte)
+00BC  BB 0203r			     mov bx,offset capst
+00BF  2E: D7			     xlat cs:capst
 			     ;set necessary bit	to 1 in	mask
-00AA  FE C1			     inc cl	     ;index in byte starts from	0, but we're shifting from CY
-00AC  F9			     stc
-00AD  D2 DD			     rcr ch,cl	     ;index=0 means bit	7 (CAPST filled	in tha way) - shift to RIGHT
+00C1  FE C1			     inc cl	     ;index in byte starts from	0, but we're shifting from CY
+00C3  F9			     stc
+00C4  D2 DD			     rcr ch,cl	     ;index=0 means bit	7 (CAPST filled	in tha way) - shift to RIGHT
 			     ;get necessary bit	in carry flag
-00AF  22 C5			     and al,ch
-00B1  D2 D0			     rcl al,cl
-00B3  58			     pop ax
-00B4  C3			     retn
+00C6  22 C5			     and al,ch
+00C8  D2 D0			     rcl al,cl
+00CA  58			     pop ax
+00CB  C3			     retn
 
-00B5  2C*(90)			     db	44 dup (90h)
+00CC  15*(90)			     db	21 dup (90h)
 			     ;---
 			     ;org    00d3h
 			     ;	     db	     34	dup (0)
@@ -940,7 +952,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02-19-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "14:12:59"
+??TIME				  Text	 "18:20:04"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -960,7 +972,6 @@ BAD_SEEK			  Number 0040
 BIOS_BREAK			  Byte	 DATA:0071
 BOOT_LOCN			  Far16	 ABS0:7C00
 BOOT_VEC			  Dword	 ABS0:0064
-BOTH				  Near16 CODE:0097
 BUFFER_END			  Word	 DATA:0082
 BUFFER_HEAD			  Word	 DATA:001A
 BUFFER_START			  Word	 DATA:0080
@@ -986,7 +997,7 @@ CTL_SHIFT			  Number 0004
 CURSOR_MODE			  Word	 DATA:0060
 CURSOR_POSN			  Word	 DATA:0050
 DAT				  Number 0040
-DECODE				  Near16 CODE:0099
+DECODE				  Near16 CODE:00B0
 DEL_KEY				  Number 0053
 DISKETTE_PARM			  Dword	 ABS0:0078
 DISKETTE_STATUS			  Byte	 DATA:0041
@@ -1150,13 +1161,16 @@ RES_FL				  Word	 ABS0:0472
 RIGHT_KEY			  Number 0055
 RIGHT_SHIFT			  Number 0001
 RS232_BASE			  Word	 DATA:0000
+RUSLAT				  Near16 CODE:0097
 RUST				  Near16 ----:---- Extern
 RUST2				  Near16 ----:---- Extern
 RUS_KEY				  Number 005B
+SCODE_TBL_SEL			  Word	 CODE:00A8
 SCROLL_KEY			  Number 0046
 SCROLL_SHIFT			  Number 0010
 SCROLL_STATE			  Number 0010
 SEEK_STATUS			  Byte	 DATA:003E
+SETBL				  Near16 CODE:00A1
 STA				  Number 0030
 STATUS_BYTE			  Byte	 XXDATA:0000
 STAT_OFFSET			  Byte	 DATA:007C

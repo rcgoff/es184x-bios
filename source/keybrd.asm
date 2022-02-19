@@ -185,10 +185,22 @@ caps:	call	decode					;CY = /caps_able
 	xor	ah,bh					;now bit6 (Z-position) of ah contains answer
 	rcl	ah,cl					;now CY contains answer
 ;select keyboard table
-	mov	bx,offset k10				;lower case (CY=0)
-	jnc	both
-	mov	bx,offset k11				;upper case (CY=1)
-both:	jmp	short k56
+	mov	bx,0
+	jnc	ruslat
+	add	bx,2					;offset in bytes for upper case
+ruslat:	test	kb_flag_1,lat				;z flag=RUS
+	jnz	setbl
+	add	bx,4					;offset in bytes for russian tables
+setbl:	db	2eh,8bh,9fh 
+	dw	scode_tbl_sel 
+;setbl:	mov	bx,[offset scode_tbl_sel+bx]
+	jmp	short k56
+
+scode_tbl_sel label word
+	dw	k10                     ;LAT LCASE
+	dw	k11                     ;LAT UCSASE
+	dw	rust                    ;RUS ISO LCASE
+	dw	rust2                   ;RUS ISO UCASE
 
 ;------ decode necessary byte in array
 ;and position in the byte
@@ -218,7 +230,7 @@ decode:
 	pop ax
 	retn
 
-	db 44 dup (90h)
+	db 21 dup (90h)
 ;---
 ;org	00d3h
 ;	db	34 dup (0)
