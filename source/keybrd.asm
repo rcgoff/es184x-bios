@@ -154,64 +154,6 @@ k58:                                    ; BUFFER-FILL-NOTEST
 k59:                                    ; NEAR-INTERRUPT-RETURN
 	jmp	k26                     ; INTERRUPT_RETURN
 
-
-;------ decode necessary byte in array
-;and position in the byte
-;on call, AL contains scan-code
-;on return, we have boolean value:
-;is this code CapsLock-influenced (CY=0) or not (CY=1)
-;bx and cx will be destroyed
-
-decode:
-	push ax
-	mov ah,0
-	dec ax		;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2 
-	mov ch,0
-	mov bl,8
-	div bl		;now quotient (byte nr) is in AL and the remainder (index in byte) is in AH
-;get byte from table
-	mov cl,ah	;remainder (index in byte)
-	mov bx,offset capst
-	xlat cs:capst
-;set necessary bit to 1 in mask
-	inc cl  	;index in byte starts from 0, but we're shifting from CY
-	stc
-	rcr ch,cl	;index=0 means bit 7 (CAPST filled in tha way) - shift to RIGHT
-;get necessary bit in carry flag
-	and al,ch
-	rcl al,cl
-	pop ax
-	retn
-
-;------ CapsLock table (latin)
-
-capst	label	byte
-;		27,'1234567'		;byte1
-	db	0ffh
-
-;		'890-='08h,09h,'q'	;byte2
-        db	11111110b
-
-;		'wertyuio'		;byte3
-	db	0
-
-;		'p[]',0dh,-1,'asd'	;byte4
-	db	01111000b
-
-;		'fghjkl;:'		;byte5
-	db	00000011b
-
-;		60h,7eh,05ch,'zxcvb'	;byte6
-	db	11100000b
-
-;		'nm,./{*',-1		;byte7
-	db	00111111b
-
-;		' }'			;byte8
-	db	0ffh
-
-	NOP
-
 ;org	0084h
 k61:                                    ; NOT-CAPS-STATE
 	mov	bx,buffer_tail          ; GET THE END POINTER TO THE BUFFER
@@ -263,8 +205,38 @@ caps:	call	decode					;CY = /caps_able
 	mov	bx,offset k10				;lower case (CY=0)
 	jnc	both
 	mov	bx,offset k11				;upper case (CY=1)
-both:	jmp	k56
+both:	jmp	short k56
 
+;------ decode necessary byte in array
+;and position in the byte
+;on call, AL contains scan-code
+;on return, we have boolean value:
+;is this code CapsLock-influenced (CY=0) or not (CY=1)
+;bx and cx will be destroyed
+
+decode:
+	push ax
+	mov ah,0
+	dec ax		;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2 
+	mov ch,0
+	mov bl,8
+	div bl		;now quotient (byte nr) is in AL and the remainder (index in byte) is in AH
+;get byte from table
+	mov cl,ah	;remainder (index in byte)
+	mov bx,offset capst
+	xlat cs:capst
+;set necessary bit to 1 in mask
+	inc cl  	;index in byte starts from 0, but we're shifting from CY
+	stc
+	rcr ch,cl	;index=0 means bit 7 (CAPST filled in tha way) - shift to RIGHT
+;get necessary bit in carry flag
+	and al,ch
+	rcl al,cl
+	pop ax
+	retn
+
+	NOP
+	NOP
 ;---
 ;org	00d3h
 ;	db	34 dup (0)
@@ -384,6 +356,33 @@ k11	label	byte
 	db	-1,-1,7ch,'ZXCVB'	;byte6
 	db	'NM<>?',-1,0,-1		;byte7
 	db	' ',-1			;byte8
+
+;------ CapsLock table (latin)
+
+capst	label	byte
+;		27,'1234567'		;byte1
+	db	0ffh
+
+;		'890-='08h,09h,'q'	;byte2
+        db	11111110b
+
+;		'wertyuio'		;byte3
+	db	0
+
+;		'p[]',0dh,-1,'asd'	;byte4
+	db	01111000b
+
+;		'fghjkl;:'		;byte5
+	db	00000011b
+
+;		60h,7eh,05ch,'zxcvb'	;byte6
+	db	11100000b
+
+;		'nm,./{*',-1		;byte7
+	db	00111111b
+
+;		' }'			;byte8
+	db	0ffh
 
 
 ;   Таблица кодов сканирования клавиш Ф11 - Ф20 (на верхнем
