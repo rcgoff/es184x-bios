@@ -116,14 +116,9 @@ error_beep	endp
 
 k54:					;rc обычный нижний регистр
 	cmp	al,59                   ; TEST FOR FUNCTION KEYS
-	jb	k55                     ; NOT-LOWER-FUNCTION
+	jb	caps                    ; NOT-LOWER-FUNCTION
 	mov	al,0                    ; SCAN CODE IN AH ALREADY
 	jmp	short k57               ; BUFFER_FILL
-
-k55:	;mov	bx,offset k10
-	test	kb_flag_1,lat
-	jz	k99			;rc переход по отсутствию флага ЛАТ
-	jmp	short caps
 
 ;------TRANSLATE THE CHARACTER
 
@@ -145,7 +140,6 @@ k58:                                    ; BUFFER-FILL-NOTEST
 k59:                                    ; NEAR-INTERRUPT-RETURN
 	jmp	k26                     ; INTERRUPT_RETURN
 
-org	0064h
 k61:                                    ; NOT-CAPS-STATE
 	mov	bx,buffer_tail          ; GET THE END POINTER TO THE BUFFER
 	mov	si,bx                   ; SAVE THE VALUE
@@ -155,8 +149,6 @@ k61:                                    ; NOT-CAPS-STATE
 	mov	word ptr [si],ax        ; STORE THE VALUE
 	mov	buffer_tail,bx          ; MOVE THE POINTER UP
 	jmp	k26                     ; INTERRUPT_RETURN
-k99:	mov	bx,offset rust			;rc маленькие рус буквы (kb_flag_1.lat=0)
-	jmp	k56
 
 ;------ BUFFER IS FULL, SOUND THE BEEPER
 
@@ -226,8 +218,7 @@ decode:
 	pop ax
 	retn
 
-	NOP
-	NOP
+	db 44 dup (90h)
 ;---
 ;org	00d3h
 ;	db	34 dup (0)
@@ -809,13 +800,7 @@ k46:                                    ; NOT-PRINT-SCREEN
 	jmp	k63                     ; TRANSLATE_SCAN
 	
 k47:                                    ; NOT-UPPER-FUNCTION
-	test	kb_flag_1,lat
-	jz	k98
 	jmp	caps
-;	mov	bx,offset k11           ; POINT TO UPPER CASE TABLE
-;	jmp	 k56                    ; OK, TRANSLATE THE CHAR
-k98:	mov	bx,offset rust2
-	jmp	k56
 
 ;------ KEYPAD KEYS, MUST TEST NUM LOCK FOR DETERMINATION
 
