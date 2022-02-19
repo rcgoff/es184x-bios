@@ -118,11 +118,12 @@ k54:					;rc обычный нижний регистр
 	cmp	al,59                   ; TEST FOR FUNCTION KEYS
 	jb	k55                     ; NOT-LOWER-FUNCTION
 	mov	al,0                    ; SCAN CODE IN AH ALREADY
-	jmp	 k57                    ; BUFFER_FILL
+	jmp	short k57               ; BUFFER_FILL
 
-k55:	mov	bx,offset k10
+k55:	;mov	bx,offset k10
 	test	kb_flag_1,lat
 	jz	k99			;rc переход по отсутствию флага ЛАТ
+	jmp	short caps
 
 ;------TRANSLATE THE CHARACTER
 
@@ -150,10 +151,68 @@ k58:                                    ; BUFFER-FILL-NOTEST
 	jnz	k61			;lat mode - skip caps conversion
 	jmp	k89
 
-org	0081h
 k59:                                    ; NEAR-INTERRUPT-RETURN
 	jmp	k26                     ; INTERRUPT_RETURN
 
+
+;------ decode necessary byte in array
+;and position in the byte
+;on call, AL contains scan-code
+;on return, we have boolean value:
+;is this code CapsLock-influenced (CY=0) or not (CY=1)
+;bx and cx will be destroyed
+
+decode:
+	push ax
+	mov ah,0
+	dec ax		;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2 
+	mov ch,0
+	mov bl,8
+	div bl		;now quotient (byte nr) is in AL and the remainder (index in byte) is in AH
+;get byte from table
+	mov cl,ah	;remainder (index in byte)
+	mov bx,offset capst
+	xlat cs:capst
+;set necessary bit to 1 in mask
+	inc cl  	;index in byte starts from 0, but we're shifting from CY
+	stc
+	rcr ch,cl	;index=0 means bit 7 (CAPST filled in tha way) - shift to RIGHT
+;get necessary bit in carry flag
+	and al,ch
+	rcl al,cl
+	pop ax
+	retn
+
+;------ CapsLock table (latin)
+
+capst	label	byte
+;		27,'1234567'		;byte1
+	db	0ffh
+
+;		'890-='08h,09h,'q'	;byte2
+        db	11111110b
+
+;		'wertyuio'		;byte3
+	db	0
+
+;		'p[]',0dh,-1,'asd'	;byte4
+	db	01111000b
+
+;		'fghjkl;:'		;byte5
+	db	00000011b
+
+;		60h,7eh,05ch,'zxcvb'	;byte6
+	db	11100000b
+
+;		'nm,./{*',-1		;byte7
+	db	00111111b
+
+;		' }'			;byte8
+	db	0ffh
+
+	NOP
+
+;org	0084h
 k61:                                    ; NOT-CAPS-STATE
 	mov	bx,buffer_tail          ; GET THE END POINTER TO THE BUFFER
 	mov	si,bx                   ; SAVE THE VALUE
@@ -164,7 +223,7 @@ k61:                                    ; NOT-CAPS-STATE
 	mov	buffer_tail,bx          ; MOVE THE POINTER UP
 	jmp	k26                     ; INTERRUPT_RETURN
 k99:	mov	bx,offset rust			;rc маленькие рус буквы (kb_flag_1.lat=0)
-	jmp k56
+	jmp	k56
 
 ;------ BUFFER IS FULL, SOUND THE BEEPER
 
@@ -180,11 +239,35 @@ k64:                                    ; TRANSLATE-SCAN-ORGD
 	xlat	cs:k9                   ; CTL TABLE SCAN
 	mov	ah,al                   ; PUT VALUE INTO AH
 	mov	al,0                    ; ZERO ASCII CODE
-	jmp	 k57                    ; PUT IT INTO THE BUFFER
+	jmp	k57                     ; PUT IT INTO THE BUFFER
 
+;------ set keyb boolean value: 0=lower, 1=upper case
+
+caps:	call	decode					;CY = /caps_able
+	mov	cl,2
+	rcr	bl,cl					;bl = /caps_able in Z position (bit 6)
+	test	kb_flag,left_shift+right_shift		;z flag=0 if SHIFT
+	lahf
+	mov	bh,ah					;bh = /shift
+	test	kb_flag,caps_state			;z flag=0 if CAPS
+	lahf                                            ;ah = /caps
+
+;formula is: value= SHIFT xor (CAPS & CAPS_ABLE)
+;that is equal to: /SHIFT xor (/CAPS or /CAPS_ABLE)
+
+;now, calculate by formula
+	or	ah,bl
+	xor	ah,bh					;now bit6 (Z-position) of ah contains answer
+	rcl	ah,cl					;now CY contains answer
+;select keyboard table
+	mov	bx,offset k10				;lower case (CY=0)
+	jnc	both
+	mov	bx,offset k11				;upper case (CY=1)
+both:	jmp	k56
 
 ;---
-	db	34 dup (0)
+;org	00d3h
+;	db	34 dup (0)
 ;1841 	org	0e82eh
 keyboard_io proc	far
 	sti	 	 	;
@@ -301,6 +384,7 @@ k11	label	byte
 	db	-1,-1,7ch,'ZXCVB'	;byte6
 	db	'NM<>?',-1,0,-1		;byte7
 	db	' ',-1			;byte8
+
 
 ;   Таблица кодов сканирования клавиш Ф11 - Ф20 (на верхнем
 ; регистре Ф1 - Ф10)
@@ -420,15 +504,15 @@ k17:	sub	di,offset k6+1		;rc получить индекс упр клавиши
 	test	kb_flag_1,inv_shift
 	jz	k400                    ;rc переход по ненажатию Р/Л
 	or	kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
-	jmp	k26a
+	jmp	short k26a
 k400:	or	kb_flag_1,lat+lat_shift ;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
-	jmp	k26a
+	jmp	short k26a
 
 				;РУС:
 k401:	test	kb_flag_1,inv_shift
 	jz	k26a                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
 	or	kb_flag_1,lat           ;rc нажата Р/Л и отпущена РУС: включить lat ///???
-	jmp	k26a
+	jmp	short k26a
 
 				;rc далее IBM-ский код				
 k300:	mov	ah,cs:k7[di]            ;rc аналогично IBM считыаем маску из k7 для совместимых упр клавиш
@@ -466,7 +550,7 @@ k18:
 	jnz	k22
 	test	kb_flag,alt_shift	  ; опрос клавиши ДОП
 	jz	k19
-	jmp	k25
+	jmp	short k25
 k19:	test	kb_flag,num_state  ; опрос клавиши ЦИФ
 	jnz	k21
 	test	kb_flag,left_shift+right_shift ; опрос клавиш левого
@@ -521,7 +605,7 @@ k304:
 k24:
 	not	ah
 	and	kb_flag_1,ah
-	jmp	 k26
+	jmp	short k26
 ;---
 
 k25:						;rc как и в IBM, здесь мы, если не управляющая клавиша
@@ -566,7 +650,7 @@ k307:	mov	ax,0a000h			;rc клавиша ИНФ, расширенный скан
 k28:
 	test	kb_flag,alt_shift
 	jnz	k29
-	jmp	k38
+	jmp	short k38
 
 ;---
 
@@ -737,8 +821,9 @@ k46:                                    ; NOT-PRINT-SCREEN
 k47:                                    ; NOT-UPPER-FUNCTION
 	test	kb_flag_1,lat
 	jz	k98
-	mov	bx,offset k11           ; POINT TO UPPER CASE TABLE
-	jmp	 k56                    ; OK, TRANSLATE THE CHAR
+	jmp	caps
+;	mov	bx,offset k11           ; POINT TO UPPER CASE TABLE
+;	jmp	 k56                    ; OK, TRANSLATE THE CHAR
 k98:	mov	bx,offset rust2
 	jmp	k56
 
