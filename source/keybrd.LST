@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    02-19-22 12:23:37	    Page 1
+Turbo Assembler	 Version 5.0	    02-19-22 13:43:42	    Page 1
 keybrd.ASM
 
 
@@ -149,26 +149,17 @@ keybrd.ASM
 
 0047			     k57:				     ; BUFFER-FILL
 0047  3C FF			     cmp     al,-1		     ; IS THIS AN IGNORE CHAR
-0049  74 16			     je	     k59		     ; YES, DO NOTHING WITH IT
+0049  74 07			     je	     k59		     ; YES, DO NOTHING WITH IT
 004B  80 FC FF			     cmp     ah,-1		     ; LOOK FOR	-1 PSEUDO SCAN
-004E  74 11			     je	     k59		     ; NEAR_INTERRUPT_RETURN
-
-			     ;------ HANDLE THE	CAPS LOCK PROBLEM
+004E  74 02			     je	     k59		     ; NEAR_INTERRUPT_RETURN
 
 0050			     k58:				     ; BUFFER-FILL-NOTEST
-0050  F6 06 0017r 40		     test    kb_flag,caps_state	     ; ARE WE IN CAPS LOCK STATE
-0055  74 0D			     jz	     k61		     ; SKIP IF NOT
+0050  EB 12			     jmp     short k61		     ;old caps processing removed
 
+0052			     k59:				     ; NEAR-INTERRUPT-RETURN
+0052  E9 033F			     jmp     k26		     ; INTERRUPT_RETURN
 
-			     ;------ IN	CAPS LOCK STATE
-0057  F6 06 0018r 02		     test    kb_flag_1,lat
-005C  75 06			     jnz     k61		     ;lat mode - skip caps conversion
-005E  E9 0000e			     jmp     k89
-
-0061			     k59:				     ; NEAR-INTERRUPT-RETURN
-0061  E9 0330			     jmp     k26		     ; INTERRUPT_RETURN
-
-			     ;org    0084h
+			     org     0064h
 0064			     k61:				     ; NOT-CAPS-STATE
 0064  8B 1E 001Cr		     mov     bx,buffer_tail	     ; GET THE END POINTER TO THE BUFFER
 0068  8B F3			     mov     si,bx		     ; SAVE THE	VALUE
@@ -966,7 +957,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02-19-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "12:23:37"
+??TIME				  Text	 "13:43:42"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -1118,7 +1109,7 @@ K55				  Near16 CODE:003A
 K56				  Near16 CODE:0043
 K57				  Near16 CODE:0047
 K58				  Near16 CODE:0050
-K59				  Near16 CODE:0061
+K59				  Near16 CODE:0052
 K6				  Byte	 CODE:011B
 K61				  Near16 CODE:0064
 K62				  Near16 CODE:0081

@@ -139,22 +139,13 @@ k57:                                    ; BUFFER-FILL
 	cmp	ah,-1                   ; LOOK FOR -1 PSEUDO SCAN
 	je	k59                     ; NEAR_INTERRUPT_RETURN
 
-;------ HANDLE THE CAPS LOCK PROBLEM
-
 k58:                                    ; BUFFER-FILL-NOTEST
-	test	kb_flag,caps_state      ; ARE WE IN CAPS LOCK STATE
-	jz	k61                     ; SKIP IF NOT
-
-
-;------ IN CAPS LOCK STATE
-	test	kb_flag_1,lat
-	jnz	k61			;lat mode - skip caps conversion
-	jmp	k89
+	jmp	short k61               ;old caps processing removed
 
 k59:                                    ; NEAR-INTERRUPT-RETURN
 	jmp	k26                     ; INTERRUPT_RETURN
 
-;org	0084h
+org	0064h
 k61:                                    ; NOT-CAPS-STATE
 	mov	bx,buffer_tail          ; GET THE END POINTER TO THE BUFFER
 	mov	si,bx                   ; SAVE THE VALUE
