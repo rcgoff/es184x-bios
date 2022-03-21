@@ -168,7 +168,14 @@ k64:                                    ; TRANSLATE-SCAN-ORGD
 
 ;------ set keyb boolean value: 0=lower, 1=upper case
 
-caps:	call	decode					;CY = /caps_able
+caps:	mov	dl,kb_flag_1				;bit 1 set =lat
+	shl	dl,1					;for second call, where setting rus/lat table
+	and	dl,lat*2
+	xor	dl,lat*2				;bit 2 set=rus
+	mov	bx,offset capst				;lat caps-able table
+	jz	decd                                    ;Z=lat
+	mov	bx,offset capstru			;rus caps-able table
+decd:	call	decode					;CY = code in AL is /caps_able
 	mov	cl,2
 	rcr	bl,cl					;bl = /caps_able in Z position (bit 6)
 	test	kb_flag,left_shift+right_shift		;z flag=0 if SHIFT
@@ -188,12 +195,10 @@ caps:	call	decode					;CY = /caps_able
 	mov	bx,0
 	jnc	ruslat
 	add	bx,2					;offset in bytes for upper case
-ruslat:	test	kb_flag_1,lat				;z flag=RUS
-	jnz	setbl
-	add	bx,4					;offset in bytes for russian tables
+ruslat:	add	bl,dl					;dl=4 if rus table, see above
 setbl:	db	2eh,8bh,9fh 
 	dw	scode_tbl_sel 
-;setbl:	mov	bx,[offset scode_tbl_sel+bx]
+;setbl:	mov	bx,cs:[offset scode_tbl_sel+bx]
 	jmp	short k56
 
 scode_tbl_sel label word
@@ -205,12 +210,14 @@ scode_tbl_sel label word
 ;------ decode necessary byte in array
 ;and position in the byte
 ;on call, AL contains scan-code
+;BX contains pointer to array
 ;on return, we have boolean value:
 ;is this code CapsLock-influenced (CY=0) or not (CY=1)
 ;bx and cx will be destroyed
 
 decode:
 	push ax
+	push bx
 	mov ah,0
 	dec ax		;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2 
 	mov ch,0
@@ -218,7 +225,7 @@ decode:
 	div bl		;now quotient (byte nr) is in AL and the remainder (index in byte) is in AH
 ;get byte from table
 	mov cl,ah	;remainder (index in byte)
-	mov bx,offset capst
+	pop bx		;restore pointer to array
 	xlat cs:capst
 ;set necessary bit to 1 in mask
 	inc cl  	;index in byte starts from 0, but we're shifting from CY
@@ -230,7 +237,7 @@ decode:
 	pop ax
 	retn
 
-	db 13 dup (90h)
+	db 2 dup (90h)
 ;---
 ;org	00d3h
 ;	db	34 dup (0)
