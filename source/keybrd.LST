@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    02-19-22 18:20:04	    Page 1
+Turbo Assembler	 Version 5.0	    03-21-22 21:38:25	    Page 1
 keybrd.ASM
 
 
@@ -211,8 +211,8 @@ keybrd.ASM
 00A6  EB 92			     jmp     short k56
 
 00A8			     scode_tbl_sel label word
-00A8  018Fr			     dw	     k10		     ;LAT LCASE
-00AA  01C9r			     dw	     k11		     ;LAT UCSASE
+00A8  0187r			     dw	     k10		     ;LAT LCASE
+00AA  01C1r			     dw	     k11		     ;LAT UCSASE
 00AC  0000e			     dw	     rust		     ;RUS ISO LCASE
 00AE  0000e			     dw	     rust2		     ;RUS ISO UCASE
 
@@ -234,7 +234,7 @@ keybrd.ASM
 			     in	AH
 			     ;get byte from table
 00BA  8A CC			     mov cl,ah	     ;remainder	(index in byte)
-00BC  BB 0203r			     mov bx,offset capst
+00BC  BB 01FBr			     mov bx,offset capst
 00BF  2E: D7			     xlat cs:capst
 			     ;set necessary bit	to 1 in	mask
 00C1  FE C1			     inc cl	     ;index in byte starts from	0, but we're shifting from CY
@@ -246,188 +246,219 @@ keybrd.ASM
 00CA  58			     pop ax
 00CB  C3			     retn
 
-00CC  15*(90)			     db	21 dup (90h)
+00CC  0D*(90)			     db	13 dup (90h)
 			     ;---
 			     ;org    00d3h
 			     ;	     db	     34	dup (0)
 			     ;1841   org     0e82eh
-00E1			     keyboard_io proc	     far
-00E1  FB			     sti		     ;
-00E2  1E			     push    ds
-00E3  53			     push    bx
-00E4  BB 0000s			     mov     bx,data
-00E7  8E DB			     mov     ds,bx	     ; установить сегмент данных
-00E9  0A E4			     or	     ah,ah	     ; AH=0
-00EB  74 0B			     jz	     k1		  ; переход к считыванию следующего	    +
+00D9			     keyboard_io proc	     far
+00D9  FB			     sti		     ;
+00DA  1E			     push    ds
+00DB  53			     push    bx
+00DC  BB 0000s			     mov     bx,data
+00DF  8E DB			     mov     ds,bx	     ; установить сегмент данных
+00E1  0A E4			     or	     ah,ah	     ; AH=0
+00E3  74 0B			     jz	     k1		  ; переход к считыванию следующего	    +
 			     символа
-00ED  FE CC			     dec     ah		     ; AH=1
-00EF  74 20			     jz	     k2		  ; переход к считыванию кода ASCII
-00F1  FE CC			     dec     ah			  ; AH=2
-00F3  74 2D			     jz	     k3		  ; переход к получению байта		    +
+00E5  FE CC			     dec     ah		     ; AH=1
+00E7  74 20			     jz	     k2		  ; переход к считыванию кода ASCII
+00E9  FE CC			     dec     ah			  ; AH=2
+00EB  74 2D			     jz	     k3		  ; переход к получению байта		    +
 			     состояния
-00F5  5B			     pop     bx			  ; восстановить регистр
-00F6  1F			     pop     ds
-00F7  CF			     iret
+00ED  5B			     pop     bx			  ; восстановить регистр
+00EE  1F			     pop     ds
+00EF  CF			     iret
 
 			     ;	 Считывание кода сканирования	и кода ASCII из буфера +
 			     клавиатуры
 			     ;
-00F8			     k1:
-00F8  FB			     sti	     ; уст признака разрешения прерывания
-00F9  90			     nop		     ; задержка
-00FA  FA			     cli	     ; сброс признака разрешения	прерывания
-00FB  8B 1E 001Ar		     mov     bx,buffer_head  ; уст вершину буфера по чтению
-00FF  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить	с вершиной буфера по	    +
+00F0			     k1:
+00F0  FB			     sti	     ; уст признака разрешения прерывания
+00F1  90			     nop		     ; задержка
+00F2  FA			     cli	     ; сброс признака разрешения	прерывания
+00F3  8B 1E 001Ar		     mov     bx,buffer_head  ; уст вершину буфера по чтению
+00F7  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить	с вершиной буфера по	    +
 			     записи
-0103  74 F3			     jz	     k1
-0105  8B 07			     mov     ax,word ptr [bx] ;	получить код	сканирования и код  +
+00FB  74 F3			     jz	     k1
+00FD  8B 07			     mov     ax,word ptr [bx] ;	получить код	сканирования и код  +
 			     ASCII
-0107  E8 FEF6			     call    k4
-010A  89 1E 001Ar		     mov     buffer_head,bx  ; запомнить вершину буфера по	    +
+00FF  E8 FEFE			     call    k4
+0102  89 1E 001Ar		     mov     buffer_head,bx  ; запомнить вершину буфера по	    +
 			     чтению
-010E  5B			     pop     bx		     ; восстановить	регистр
-010F  1F			     pop     ds		     ; восстановить	сегмент
-0110  CF			     iret		     ; возврат к программе
+0106  5B			     pop     bx		     ; восстановить	регистр
+0107  1F			     pop     ds		     ; восстановить	сегмент
+0108  CF			     iret		     ; возврат к программе
 
 			     ;	 Считать	код ASCII
 
-0111			     k2:
-0111  FA			     cli	     ; Сброс признака разрешения	прерывания
-0112  8B 1E 001Ar		     mov     bx,buffer_head  ; получить	указатель вершины	    +
+0109			     k2:
+0109  FA			     cli	     ; Сброс признака разрешения	прерывания
+010A  8B 1E 001Ar		     mov     bx,buffer_head  ; получить	указатель вершины	    +
 			     буфера
 							     ; по чтению
-0116  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить	с вершиной буфера по	    +
+010E  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить	с вершиной буфера по	    +
 			     записи
-011A  8B 07			     mov     ax,word ptr [bx]
-011C  FB			     sti		     ; уст признак разрешения		    +
+0112  8B 07			     mov     ax,word ptr [bx]
+0114  FB			     sti		     ; уст признак разрешения		    +
 			     прерывания
-011D  5B			     pop     bx		     ; восстановить	регистр
-011E  1F			     pop     ds		     ; восстановить	сегмент
-011F  CA 0002			     ret     2
+0115  5B			     pop     bx		     ; восстановить	регистр
+0116  1F			     pop     ds		     ; восстановить	сегмент
+0117  CA 0002			     ret     2
 
 			     ;	 Получение младшего байта	состояния (флажков)
 
-0122			     k3:
-0122  A0 0017r			     mov     al,kb_flag	     ; получить	младший байт	состояния  +
+011A			     k3:
+011A  A0 0017r			     mov     al,kb_flag	     ; получить	младший байт	состояния  +
 			     на
-0125  5B			     pop     bx		     ; восстановить	регистр
-0126  1F			     pop     ds		     ; восстановить	сегмент
-0127  CF			     iret		     ; возврат к программе
-0128			     keyboard_io     endp
+011D  5B			     pop     bx		     ; восстановить	регистр
+011E  1F			     pop     ds		     ; восстановить	сегмент
+011F  CF			     iret		     ; возврат к программе
+0120			     keyboard_io     endp
 
 			     ;	 Таблица	кодов сканирования управляющих клавиш
 
-0128			     k6	     label   byte
-0128  52			     db	     ins_key
-0129  56 45 46 38 1D		     db	     caps_key,num_key,scroll_key,alt_key,ctl_key
-012E  54 55			     db	     left_key,right_key
-0130  58			     db	     inv_key_l
-0131  5A 57 5B			     db	     inv_key_r,lat_key,rus_key
+0120			     k6	     label   byte
+0120  52			     db	     ins_key
+0121  56 45 46 38 1D		     db	     caps_key,num_key,scroll_key,alt_key,ctl_key
+0126  54 55			     db	     left_key,right_key
+0128  58			     db	     inv_key_l
+0129  5A 57 5B			     db	     inv_key_r,lat_key,rus_key
       =000C		     k6l     equ     0ch
 
 			     ;	 Таблица	масок нажатых управляющих клавиш
 
-0134			     k7	     label   byte
-0134  80			     db	     ins_shift
-0135  40 20 10 08 04		     db	     caps_shift,num_shift,scroll_shift,alt_shift,ctl_shift
-013A  02 01			     db	     left_shift,right_shift
+012C			     k7	     label   byte
+012C  80			     db	     ins_shift
+012D  40 20 10 08 04		     db	     caps_shift,num_shift,scroll_shift,alt_shift,ctl_shift
+0132  02 01			     db	     left_shift,right_shift
 
 
 			     ;	 Таблица	кодов сканирования при нажатой клавише    +
 			     УПР для
 			     ; кодов сканирования клавиш	меньше 59
 
-013C  1B FF 00 FF FF FF	1E+  k8	     db	     27,-1,0,-1,-1,-1,30,-1
+0134  1B FF 00 FF FF FF	1E+  k8	     db	     27,-1,0,-1,-1,-1,30,-1
       FF
-0144  FF FF FF 1F FF 7F	FF+	     db	     -1,-1,-1,31,-1,127,-1,17
+013C  FF FF FF 1F FF 7F	FF+	     db	     -1,-1,-1,31,-1,127,-1,17
       11
-014C  17 05 12 14 19 15	09+	     db	     23,5,18,20,25,21,9,15
+0144  17 05 12 14 19 15	09+	     db	     23,5,18,20,25,21,9,15
       0F
-0154  10 1B 1D 0A FF 01	13	     db	     16,27,29,10,-1,1,19
-015B  04 06 07 08 0A 0B	0C+	     db	     4,6,7,8,10,11,12,-1,-1
+014C  10 1B 1D 0A FF 01	13	     db	     16,27,29,10,-1,1,19
+0153  04 06 07 08 0A 0B	0C+	     db	     4,6,7,8,10,11,12,-1,-1
       FF FF
-0164  FF FF 1C 1A 18 03	16+	     db	     -1,-1,28,26,24,3,22,2
+015C  FF FF 1C 1A 18 03	16+	     db	     -1,-1,28,26,24,3,22,2
       02
-016C  0E 0D FF FF FF FF	FF+	     db	     14,13,-1,-1,-1,-1,-1,-1
+0164  0E 0D FF FF FF FF	FF+	     db	     14,13,-1,-1,-1,-1,-1,-1
       FF
-0174  20 FF			     db	     ' ',-1
+016C  20 FF			     db	     ' ',-1
 
 			     ;	 Таблица	кодов сканирования при нажатой клавише    +
 			     УПР для
 			     ; кодов сканирования клавиш	больше 59
-0176			     k9	     label   byte
-0176  5E 5F 60 61 62 63	64+	     db	     94,95,96,97,98,99,100,101
+016E			     k9	     label   byte
+016E  5E 5F 60 61 62 63	64+	     db	     94,95,96,97,98,99,100,101
       65
-017E  66 67 FF FF 77 FF	84+	     db	     102,103,-1,-1,119,-1,132,-1
+0176  66 67 FF FF 77 FF	84+	     db	     102,103,-1,-1,119,-1,132,-1
       FF
-0186  73 FF 74 FF 75 FF	76+	     db	     115,-1,116,-1,117,-1,118,-1
+017E  73 FF 74 FF 75 FF	76+	     db	     115,-1,116,-1,117,-1,118,-1
       FF
-018E  FF			     db	     -1
+0186  FF			     db	     -1
 
 			     ;	 Таблица	кодов ASCII нижнего	регистра клавиатуры
 
-018F			     k10     label   byte
-018F  1B 31 32 33 34 35	36+	     db	     27,'1234567'	     ;byte1
+0187			     k10     label   byte
+0187  1B 31 32 33 34 35	36+	     db	     27,'1234567'	     ;byte1
       37
-0197  38 39 30 2D 3D 08	09+	     db	     '890-=',08h,09h,'q'     ;byte2
+018F  38 39 30 2D 3D 08	09+	     db	     '890-=',08h,09h,'q'     ;byte2
       71
-019F  77 65 72 74 79 75	69+	     db	     'wertyuio'		     ;byte3
+0197  77 65 72 74 79 75	69+	     db	     'wertyuio'		     ;byte3
       6F
-01A7  70 5B 5D 0D FF 61	73+	     db	     'p[]',0dh,-1,'asd'	     ;byte4
+019F  70 5B 5D 0D FF 61	73+	     db	     'p[]',0dh,-1,'asd'	     ;byte4
       64
-01AF  66 67 68 6A 6B 6C	3B+	     db	     'fghjkl;:'		     ;byte5
+01A7  66 67 68 6A 6B 6C	3B+	     db	     'fghjkl;:'		     ;byte5
       3A
-01B7  60 7E 5C 7A 78 63	76+	     db	     60h,7eh,05ch,'zxcvb'    ;byte6
+01AF  60 7E 5C 7A 78 63	76+	     db	     60h,7eh,05ch,'zxcvb'    ;byte6
       62
-01BF  6E 6D 2C 2E 2F 7B	2A+	     db	     'nm,./{*',-1	     ;byte7
+01B7  6E 6D 2C 2E 2F 7B	2A+	     db	     'nm,./{*',-1	     ;byte7
       FF
-01C7  20 7D			     db	     ' }'		     ;byte8
+01BF  20 7D			     db	     ' }'		     ;byte8
 
 			     ;	 Таблица	кодов ASCII верхнего регистра клавиатуры
 
-01C9			     k11     label   byte
-01C9  1B 21 40 23 24 25	5E+	     db	     27,'!@#$',37,05eh,'&'   ;byte1
+01C1			     k11     label   byte
+01C1  1B 21 40 23 24 25	5E+	     db	     27,'!@#$',37,05eh,'&'   ;byte1
       26
-01D1  2A 28 29 5F 2B 08	00+	     db	     '*()_+',08h,0,'Q'	     ;byte2
+01C9  2A 28 29 5F 2B 08	00+	     db	     '*()_+',08h,0,'Q'	     ;byte2
       51
-01D9  57 45 52 54 59 55	49+	     db	     'WERTYUIO'		     ;byte3
+01D1  57 45 52 54 59 55	49+	     db	     'WERTYUIO'		     ;byte3
       4F
-01E1  50 FF FF 0D FF 41	53+	     db	     'P',-1,-1,0dh,-1,'ASD'  ;byte4
+01D9  50 FF FF 0D FF 41	53+	     db	     'P',-1,-1,0dh,-1,'ASD'  ;byte4
       44
-01E9  46 47 48 4A 4B 4C	27+	     db	     'FGHJKL',027h,'"'	     ;byte5
+01E1  46 47 48 4A 4B 4C	27+	     db	     'FGHJKL',027h,'"'	     ;byte5
       22
-01F1  FF FF 7C 5A 58 43	56+	     db	     -1,-1,7ch,'ZXCVB'	     ;byte6
+01E9  FF FF 7C 5A 58 43	56+	     db	     -1,-1,7ch,'ZXCVB'	     ;byte6
       42
-01F9  4E 4D 3C 3E 3F FF	00+	     db	     'NM<>?',-1,0,-1	     ;byte7
+01F1  4E 4D 3C 3E 3F FF	00+	     db	     'NM<>?',-1,0,-1	     ;byte7
       FF
-0201  20 FF			     db	     ' ',-1		     ;byte8
+01F9  20 FF			     db	     ' ',-1		     ;byte8
+
 
 			     ;------ CapsLock table (latin)
 
-0203			     capst   label   byte
+01FB			     capst   label   byte
 			     ;		     27,'1234567'	     ;byte1
-0203  FF			     db	     0ffh
+01FB  FF			     db	     0ffh
 
 			     ;		     '890-='08h,09h,'q'	     ;byte2
-0204  FE			     db	     11111110b
+01FC  FE			     db	     11111110b
 
 			     ;		     'wertyuio'		     ;byte3
-0205  00			     db	     0
+01FD  00			     db	     0
 
 			     ;		     'p[]',0dh,-1,'asd'	     ;byte4
-0206  78			     db	     01111000b
+01FE  78			     db	     01111000b
 
 			     ;		     'fghjkl;:'		     ;byte5
-0207  03			     db	     00000011b
+01FF  03			     db	     00000011b
 
 			     ;		     60h,7eh,05ch,'zxcvb'    ;byte6
-0208  E0			     db	     11100000b
+0200  E0			     db	     11100000b
 
 			     ;		     'nm,./{*',-1	     ;byte7
-0209  3F			     db	     00111111b
+0201  3F			     db	     00111111b
 
 			     ;		     ' }'		     ;byte8
-020A  FF			     db	     0ffh
+0202  FF			     db	     0ffh
+
+
+			     ;------ CapsLock table (cyrillic)
+			     ;first 3 bytes are	the same
+
+0203			     capstru label   byte
+			     ;					     ;byte1
+0203  FF			     db	     0ffh
+
+			     ;		     последняя	- Й	     ;byte2
+0204  FE			     db	     11111110b
+
+			     ;		     'ЦУКЕНГШЩ'		     ;byte3
+0205  00			     db	     0
+
+			     ;		     'ЗЖЭ',0dh,-1,'ФЫВ'	     ;byte4
+0206  18			     db	     00011000b
+
+			     ;		     'АПРОЛД',27h,'"'  ;byte5
+0207  03			     db	     00000011b
+
+			     ;		     'БЮ',7ch,'ЯЧСМИ' ;byte6
+0208  20			     db	     00100000b
+
+			     ;		     'ТЬ','<>?','Х',0,-1  ;byte7
+0209  3B			     db	     00111011b
+
+			     ;		     ' Ъ'		     ;byte8
+020A  BF			     db	     10111111b
+
 
 
 			     ;	 Таблица	кодов сканирования клавиш Ф11 -	Ф20 (на	    +
@@ -524,7 +555,7 @@ keybrd.ASM
 026A  24 7F			     and     al,07fh	     ; сброс бита отжатия клавиши
 026C  0E			     push    cs
 026D  07			     pop     es
-026E  BF 0128r			     mov     di,offset k6  ; установить адрес таблицы		    +
+026E  BF 0120r			     mov     di,offset k6  ; установить адрес таблицы		    +
 			     сканирования
 							   ; управляющих клавиш
 0271  B9 000C			     mov     cx,k6l
@@ -549,7 +580,7 @@ keybrd.ASM
 			     ;	 Получение маски нажатой управляющей клавиши
 
 
-0294  81 EF 0129r	     k17:    sub     di,offset k6+1	     ;rc получить индекс упр клавиши+
+0294  81 EF 0121r	     k17:    sub     di,offset k6+1	     ;rc получить индекс упр клавиши+
 			     в	табл k6, начиная с 0
 0298  83 FF 08			     cmp     di,8
 029B  72 38			     jb	     k300		     ;rc меньше 8	(это	совместимые	    +
@@ -587,7 +618,7 @@ keybrd.ASM
 02D3  EB 2B			     jmp     short k26a
 
 							     ;rc далее IBM-ский код
-02D5  2E: 8A A5	0134r	     k300:   mov     ah,cs:k7[di]	     ;rc аналогично IBM считыаем	    +
+02D5  2E: 8A A5	012Cr	     k300:   mov     ah,cs:k7[di]	     ;rc аналогично IBM считыаем	    +
 			     маску	из k7	для совместимых упр клавиш
 02DA			     k301:
 02DA  A8 80			     test    al,80h	     ; клавиша отжата ?
@@ -860,12 +891,12 @@ keybrd.ASM
 			     ;---
 
 047C			     k42:
-047C  BB 013Cr			     mov     bx,offset k8
+047C  BB 0134r			     mov     bx,offset k8
 047F  3C 3B			     cmp     al,59
 0481  73 03			     jae     k43
 0483  E9 FBB4			     jmp     k56
 0486			     k43:
-0486  BB 0176r			     mov     bx,offset k9
+0486  BB 016Er			     mov     bx,offset k9
 0489  E9 FBDE			     jmp     k63
 
 			     ;------ NOT IN CONTROL SHIFT
@@ -950,9 +981,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02-19-22"
+??DATE				  Text	 "03-21-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "18:20:04"
+??TIME				  Text	 "21:38:25"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -977,7 +1008,8 @@ BUFFER_HEAD			  Word	 DATA:001A
 BUFFER_START			  Word	 DATA:0080
 BUFFER_TAIL			  Word	 DATA:001C
 CAPS				  Near16 CODE:0074
-CAPST				  Byte	 CODE:0203
+CAPST				  Byte	 CODE:01FB
+CAPSTRU				  Byte	 CODE:0203
 CAPS_KEY			  Number 0056
 CAPS_SHIFT			  Number 0040
 CAPS_STATE			  Number 0040
@@ -1035,9 +1067,9 @@ INV_SHIFT			  Number 0004
 IO_RAM_SIZE			  Word	 DATA:0015
 IO_ROM_INIT			  Word	 DATA:0067
 IO_ROM_SEG			  Word	 DATA:0069
-K1				  Near16 CODE:00F8
-K10				  Byte	 CODE:018F
-K11				  Byte	 CODE:01C9
+K1				  Near16 CODE:00F0
+K10				  Byte	 CODE:0187
+K11				  Byte	 CODE:01C1
 K12				  Byte	 CODE:020B
 K13				  Byte	 CODE:0215
 K14				  Byte	 CODE:021F
@@ -1046,7 +1078,7 @@ K16				  Near16 CODE:026A
 K17				  Near16 CODE:0294
 K18				  Near16 CODE:0303
 K19				  Near16 CODE:0317
-K2				  Near16 CODE:0111
+K2				  Near16 CODE:0109
 K20				  Near16 CODE:0325
 K21				  Near16 CODE:032B
 K22				  Near16 CODE:0332
@@ -1058,7 +1090,7 @@ K26A				  Near16 CODE:0300
 K27				  Near16 CODE:03A6
 K28				  Near16 CODE:03B5
 K29				  Near16 CODE:03BE
-K3				  Near16 CODE:0122
+K3				  Near16 CODE:011A
 K30				  Near16 ----:---- Extern
 K300				  Near16 CODE:02D5
 K301				  Near16 CODE:02DA
@@ -1103,7 +1135,7 @@ K56				  Near16 CODE:003A
 K57				  Near16 CODE:003E
 K58				  Near16 CODE:0047
 K59				  Near16 CODE:0049
-K6				  Byte	 CODE:0128
+K6				  Byte	 CODE:0120
 K61				  Near16 CODE:004C
 K62				  Near16 CODE:0064
 K63				  Near16 CODE:006A
@@ -1112,10 +1144,10 @@ K65				  Near16 CODE:0016
 K66				  Near16 CODE:001D
 K67				  Near16 CODE:0026
 K6L				  Number 000C
-K7				  Byte	 CODE:0134
-K8				  Byte	 CODE:013C
+K7				  Byte	 CODE:012C
+K8				  Byte	 CODE:0134
 K89				  Near16 ----:---- Extern
-K9				  Byte	 CODE:0176
+K9				  Byte	 CODE:016E
 KBDINT				  Number 0002
 KBD_IN				  Number 0060
 KB_BUFFER			  Word	 DATA:001E
@@ -1125,7 +1157,7 @@ KB_DAT				  Number 0060
 KB_FLAG				  Byte	 DATA:0017
 KB_FLAG_1			  Byte	 DATA:0018
 KB_INT				  Far16	 CODE:0242
-KEYBOARD_IO			  Far16	 CODE:00E1
+KEYBOARD_IO			  Far16	 CODE:00D9
 LAST_VAL			  Byte	 DATA:006B
 LAT				  Number 0002
 LAT_KEY				  Number 0057

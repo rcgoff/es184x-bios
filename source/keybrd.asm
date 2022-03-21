@@ -230,7 +230,7 @@ decode:
 	pop ax
 	retn
 
-	db 21 dup (90h)
+	db 13 dup (90h)
 ;---
 ;org	00d3h
 ;	db	34 dup (0)
@@ -351,6 +351,7 @@ k11	label	byte
 	db	'NM<>?',-1,0,-1		;byte7
 	db	' ',-1			;byte8
 
+
 ;------ CapsLock table (latin)
 
 capst	label	byte
@@ -377,6 +378,36 @@ capst	label	byte
 
 ;		' }'			;byte8
 	db	0ffh
+
+
+;------ CapsLock table (cyrillic)
+;first 3 bytes are the same
+
+capstru	label 	byte
+;					;byte1
+	db	0ffh
+
+;		последняя - Й		;byte2
+	db	11111110b
+
+;		'ЦУКЕНГШЩ'	 	;byte3
+	db	0
+
+;		'ЗЖЭ',0dh,-1,'ФЫВ' 	;byte4
+	db	00011000b
+
+;		'АПРОЛД',27h,'"' 	;byte5
+	db	00000011b
+
+;		'БЮ',7ch,'ЯЧСМИ'	;byte6
+	db	00100000b
+
+;		'ТЬ','<>?','Х',0,-1	;byte7
+	db	00111011b
+
+;		' Ъ'		 	;byte8
+	db	10111111b
+
 
 
 ;   Таблица кодов сканирования клавиш Ф11 - Ф20 (на верхнем
