@@ -46,8 +46,9 @@ INCLUDE DSEG40.INC
 code segment para public
 
 		org 0E000h
-
-infostr		db '1840v5 17.12.21 RCgoff'
+.nolist
+INCLUDE INFOST40.INC			; дата последних изменений
+.list
 c1		dw offset c11		; адрес	возврата
 caw		dw offset ca3
  	assume cs:code,ss:code,es:abs0,ds:data
