@@ -454,7 +454,7 @@ k15	label byte
 	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
-	db	7 dup (0)
+	db	9 dup (0)
 
 ;----INT 9--------------------------
 ;
@@ -517,9 +517,9 @@ k16:
 k406:           			;rc это обработчик клавиши Ё
 	test	kb_flag_1,lat
 	jnz	k26a                    ;rc в ЛАТ-режиме клавиша не генерирует ничего, выход
-	test	kb_flag,left_shift+right_shift
+	call	upplow			;rc CY=1: верхний регистр
 	mov	ax,5cf1h		;rc ё
-	jz	k407
+	jnc	k407
 	mov	ax,5cf0h                ;rc Ё
 k407:					;rc передвинул сюда, двумя строками выше  (это ж не получение маски)
 	jmp	k57

@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    03-23-22 20:00:51	    Page 1
+Turbo Assembler	 Version 5.0	    03-23-22 20:19:37	    Page 1
 keybrd.ASM
 
 
@@ -512,7 +512,7 @@ keybrd.ASM
 0235  FF 4F 50 51 52 53		     db	     -1,79,80,81,82,83
 
 			     ;1841   org     0e987h
-023B  07*(00)			     db	     7 dup (0)
+023B  09*(00)			     db	     9 dup (0)
 
 			     ;----INT 9--------------------------
 			     ;
@@ -534,62 +534,62 @@ keybrd.ASM
 			     ;
 			     ;-----------------------------------
 
-0242			     kb_int proc far
-0242  FB			     sti		; установка признака разрешения	    +
+0244			     kb_int proc far
+0244  FB			     sti		; установка признака разрешения	    +
 			     прерывания
-0243  50			     push    ax
-0244  53			     push    bx
-0245  51			     push    cx
-0246  52			     push    dx
-0247  56			     push    si
-0248  57			     push    di
-0249  1E			     push    ds
-024A  06			     push    es
-024B  FC			     cld		    ; установить признак направления    +
+0245  50			     push    ax
+0246  53			     push    bx
+0247  51			     push    cx
+0248  52			     push    dx
+0249  56			     push    si
+024A  57			     push    di
+024B  1E			     push    ds
+024C  06			     push    es
+024D  FC			     cld		    ; установить признак направления    +
 			     вперед
-024C  B8 0000s			     mov     ax,data	    ; установить адресацию
-024F  8E D8			     mov     ds,ax
-0251  E4 60			     in	     al,kb_dat	    ; считать код сканирования
-0253  50			     push    ax
-0254  E4 61			     in	     al,kb_ctl	    ; считать значение порта 61
-0256  8A E0			     mov     ah,al	    ; сохранить считанное значение
-0258  0C 80			     or	     al,80h	    ; установить бит 7 порта 61
-025A  E6 61			     out     kb_ctl,al	    ; для работы с клавиатурой
-025C  86 E0			     xchg    ah,al	    ; восстановить значение	порта 61
-025E  E6 61			     out     kb_ctl,al
-0260  58			     pop     ax		    ; восстановить код сканирования
-0261  8A E0			     mov     ah,al	    ; и сохранить его в AH
+024E  B8 0000s			     mov     ax,data	    ; установить адресацию
+0251  8E D8			     mov     ds,ax
+0253  E4 60			     in	     al,kb_dat	    ; считать код сканирования
+0255  50			     push    ax
+0256  E4 61			     in	     al,kb_ctl	    ; считать значение порта 61
+0258  8A E0			     mov     ah,al	    ; сохранить считанное значение
+025A  0C 80			     or	     al,80h	    ; установить бит 7 порта 61
+025C  E6 61			     out     kb_ctl,al	    ; для работы с клавиатурой
+025E  86 E0			     xchg    ah,al	    ; восстановить значение	порта 61
+0260  E6 61			     out     kb_ctl,al
+0262  58			     pop     ax		    ; восстановить код сканирования
+0263  8A E0			     mov     ah,al	    ; и сохранить его в AH
 
 			     ;---
 
-0263  3C FF			     cmp     al,0ffh  ;	сравнение с кодом заполнения буфера
+0265  3C FF			     cmp     al,0ffh  ;	сравнение с кодом заполнения буфера
 						      ;	клавиатуры
-0265  75 03			     jnz     k16	     ; продолжить
-0267  E9 FDFA			     jmp     k62     ; переход на звуковой сигнал по		    +
+0267  75 03			     jnz     k16	     ; продолжить
+0269  E9 FDF8			     jmp     k62     ; переход на звуковой сигнал по		    +
 			     заполнению
 						     ; буфера клавиатуры
 
-026A			     k16:
-026A  24 7F			     and     al,07fh	     ; сброс бита отжатия клавиши
-026C  0E			     push    cs
-026D  07			     pop     es
-026E  BF 0122r			     mov     di,offset k6  ; установить адрес таблицы		    +
+026C			     k16:
+026C  24 7F			     and     al,07fh	     ; сброс бита отжатия клавиши
+026E  0E			     push    cs
+026F  07			     pop     es
+0270  BF 0122r			     mov     di,offset k6  ; установить адрес таблицы		    +
 			     сканирования
 							   ; управляющих клавиш
-0271  B9 000C			     mov     cx,k6l
-0274  F2> AE			     repne   scasb   ; сравнение полученного кода		    +
+0273  B9 000C			     mov     cx,k6l
+0276  F2> AE			     repne   scasb   ; сравнение полученного кода		    +
 			     сканирования с содержимым таблицы
-0276  8A C4			     mov     al,ah	     ; запомнить код сканирования
-0278  74 1A			     je	     k17	     ; переход по совпадению
-027A  E9 0105			     jmp     k25	     ; переход по несовпадению
+0278  8A C4			     mov     al,ah	     ; запомнить код сканирования
+027A  74 18			     je	     k17	     ; переход по совпадению
+027C  E9 0103			     jmp     k25	     ; переход по несовпадению
 
-027D			     k406:				     ;rc это	обработчик клавиши Ё
-027D  F6 06 0018r 02		     test    kb_flag_1,lat
-0282  75 7C			     jnz     k26a		     ;rc в ЛАТ-режиме	клавиша не	    +
+027F			     k406:				     ;rc это	обработчик клавиши Ё
+027F  F6 06 0018r 02		     test    kb_flag_1,lat
+0284  75 7A			     jnz     k26a		     ;rc в ЛАТ-режиме	клавиша не	    +
 			     генерирует ничего,	выход
-0284  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift
+0286  E8 FE39			     call    upplow		     ;rc CY=1: верхний регистр
 0289  B8 5CF1			     mov     ax,5cf1h		     ;rc ё
-028C  74 03			     jz	     k407
+028C  73 03			     jnc     k407
 028E  B8 5CF0			     mov     ax,5cf0h		     ;rc Ё
 0291			     k407:				     ;rc передвинул сюда,	двумя	    +
 			     строками выше	(это	ж не	получение маски)
@@ -748,7 +748,7 @@ keybrd.ASM
 			     (выдает 0a00h расшир код)
 038A  3C 5C			     cmp     al,92
 038C  75 03			     jne     k406b
-038E  E9 FEEC			     jmp     k406			     ;rc обработчик клавиши Ё	    +
+038E  E9 FEEE			     jmp     k406			     ;rc обработчик клавиши Ё	    +
 			     (выдает ASCII F0h/F1h в режиме РУС)
 0391			     k406b:					     ;rc далее как в IBM
 0391  F6 06 0018r 08		     test    kb_flag_1,hold_state
@@ -1001,7 +1001,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03-23-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "20:00:51"
+??TIME				  Text	 "20:19:37"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -1093,7 +1093,7 @@ K12				  Byte	 CODE:020D
 K13				  Byte	 CODE:0217
 K14				  Byte	 CODE:0221
 K15				  Byte	 CODE:022E
-K16				  Near16 CODE:026A
+K16				  Near16 CODE:026C
 K17				  Near16 CODE:0294
 K18				  Near16 CODE:0303
 K19				  Near16 CODE:0317
@@ -1131,7 +1131,7 @@ K4				  Near16 CODE:0000
 K40				  Near16 CODE:0468
 K400				  Near16 CODE:02C0
 K401				  Near16 CODE:02C7
-K406				  Near16 CODE:027D
+K406				  Near16 CODE:027F
 K406B				  Near16 CODE:0391
 K407				  Near16 CODE:0291
 K41				  Near16 CODE:0472
@@ -1175,7 +1175,7 @@ KB_CTL				  Number 0061
 KB_DAT				  Number 0060
 KB_FLAG				  Byte	 DATA:0017
 KB_FLAG_1			  Byte	 DATA:0018
-KB_INT				  Far16	 CODE:0242
+KB_INT				  Far16	 CODE:0244
 KEYBOARD_IO			  Far16	 CODE:00DB
 LAST_VAL			  Byte	 DATA:006B
 LAT				  Number 0002
