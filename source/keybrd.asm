@@ -175,7 +175,9 @@ caps:	mov	dl,kb_flag_1				;bit 1 set =lat
 	mov	bx,offset capst				;lat caps-able table
 	jz	decd                                    ;Z=lat
 	mov	bx,offset capstru			;rus caps-able table
-decd:	call	decode					;CY = code in AL is /caps_able
+decd:	push	ax                                      ;save scancode in AL and AH 
+							;(later code destroys AH, DECODE - dec al)
+	call	decode					;CY = code in AL is /caps_able
 	mov	cl,2
 	rcr	bl,cl					;bl = /caps_able in Z position (bit 6)
 	test	kb_flag,left_shift+right_shift		;z flag=0 if SHIFT
@@ -199,6 +201,7 @@ ruslat:	add	bl,dl					;dl=4 if rus table, see above
 setbl:	db	2eh,8bh,9fh 
 	dw	scode_tbl_sel 
 ;setbl:	mov	bx,cs:[offset scode_tbl_sel+bx]
+	pop	ax					;restore scancode in AL and AH
 	jmp	short k56
 
 scode_tbl_sel label word
@@ -213,10 +216,9 @@ scode_tbl_sel label word
 ;BX contains pointer to array
 ;on return, we have boolean value:
 ;is this code CapsLock-influenced (CY=0) or not (CY=1)
-;bx and cx will be destroyed
+;ax and cx will be destroyed
 
 decode:
-	push ax
 	push bx
 	mov ah,0
 	dec ax		;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2 
@@ -234,7 +236,6 @@ decode:
 ;get necessary bit in carry flag
 	and al,ch
 	rcl al,cl
-	pop ax
 	retn
 
 	db 2 dup (90h)
