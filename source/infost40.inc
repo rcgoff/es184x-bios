@@ -1,1 +1,0 @@
-infostr		db '1840v5 21.03.22 RCgoff'

@@ -22,6 +22,7 @@ EXTERN	VECTOR_TABLE:near
 EXTERN	SEEK:near
 EXTERN	F19A:near
 EXTERN	F20A:near
+EXTERN	INFOSTR
 
 PUBLIC	RUST2
 PUBLIC	P_MSG
@@ -43,12 +44,12 @@ INCLUDE DSEG40.INC
 ;  Основной массив в ПЗУ (сегмент code)
 ;____________________
 
-code segment para public
+code segment byte public
 
-		org 0E000h
-.nolist
-INCLUDE INFOST40.INC			; дата последних изменений
-.list
+infolen	equ	16h			; строка с датой последних изменений (хранится в infolen40.asm)
+					; ссылка на нее - infostr
+					; в infolen40.asm прописан начальный адрес BIOS - E000h 
+
 c1		dw offset c11		; адрес	возврата
 caw		dw offset ca3
  	assume cs:code,ss:code,es:abs0,ds:data
@@ -842,7 +843,7 @@ f7a:	movsw
 	loop	f7a
 	jmp short tst14
 	
-	org	0e47dh		;rc для устранения съезжания при переделке загрузчика таблицы векторв прерываний
+	db	(?)		;rc для устранения съезжания при переделке загрузчика таблицы векторв прерываний
 
 ;______________________
 ;   ТЕСТ.14
@@ -1106,10 +1107,8 @@ p_msg	endp
 
 
 e190:
-	mov	si,offset infostr	;адрес поля информации о BIOS
-	infoend	equ	offset c1
-	infobeg	equ	offset infostr
- 	mov	cx, infoend-infobeg	; длина информации
+	mov	si,offset infostr	; адрес поля информации о BIOS
+ 	mov	cx, infolen		; длина информации
  	call	p_msg_noerr 		; вывод на экран
 	push	ds
 	mov	ax, 16
@@ -1182,7 +1181,8 @@ e21a:
 	je	pre12		;rc отсутствие, значит - не ошибка
 	jmp	osh
 
-org	0e684h
+	db	3 dup (?)	;rc для устранения съезжаний адресов последующего кода
+
 prt_hex		proc near
 		mov	ah, 14
 		int	10h
