@@ -1,5 +1,5 @@
-Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
-1840v5-b.asm
+Turbo Assembler	 Version 5.0	    03-23-22 21:11:50	    Page 1
+1840v5-b.ASM
 
 
 
@@ -9,7 +9,6 @@ Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
 			     EXTERN  BOOT_STRAP:near
 			     EXTERN  START:near
 			     EXTERN  RESET:near
-			     EXTERN  K61:near
 			     EXTERN  BEEP:near
 			     EXTERN  PRT_STR:near
 			     EXTERN  E1:near
@@ -20,7 +19,6 @@ Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
 
 			     PUBLIC  RUST
 			     PUBLIC  K30
-			     PUBLIC  K89
 			     PUBLIC  OSH2
 			     PUBLIC  SEEK
 			     PUBLIC  F19A
@@ -1252,7 +1250,7 @@ Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
 0409  0602r			     dw	     offset  set_color
 040B  07E6r			     dw	     offset  write_dot
 040D  07D5r			     dw	     offset  read_dot
-040F  0D14r			     dw	     offset  write_tty2
+040F  0CE1r			     dw	     offset  write_tty2
 0411  0628r			     dw	     offset  video_state
       =0020		     m1l     equ     20h
 
@@ -3230,59 +3228,36 @@ Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
 0CDE  CA 0002				     retf    2
 
 			     ;---
-0CE1  F6 06 0017r 03	     k89:    test    kb_flag,left_shift+right_shift
-0CE6  74 11			     jz	     k80
-0CE8  3C F0			     cmp     al,0f0h
-0CEA  74 23			     je	     k89a
-0CEC  3C B0			     cmp     al,0b0h
-0CEE  72 06			     jb	     k81
-0CF0  3C CF			     cmp     al,0cfh
-0CF2  77 02			     ja	     k81
-0CF4  04 20			     add     al,20h
-0CF6  E9 0000e		     k81:    jmp     k61
-0CF9  3C F1		     k80:    cmp     al,0f1h
-0CFB  74 0D			     je	     k89b
-0CFD  3C D0			     cmp     al,0d0h
-0CFF  72 F5			     jb	     k81
-0D01  3C FE			     cmp     al,0feh
-0D03  77 F1			     ja	     k81
-0D05  2C 20			     sub     al,20h
-0D07  E9 0000e			     jmp     k61
-0D0A  2C 01		     k89b:   sub     al,01h
-0D0C  E9 0000e			     jmp     k61
-0D0F  04 01		     k89a:   add     al,01h
-0D11  E9 0000e			     jmp     k61
+0CE1			     write_tty2:
+0CE1  8A 3E 0062r			     mov     bh, ds:active_page
+0CE5  E9 FDE8				     jmp     write_tty
 
-0D14			     write_tty2:
-0D14  8A 3E 0062r			     mov     bh, ds:active_page
-0D18  E9 FDB5				     jmp     write_tty
+0CE8			     f19a:
+0CE8  42				     inc     dx
+0CE9  B0 08				     mov     al, 8
+0CEB  EE				     out     dx, al
+0CEC  BA 03FE				     mov     dx, 3FEh
+0CEF  EE				     out     dx, al
+0CF0  B0 A4				     mov     al, 0A4h
+0CF2  E6 21				     out     inta01, al
+0CF4  8B C6				     mov     ax, si
+0CF6  B1 03				     mov     cl, 3
+0CF8  E9 0000e				     jmp     f19b
 
-0D1B			     f19a:
-0D1B  42				     inc     dx
-0D1C  B0 08				     mov     al, 8
-0D1E  EE				     out     dx, al
-0D1F  BA 03FE				     mov     dx, 3FEh
-0D22  EE				     out     dx, al
-0D23  B0 A4				     mov     al, 0A4h
-0D25  E6 21				     out     inta01, al
-0D27  8B C6				     mov     ax, si
-0D29  B1 03				     mov     cl, 3
-0D2B  E9 0000e				     jmp     f19b
-
-0D2E			     f20a:
-0D2E  B0 80				     mov     al, 80h
-0D30  E6 A0				     out     0A0h, al
-0D32  B0 BC				     mov     al, 0BCh
-0D34  E6 21				     out     21h, al
-0D36  E9 0000e				     jmp     f20b
+0CFB			     f20a:
+0CFB  B0 80				     mov     al, 80h
+0CFD  E6 A0				     out     0A0h, al
+0CFF  B0 BC				     mov     al, 0BCh
+0D01  E6 21				     out     21h, al
+0D03  E9 0000e				     jmp     f20b
 			     ;
-0D39  50		     dummm_return:   push    ax
-0D3A  B0 20				     mov     al,20h
-0D3C  E6 20				     out     20h,al
-0D3E  58				     pop     ax
-0D3F  CF				     iret
+0D06  50		     dummm_return:   push    ax
+0D07  B0 20				     mov     al,20h
+0D09  E6 20				     out     20h,al
+0D0B  58				     pop     ax
+0D0C  CF				     iret
 
-0D40  DC*(00)				     db	220 dup(0)
+0D0D  010F*(00)				     db	271 dup(0)
 
 			     ;**************************************
 			     ;
@@ -3841,8 +3816,8 @@ Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
 12A1  1253r			     dw	     offset timer_int	     ; прерывание 8
 12A3  0000e			     dw	     offset kb_int	     ; прерывание 9
 12A5  1301r			     dw	     offset dummy_return     ; прерывание А
-12A7  0D39r			     dw	     offset dummm_return     ; прерывание B
-12A9  0D39r			     dw	     offset dummm_return     ; прерывание C
+12A7  0D06r			     dw	     offset dummm_return     ; прерывание B
+12A9  0D06r			     dw	     offset dummm_return     ; прерывание C
 12AB  1301r			     dw	     offset dummy_return     ; прерывание D
 12AD  0305r			     dw	     offset disk_int	     ; прерывание E
 12AF  1301r			     dw	     offset dummy_return     ; прерывание F
@@ -4036,9 +4011,9 @@ Turbo Assembler	 Version 5.0	    01-03-22 14:39:49	    Page 1
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "01-03-22"
+??DATE				  Text	 "03-23-22"
 ??FILENAME			  Text	 "1840v5-b"
-??TIME				  Text	 "14:39:49"
+??TIME				  Text	 "21:11:50"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -4118,7 +4093,7 @@ DMA				  Number 0000
 DMA08				  Number 0008
 DMA_BOUNDARY			  Number 0009
 DMA_SETUP			  Near16 CODE:0277
-DUMMM_RETURN			  Near16 CODE:0D39
+DUMMM_RETURN			  Near16 CODE:0D06
 DUMMY_RETURN			  Near16 CODE:1301
 E1				  Near16 ----:---- Extern
 E1L				  Number 0004
@@ -4130,9 +4105,9 @@ ERR10				  Near16 CODE:1369
 EVN				  Near16 CODE:0C62
 EXIT				  Near16 CODE:1373
 EXT_PTR				  Dword	 ABS0:007C
-F19A				  Near16 CODE:0D1B
+F19A				  Near16 CODE:0CE8
 F19B				  Near16 ----:---- Extern
-F20A				  Near16 CODE:0D2E
+F20A				  Near16 CODE:0CFB
 F20B				  Near16 ----:---- Extern
 FIND_POSITION			  Near16 CODE:0755
 GET_PARM			  Near16 CODE:01FF
@@ -4207,12 +4182,6 @@ J7				  Near16 CODE:00A6
 J8				  Near16 CODE:00B7
 J9				  Near16 CODE:00BE
 K30				  Byte	 CODE:0CB3
-K61				  Near16 ----:---- Extern
-K80				  Near16 CODE:0CF9
-K81				  Near16 CODE:0CF6
-K89				  Near16 CODE:0CE1
-K89A				  Near16 CODE:0D0F
-K89B				  Near16 CODE:0D0A
 KBDINT				  Number 0002
 KBD_IN				  Number 0060
 KB_BUFFER			  Word	 DATA:001E
@@ -4443,7 +4412,7 @@ WRITE_C_CURRENT			  Near16 CODE:07A4
 WRITE_DOT			  Near16 CODE:07E6
 WRITE_PROTECT			  Number 0003
 WRITE_TTY			  Near16 CODE:0AD0
-WRITE_TTY2			  Near16 CODE:0D14
+WRITE_TTY2			  Near16 CODE:0CE1
 X1				  Near16 CODE:0139
 X2				  Near16 CODE:0135
 XXDAT				  Number 0050

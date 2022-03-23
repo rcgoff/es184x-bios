@@ -1,9 +1,7 @@
 	PUBLIC keyboard_io
 	PUBLIC kb_int
-	PUBLIC k61
 	PUBLIC error_beep
 
-	EXTERN k89:near
 	EXTERN rust:near
 	EXTERN rust2:near
 	EXTERN k30:near

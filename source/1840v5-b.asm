@@ -4,7 +4,6 @@ EXTERN	KEYBOARD_IO:near
 EXTERN	BOOT_STRAP:near
 EXTERN	START:near
 EXTERN	RESET:near
-EXTERN	K61:near
 EXTERN	BEEP:near
 EXTERN	PRT_STR:near
 EXTERN	E1:near
@@ -15,7 +14,6 @@ EXTERN	F20B:near
 
 PUBLIC	RUST
 PUBLIC	K30
-PUBLIC	K89
 PUBLIC	OSH2
 PUBLIC	SEEK
 PUBLIC	F19A
@@ -2927,29 +2925,6 @@ int15h:
 		retf	2
 
 ;---
-k89:	test	kb_flag,left_shift+right_shift
- 	jz	k80
- 	cmp	al,0f0h
- 	je	k89a
- 	cmp	al,0b0h
- 	jb	k81
- 	cmp	al,0cfh
- 	ja	k81
- 	add	al,20h
-k81:	jmp	k61
-k80:	cmp	al,0f1h
- 	je	k89b
- 	cmp	al,0d0h
- 	jb	k81
- 	cmp	al,0feh
- 	ja	k81
- 	sub	al,20h
- 	jmp	k61
-k89b:	sub	al,01h
- 	jmp	k61
-k89a:	add	al,01h
- 	jmp	k61
-
 write_tty2:
 		mov	bh, ds:active_page
 		jmp	write_tty
@@ -2979,7 +2954,7 @@ dummm_return:	push	ax
  	 	pop	ax
  	 	iret
 
-		db 220 dup(0)
+		db 271 dup(0)
 		
 ;**************************************
 ;

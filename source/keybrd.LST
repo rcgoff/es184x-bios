@@ -1,14 +1,12 @@
-Turbo Assembler	 Version 5.0	    03-23-22 20:19:37	    Page 1
+Turbo Assembler	 Version 5.0	    03-23-22 21:11:49	    Page 1
 keybrd.ASM
 
 
 
 				     PUBLIC keyboard_io
 				     PUBLIC kb_int
-				     PUBLIC k61
 				     PUBLIC error_beep
 
-				     EXTERN k89:near
 				     EXTERN rust:near
 				     EXTERN rust2:near
 				     EXTERN k30:near
@@ -1001,7 +999,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03-23-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "20:19:37"
+??TIME				  Text	 "21:11:49"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -1165,7 +1163,6 @@ K67				  Near16 CODE:0026
 K6L				  Number 000C
 K7				  Byte	 CODE:012E
 K8				  Byte	 CODE:0136
-K89				  Near16 ----:---- Extern
 K9				  Byte	 CODE:0170
 KBDINT				  Number 0002
 KBD_IN				  Number 0060
