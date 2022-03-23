@@ -178,21 +178,7 @@ caps:	mov	dl,kb_flag_1				;bit 1 set =lat
 decd:	push	ax                                      ;save scancode in AL and AH 
 							;(later code destroys AH, DECODE - dec al)
 	call	decode					;CY = code in AL is /caps_able
-	mov	cl,2
-	rcr	bl,cl					;bl = /caps_able in Z position (bit 6)
-	test	kb_flag,left_shift+right_shift		;z flag=0 if SHIFT
-	lahf
-	mov	bh,ah					;bh = /shift
-	test	kb_flag,caps_state			;z flag=0 if CAPS
-	lahf                                            ;ah = /caps
-
-;formula is: value= SHIFT xor (CAPS & CAPS_ABLE)
-;that is equal to: /SHIFT xor (/CAPS or /CAPS_ABLE)
-
-;now, calculate by formula
-	or	ah,bl
-	xor	ah,bh					;now bit6 (Z-position) of ah contains answer
-	rcl	ah,cl					;now CY contains answer
+	call	upplow					;CY = uppercase
 ;select keyboard table
 	mov	bx,0
 	jnc	ruslat
@@ -238,7 +224,29 @@ decode:
 	rcl al,cl
 	retn
 
-	db 2 dup (90h)
+;------ check if we need to use UPPER or LOWER keys
+;on call, CY= /this-scancode-is-caps-able
+;on return, CY=UPPERCASE
+;in other words, CY=SHIFT xor (CAPS & CAPS_ABLE)
+;AH,BX,CL are destroyed
+
+upplow:	mov	cl,2
+	rcr	bl,cl					;bl = /caps_able in Z position (bit 6)
+	test	kb_flag,left_shift+right_shift		;z flag=0 if SHIFT
+	lahf
+	mov	bh,ah					;bh = /shift
+	test	kb_flag,caps_state			;z flag=0 if CAPS
+	lahf                                            ;ah = /caps
+
+;formula is: value= SHIFT xor (CAPS & CAPS_ABLE)
+;that is equal to: /SHIFT xor (/CAPS or /CAPS_ABLE)
+
+;now, calculate by formula
+	or	ah,bl
+	xor	ah,bh					;now bit6 (Z-position) of ah contains answer
+	rcl	ah,cl					;now CY contains answer
+	retn
+
 ;---
 ;org	00d3h
 ;	db	34 dup (0)
@@ -446,7 +454,7 @@ k15	label byte
 	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
-	db	9 dup (0)
+	db	7 dup (0)
 
 ;----INT 9--------------------------
 ;
