@@ -176,12 +176,11 @@ caps:	mov	dl,kb_flag_1				;bit 1 set =lat
 decd:	push	ax                                      ;save scancode in AL and AH 
 							;(later code destroys AH, DECODE - dec al)
 	call	decode					;CY = code in AL is /caps_able
-	call	upplow					;CY = uppercase
+	call	upplow					;CY = uppercase, CL=2
 ;select keyboard table
 	mov	bx,0
-	jnc	ruslat
-	add	bx,2					;offset in bytes for upper case
-ruslat:	add	bl,dl					;dl=4 if rus table, see above
+	rcl	bx,cl 					;BX=2 if uppercase (offset in bytes for upper case)
+	add	bl,dl					;DL=4 if rus table, see above
 setbl:	db	2eh,8bh,9fh 
 	dw	scode_tbl_sel 
 ;setbl:	mov	bx,cs:[offset scode_tbl_sel+bx]
@@ -224,7 +223,7 @@ decode:
 
 ;------ check if we need to use UPPER or LOWER keys
 ;on call, CY= /this-scancode-is-caps-able
-;on return, CY=UPPERCASE
+;on return, CY=UPPERCASE, CL=2
 ;in other words, CY=SHIFT xor (CAPS & CAPS_ABLE)
 ;AH,BX,CL are destroyed
 
@@ -452,7 +451,7 @@ k15	label byte
 	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
-	db	9 dup (0)
+	db	12 dup (0)
 
 ;----INT 9--------------------------
 ;
