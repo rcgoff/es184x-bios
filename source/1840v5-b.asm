@@ -21,6 +21,8 @@ PUBLIC 	F20A
 PUBLIC	PRINT_SCREEN
 PUBLIC	BCT
 PUBLIC	VECTOR_TABLE
+PUBLIC	LOW866
+PUBLIC	UP866
 
 .XLIST
 INCLUDE POSTEQU0.INC
@@ -2954,7 +2956,8 @@ dummm_return:	push	ax
  	 	pop	ax
  	 	iret
 
-		db 271 dup(0)
+		db 155 dup(0)
+include	866tbl.inc
 		
 ;**************************************
 ;

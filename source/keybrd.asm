@@ -2,10 +2,12 @@
 	PUBLIC kb_int
 	PUBLIC error_beep
 
-	EXTERN rust:near
-	EXTERN rust2:near
+	EXTERN rust:near        ;RUS ISO LCASE
+	EXTERN rust2:near       ;RUS ISO UCASE
 	EXTERN k30:near
 	EXTERN reset:near
+	EXTERN low866:near	;RUS 866 LCASE
+	EXTERN up866:near	;RUS 866 UCASE
 
 .XLIST	
 INCLUDE POSTEQU0.inc
@@ -175,24 +177,6 @@ caps:	mov	dl,kb_flag_1				;bit 1 set =lat
 	mov	bx,offset capstru			;rus caps-able table
 decd:	push	ax                                      ;save scancode in AL and AH 
 							;(later code destroys AH, DECODE - dec al)
-	call	decode					;CY = code in AL is /caps_able
-	call	upplow					;CY = uppercase, CL=2
-;select keyboard table
-	mov	bx,0
-	rcl	bx,cl 					;BX=2 if uppercase (offset in bytes for upper case)
-	add	bl,dl					;DL=4 if rus table, see above
-setbl:	db	2eh,8bh,9fh 
-	dw	scode_tbl_sel 
-;setbl:	mov	bx,cs:[offset scode_tbl_sel+bx]
-	pop	ax					;restore scancode in AL and AH
-	jmp	short k56
-
-scode_tbl_sel label word
-	dw	k10                     ;LAT LCASE
-	dw	k11                     ;LAT UCSASE
-	dw	rust                    ;RUS ISO LCASE
-	dw	rust2                   ;RUS ISO UCASE
-
 ;------ decode necessary byte in array
 ;and position in the byte
 ;on call, AL contains scan-code
@@ -201,7 +185,7 @@ scode_tbl_sel label word
 ;is this code CapsLock-influenced (CY=0) or not (CY=1)
 ;ax and cx will be destroyed
 
-decode:
+decode	proc near
 	push bx
 	mov ah,0
 	dec ax		;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2 
@@ -219,20 +203,47 @@ decode:
 ;get necessary bit in carry flag
 	and al,ch
 	rcl al,cl
-	retn
+decode	endp
+;now CY = code in AL is /caps_able
+
+	call	upplow					;CY = uppercase, CL=2
+;prepare pointer for keyboard table selection
+	mov	bx,0
+	rcl	bx,cl 					;BX=2 if uppercase (offset in bytes for upper case)
+	add	bl,dl					;DL=4 if rus table, see above
+	cmp	byte ptr idnpol+1,02                    ;idnpol=0800:iso, =0802:866
+	jnz	setbl					;skip if not 866
+;offset for 866 tables
+	add	bl,4        				;if BL was 00xx, now 01xx; if BL was 01xx,now 10xx
+	and	bl,00001011b                            ;delete bit 3 (avoid 00xx->01xx transformation)
+;table selection
+setbl:	db	2eh,8bh,9fh
+	dw	scode_tbl_sel 				;this is equal to: "setbl: mov	bx,cs:[offset scode_tbl_sel+bx]"
+	pop	ax					;restore scancode in AL and AH
+	jmp	k56
+
+scode_tbl_sel label word
+	dw	k10                     ;LAT LCASE
+	dw	k11                     ;LAT UCSASE
+	dw	rust                    ;RUS ISO LCASE
+	dw	rust2                   ;RUS ISO UCASE
+	dw	low866			;RUS 866 LCASE
+	dw	up866			;RUS 866 UCASE
+
 
 ;------ check if we need to use UPPER or LOWER keys
 ;on call, CY= /this-scancode-is-caps-able
 ;on return, CY=UPPERCASE, CL=2
 ;in other words, CY=SHIFT xor (CAPS & CAPS_ABLE)
-;AH,BX,CL are destroyed
+;AX,BX,CL are destroyed
 
 upplow:	mov	cl,2
 	rcr	bl,cl					;bl = /caps_able in Z position (bit 6)
-	test	kb_flag,left_shift+right_shift		;z flag=0 if SHIFT
+	mov	al,kb_flag
+	test	al,left_shift+right_shift		;z flag=0 if SHIFT
 	lahf
 	mov	bh,ah					;bh = /shift
-	test	kb_flag,caps_state			;z flag=0 if CAPS
+	test	al,caps_state				;z flag=0 if CAPS
 	lahf                                            ;ah = /caps
 
 ;formula is: value= SHIFT xor (CAPS & CAPS_ABLE)
@@ -451,7 +462,7 @@ k15	label byte
 	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
-	db	12 dup (0)
+	db	1 dup (0)
 
 ;----INT 9--------------------------
 ;
@@ -569,7 +580,7 @@ k301:
 
 	or	kb_flag,ah	; установка масок управляющих клавиш
 	 	 	 	; без запоминания
-	jmp	k26	 	; к выходу из прерывания
+	jmp	k26 		; к выходу из прерывания
 
 k302:	or	kb_flag_1,inv_shift+lat ;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
 	test	kb_flag_1,lat_shift	;rc светодиодный ЛАТ есть?

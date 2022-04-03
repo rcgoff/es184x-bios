@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    03-23-22 21:11:50	    Page 1
+Turbo Assembler	 Version 5.0	    04-03-22 00:37:58	    Page 1
 1840v5-b.ASM
 
 
@@ -26,6 +26,8 @@ Turbo Assembler	 Version 5.0	    03-23-22 21:11:50	    Page 1
 			     PUBLIC  PRINT_SCREEN
 			     PUBLIC  BCT
 			     PUBLIC  VECTOR_TABLE
+			     PUBLIC  LOW866
+			     PUBLIC  UP866
 
 
 0000			     CODE    SEGMENT byte PUBLIC
@@ -3257,7 +3259,48 @@ Turbo Assembler	 Version 5.0	    03-23-22 21:11:50	    Page 1
 0D0B  58				     pop     ax
 0D0C  CF				     iret
 
-0D0D  010F*(00)				     db	271 dup(0)
+0D0D  9B*(00)				     db	155 dup(0)
+			     include 866tbl.inc
+			     ;
+			     ;	 Таблица	кодов русских маленьких букв (строчных)
+			     ;
+0DA8			     low866  label   byte
+0DA8  1B 31 32 33 34 35	36+	     db	     1bh,'1234567890-='
+      37 38 39 30 2D 3D
+0DB5  08 09			     db	     08h,09h
+			     ;866 кодировка, строчные,	сканкоды
+0DB7  A9 E6 E3 AA A5 AD	A3+	     db	     0A9h,0E6h,0E3h,0AAh,0A5h,0ADh,0A3h,0E8h ;'йцукенгш'
+      E8
+0DBF  E9 A7 A6 ED 0D FF	E4+	     db	     0E9h,0A7h,0A6h,0EDh,00Dh,0FFh,0E4h,0EBh ;'щзжэ',0dh,-1,'фы'
+      EB
+0DC7  A2 A0 AF E0 AE AB	A4+	     db	     0A2h,0A0h,0AFh,0E0h,0AEh,0ABh,0A4h,03Bh ;'вапролд',';'
+      3B
+0DCF  3A A1 EE 5C EF E7	E1+	     db	     03Ah,0A1h,0EEh,05Ch,0EFh,0E7h,0E1h,0ACh ;':бю',5ch,'ячсм'
+      AC
+0DD7  A8 E2 EC 2C 2E 2F	E5+	     db	     0A8h,0E2h,0ECh,02Ch,02Eh,02Fh,0E5h,02Ah ;'ить',',./','х*'
+      2A
+0DDF  FF 20 EA			     db	     0FFh,020h,0EAh			     ;-1,' ъ'
+
+			     ;
+			     ;	 Таблица	кодов русских больших букв (заглавных)
+			     ;
+0DE2			     up866   label   byte
+0DE2  1B 21 40 FC 24 25	5E+	     db	     1bh,'!@',0FCH,'$',37,05eh,'&*()_+'	     ;RCgoff поставлен	знак    +
+      26 2A 28 29 5F 2B	     номера
+0DEF  08 00			     db	     08h,0
+			     ;866 кодировка, заглавные, сканкоды
+0DF1  89 96 93 8A 85 8D	83+	     db	     089h,096h,093h,08Ah,085h,08Dh,083h,098h ;'ЙЦУКЕНГШ'
+      98
+0DF9  99 87 86 9D 0D FF	94+	     db	     099h,087h,086h,09Dh,00Dh,0FFh,094h,09Bh ;'ЩЗЖЭ',0dh,-1,'ФЫ'
+      9B
+0E01  82 80 8F 90 8E 8B	84+	     db	     082h,080h,08Fh,090h,08Eh,08Bh,084h,027h ;'ВАПРОЛД',27h
+      27
+0E09  22 81 9E 7C 9F 97	91+	     db	     022h,081h,09Eh,07Ch,09Fh,097h,091h,08Ch ;'"БЮ',7ch,'ЯЧСМ'
+      8C
+0E11  88 92 9C 3C 3E 3F	95+	     db	     088h,092h,09Ch,03Ch,03Eh,03Fh,095h,000h ;'ИТЬ','<>?','Х',0
+      00
+0E19  FF 20 9A			     db	     0FFh,020h,09Ah			     ;-1,' Ъ'
+
 
 			     ;**************************************
 			     ;
@@ -4011,9 +4054,9 @@ Turbo Assembler	 Version 5.0	    03-23-22 21:11:50	    Page 1
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "03-23-22"
+??DATE				  Text	 "04-03-22"
 ??FILENAME			  Text	 "1840v5-b"
-??TIME				  Text	 "21:11:50"
+??TIME				  Text	 "00:37:58"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -4198,6 +4241,7 @@ LAT_KEY				  Number 0057
 LAT_SHIFT			  Number 0001
 LEFT_KEY			  Number 0054
 LEFT_SHIFT			  Number 0002
+LOW866				  Byte	 CODE:0DA8
 M1				  Word	 CODE:03F3
 M10				  Near16 CODE:04F2
 M11				  Near16 CODE:051D
@@ -4393,6 +4437,7 @@ U6				  Near16 CODE:0B2E
 U7				  Near16 CODE:0B30
 U8				  Near16 CODE:0B34
 U9				  Near16 CODE:0B3D
+UP866				  Byte	 CODE:0DE2
 V1				  Byte	 CODE:0B4F
 V2				  Near16 CODE:0B96
 V3				  Near16 CODE:0BBD
