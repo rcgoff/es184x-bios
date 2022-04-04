@@ -256,9 +256,6 @@ upplow:	mov	cl,2
 	retn
 
 ;---
-;org	00d3h
-;	db	34 dup (0)
-;1841 	org	0e82eh
 keyboard_io proc	far
 	sti	 	 	;
 	push	ds

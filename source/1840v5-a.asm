@@ -1,6 +1,6 @@
 ;ES1840 bios v.5
 ;Modified by Leonid Yadrennikov, Tyumen.
-;05.10.2021-17.12.2021.
+;05.10.2021-04.04.2021.
 ;Based on ES1840 bios v.4 source code made by Gleb Larionov, Prague.
 
 ;New features are:
@@ -14,6 +14,8 @@
 ;	--this BIOS can detect bank (0/1) where RAM error occured (like ES-1841)
 ;	--in addition and unlike ES1841, this BIOS also can detect bank where
 ;	  parity chip error ocured.
+;-keyboard driver supports both ISO 8859-5 and CP866 code tables, 
+;	with hot switching between them by Ctrl-Inf.
 
 EXTERN	BCT:near
 EXTERN	OSH2:near

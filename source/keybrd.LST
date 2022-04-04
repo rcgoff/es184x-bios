@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    04-04-22 23:34:00	    Page 1
+Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 keybrd.ASM
 
 
@@ -278,9 +278,6 @@ keybrd.ASM
 00E2  C3			     retn
 
 			     ;---
-			     ;org    00d3h
-			     ;	     db	     34	dup (0)
-			     ;1841   org     0e82eh
 00E3			     keyboard_io proc	     far
 00E3  FB			     sti		     ;
 00E4  1E			     push    ds
@@ -1027,7 +1024,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "04-04-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "23:34:00"
+??TIME				  Text	 "23:39:57"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
