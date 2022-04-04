@@ -215,7 +215,7 @@ decode	endp
 	jnz	setbl					;skip if not 866
 ;offset for 866 tables
 	add	bl,4        				;if BL was 00xx, now 01xx; if BL was 01xx,now 10xx
-	and	bl,00001011b                            ;delete bit 3 (avoid 00xx->01xx transformation)
+	and	bl,00001011b                            ;clear bit 3 (avoid 00xx->01xx transformation)
 ;table selection
 setbl:	db	2eh,8bh,9fh
 	dw	scode_tbl_sel 				;this is equal to: "setbl: mov	bx,cs:[offset scode_tbl_sel+bx]"
@@ -462,7 +462,7 @@ k15	label byte
 	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
-	db	1 dup (0)
+	db	16 dup (0)
 
 ;----INT 9--------------------------
 ;
@@ -528,7 +528,7 @@ k406:           			;rc это обработчик клавиши Ё
 	call	upplow			;rc CY=1: верхний регистр
 	mov	ax,5cf1h		;rc ё
 	jnc	k407
-	mov	ax,5cf0h                ;rc Ё
+	mov	al,0f0h                 ;rc Ё (5ch в AH уже есть)
 k407:					;rc передвинул сюда, двумя строками выше  (это ж не получение маски)
 	jmp	k57
 
@@ -545,21 +545,25 @@ k17:	sub	di,offset k6+1		;rc получить индекс упр клавиши
 	jz	k26a                    ;rc если не отпускание РУС или ЛАТ -> вых (борьба с автоповтором?)
 
 				;rc здесь мы после отпускания РУС или ЛАТ
-	and	kb_flag_1,not lat+lat_shift   ;rc not действует на оба, сбрасываем lat и "светодиодный" lat
+	push	ax
+	mov	al,kb_flag_1
+	and	al,not lat+lat_shift	;rc not действует на оба, сбрасываем lat и "светодиодный" lat
 	cmp	di,0bh
 	je	k401                    ;rc переход, если РУС
 				;rc если ЛАТ:
-	test	kb_flag_1,inv_shift
+	test	al,inv_shift
 	jz	k400                    ;rc переход по ненажатию Р/Л
-	or	kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
-	jmp	short k26a
-k400:	or	kb_flag_1,lat+lat_shift ;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
-	jmp	short k26a
+	or	al,lat_shift     	;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
+	jmp	short k402
+k400:	or	al,lat+lat_shift 	;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
+	jmp	short k402
 
 				;РУС:
-k401:	test	kb_flag_1,inv_shift
-	jz	k26a                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
-	or	kb_flag_1,lat           ;rc нажата Р/Л и отпущена РУС: включить lat ///???
+k401:	test	al,inv_shift
+	jz	k402                    ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
+	or	al,lat           	;rc нажата Р/Л и отпущена РУС: включить lat ///???
+k402:	mov	kb_flag_1,al
+	pop	ax
 	jmp	short k26a
 
 				;rc далее IBM-ский код				
@@ -580,14 +584,20 @@ k301:
 
 	or	kb_flag,ah	; установка масок управляющих клавиш
 	 	 	 	; без запоминания
-	jmp	k26 		; к выходу из прерывания
+	jmp	short k26a	; к выходу из прерывания
 
-k302:	or	kb_flag_1,inv_shift+lat ;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
-	test	kb_flag_1,lat_shift	;rc светодиодный ЛАТ есть?
-	jz	k26a                    ;rc нет -> выходим
-	and	kb_flag_1,not lat       ;rc есть -> сбрасываем латиницу
+k302:
+	push	ax
+	mov	al,kb_flag_1
+	or	al,inv_shift+lat	;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
+	test	al,lat_shift		;rc светодиодный ЛАТ есть?
+	jz	k402			;rc нет -> выходим
+	and	al,not lat		;rc есть -> сбрасываем латиницу
+	jmp	short k402
+;---------------------
 k26a:
 	jmp	k26
+;---------------------
 
 ;   Опрос нажатия клавиши с запоминанием
 
@@ -608,6 +618,7 @@ k19:	test	kb_flag,num_state  ; опрос клавиши ЦИФ
 k20:
 	mov	ax,5230h
 	jmp	k57	      ; установка кода нуля
+
 k21:
 	test	kb_flag,left_shift+right_shift
 	jz	k20

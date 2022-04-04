@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    04-03-22 23:01:31	    Page 1
+Turbo Assembler	 Version 5.0	    04-04-22 22:51:36	    Page 1
 keybrd.ASM
 
 
@@ -234,7 +234,7 @@ keybrd.ASM
 			     ;offset for 866 tables
 00B2  80 C3 04			     add     bl,4				     ;if BL was	00xx, now 01xx;	if BL was   +
 			     01xx,now 10xx
-00B5  80 E3 0B			     and     bl,00001011b			     ;delete bit 3 (avoid 00xx->01xx	    +
+00B5  80 E3 0B			     and     bl,00001011b			     ;clear bit	3 (avoid 00xx->01xx	    +
 			     transformation)
 			     ;table selection
 00B8  2E 8B 9F		     setbl:  db	     2eh,8bh,9fh
@@ -524,7 +524,7 @@ keybrd.ASM
 023D  FF 4F 50 51 52 53		     db	     -1,79,80,81,82,83
 
 			     ;1841   org     0e987h
-0243  01*(00)			     db	     1 dup (0)
+0243  10*(00)			     db	     16	dup (0)
 
 			     ;----INT 9--------------------------
 			     ;
@@ -546,136 +546,146 @@ keybrd.ASM
 			     ;
 			     ;-----------------------------------
 
-0244			     kb_int proc far
-0244  FB			     sti		; установка признака разрешения	    +
+0253			     kb_int proc far
+0253  FB			     sti		; установка признака разрешения	    +
 			     прерывания
-0245  50			     push    ax
-0246  53			     push    bx
-0247  51			     push    cx
-0248  52			     push    dx
-0249  56			     push    si
-024A  57			     push    di
-024B  1E			     push    ds
-024C  06			     push    es
-024D  FC			     cld		    ; установить признак направления    +
+0254  50			     push    ax
+0255  53			     push    bx
+0256  51			     push    cx
+0257  52			     push    dx
+0258  56			     push    si
+0259  57			     push    di
+025A  1E			     push    ds
+025B  06			     push    es
+025C  FC			     cld		    ; установить признак направления    +
 			     вперед
-024E  B8 0000s			     mov     ax,data	    ; установить адресацию
-0251  8E D8			     mov     ds,ax
-0253  E4 60			     in	     al,kb_dat	    ; считать код сканирования
-0255  50			     push    ax
-0256  E4 61			     in	     al,kb_ctl	    ; считать значение порта 61
-0258  8A E0			     mov     ah,al	    ; сохранить считанное значение
-025A  0C 80			     or	     al,80h	    ; установить бит 7 порта 61
-025C  E6 61			     out     kb_ctl,al	    ; для работы с клавиатурой
-025E  86 E0			     xchg    ah,al	    ; восстановить значение	порта 61
-0260  E6 61			     out     kb_ctl,al
-0262  58			     pop     ax		    ; восстановить код сканирования
-0263  8A E0			     mov     ah,al	    ; и сохранить его в AH
+025D  B8 0000s			     mov     ax,data	    ; установить адресацию
+0260  8E D8			     mov     ds,ax
+0262  E4 60			     in	     al,kb_dat	    ; считать код сканирования
+0264  50			     push    ax
+0265  E4 61			     in	     al,kb_ctl	    ; считать значение порта 61
+0267  8A E0			     mov     ah,al	    ; сохранить считанное значение
+0269  0C 80			     or	     al,80h	    ; установить бит 7 порта 61
+026B  E6 61			     out     kb_ctl,al	    ; для работы с клавиатурой
+026D  86 E0			     xchg    ah,al	    ; восстановить значение	порта 61
+026F  E6 61			     out     kb_ctl,al
+0271  58			     pop     ax		    ; восстановить код сканирования
+0272  8A E0			     mov     ah,al	    ; и сохранить его в AH
 
 			     ;---
 
-0265  3C FF			     cmp     al,0ffh  ;	сравнение с кодом заполнения буфера
+0274  3C FF			     cmp     al,0ffh  ;	сравнение с кодом заполнения буфера
 						      ;	клавиатуры
-0267  75 03			     jnz     k16	     ; продолжить
-0269  E9 FDF8			     jmp     k62     ; переход на звуковой сигнал по		    +
+0276  75 03			     jnz     k16	     ; продолжить
+0278  E9 FDE9			     jmp     k62     ; переход на звуковой сигнал по		    +
 			     заполнению
 						     ; буфера клавиатуры
 
-026C			     k16:
-026C  24 7F			     and     al,07fh	     ; сброс бита отжатия клавиши
-026E  0E			     push    cs
-026F  07			     pop     es
-0270  BF 012Ar			     mov     di,offset k6  ; установить адрес таблицы		    +
+027B			     k16:
+027B  24 7F			     and     al,07fh	     ; сброс бита отжатия клавиши
+027D  0E			     push    cs
+027E  07			     pop     es
+027F  BF 012Ar			     mov     di,offset k6  ; установить адрес таблицы		    +
 			     сканирования
 							   ; управляющих клавиш
-0273  B9 000C			     mov     cx,k6l
-0276  F2> AE			     repne   scasb   ; сравнение полученного кода		    +
+0282  B9 000C			     mov     cx,k6l
+0285  F2> AE			     repne   scasb   ; сравнение полученного кода		    +
 			     сканирования с содержимым таблицы
-0278  8A C4			     mov     al,ah	     ; запомнить код сканирования
-027A  74 18			     je	     k17	     ; переход по совпадению
-027C  E9 0103			     jmp     k25	     ; переход по несовпадению
+0287  8A C4			     mov     al,ah	     ; запомнить код сканирования
+0289  74 17			     je	     k17	     ; переход по совпадению
+028B  E9 00F4			     jmp     k25	     ; переход по несовпадению
 
-027F			     k406:				     ;rc это	обработчик клавиши Ё
-027F  F6 06 0018r 02		     test    kb_flag_1,lat
-0284  75 7A			     jnz     k26a		     ;rc в ЛАТ-режиме	клавиша не	    +
+028E			     k406:				     ;rc это	обработчик клавиши Ё
+028E  F6 06 0018r 02		     test    kb_flag_1,lat
+0293  75 6B			     jnz     k26a		     ;rc в ЛАТ-режиме	клавиша не	    +
 			     генерирует ничего,	выход
-0286  E8 FE44			     call    upplow		     ;rc CY=1: верхний регистр
-0289  B8 5CF1			     mov     ax,5cf1h		     ;rc ё
-028C  73 03			     jnc     k407
-028E  B8 5CF0			     mov     ax,5cf0h		     ;rc Ё
-0291			     k407:				     ;rc передвинул сюда,	двумя	    +
+0295  E8 FE35			     call    upplow		     ;rc CY=1: верхний регистр
+0298  B8 5CF1			     mov     ax,5cf1h		     ;rc ё
+029B  73 02			     jnc     k407
+029D  B0 F0			     mov     al,0f0h		     ;rc Ё (5ch в AH уже есть)
+029F			     k407:				     ;rc передвинул сюда,	двумя	    +
 			     строками выше	(это	ж не	получение маски)
-0291  E9 FDAA			     jmp     k57
+029F  E9 FD9C			     jmp     k57
 
 			     ;	 Получение маски нажатой управляющей клавиши
 
 
-0294  81 EF 012Br	     k17:    sub     di,offset k6+1	     ;rc получить индекс упр клавиши+
+02A2  81 EF 012Br	     k17:    sub     di,offset k6+1	     ;rc получить индекс упр клавиши+
 			     в	табл k6, начиная с 0
-0298  83 FF 08			     cmp     di,8
-029B  72 38			     jb	     k300		     ;rc меньше 8	(это	совместимые	    +
+02A6  83 FF 08			     cmp     di,8
+02A9  72 2E			     jb	     k300		     ;rc меньше 8	(это	совместимые	    +
 			     клавиши) обрабатываются как в IBM
-029D  B4 06			     mov     ah,6		     ;rc маска 0b00000110 для руслат	    +
+02AB  B4 06			     mov     ah,6		     ;rc маска 0b00000110 для руслат	    +
 			     (inv_shift	+ lat)
-029F  83 FF 0A			     cmp     di,0ah
-02A2  72 36			     jb	     k301		     ;rc если inv_key (Р/Л)
-02A4  A8 80			     test    al,80h
-02A6  74 58			     jz	     k26a		     ;rc если не отпускание РУС или   +
+02AD  83 FF 0A			     cmp     di,0ah
+02B0  72 2C			     jb	     k301		     ;rc если inv_key (Р/Л)
+02B2  A8 80			     test    al,80h
+02B4  74 4A			     jz	     k26a		     ;rc если не отпускание РУС или   +
 			     ЛАТ -> вых (борьба с автоповтором?)
 
 							     ;rc здесь мы после отпускания РУС	    +
 			     или ЛАТ
-02A8  80 26 0018r FC		     and     kb_flag_1,not lat+lat_shift   ;rc not действует на оба,	    +
+02B6  50			     push    ax
+02B7  A0 0018r			     mov     al,kb_flag_1
+02BA  24 FC			     and     al,not lat+lat_shift    ;rc not действует	на оба,		    +
 			     сбрасываем lat и "светодиодный" lat
-02AD  83 FF 0B			     cmp     di,0bh
-02B0  74 15			     je	     k401		     ;rc переход, если РУС
+02BC  83 FF 0B			     cmp     di,0bh
+02BF  74 0C			     je	     k401		     ;rc переход, если РУС
 							     ;rc если ЛАТ:
-02B2  F6 06 0018r 04		     test    kb_flag_1,inv_shift
-02B7  74 07			     jz	     k400		     ;rc переход	по ненажатию	Р/Л
-02B9  80 0E 0018r 01		     or	     kb_flag_1,lat_shift     ;rc нажата Р/Л->отметить нажатие+
+02C1  A8 04			     test    al,inv_shift
+02C3  74 04			     jz	     k400		     ;rc переход	по ненажатию	Р/Л
+02C5  0C 01			     or	     al,lat_shift	     ;rc нажата Р/Л->отметить нажатие+
 			     ("светодиодный") ЛАТа и всё
-02BE  EB 40			     jmp     short k26a
-02C0  80 0E 0018r 03	     k400:   or	     kb_flag_1,lat+lat_shift ;rc не нажата Р/Л и нажат		    +
+02C7  EB 0A			     jmp     short k402
+02C9  0C 03		     k400:   or	     al,lat+lat_shift	     ;rc не нажата Р/Л и нажат		    +
 			     ЛАТ->включить ЛАТ и	факт нажатия	("светодиодный")
-02C5  EB 39			     jmp     short k26a
+02CB  EB 06			     jmp     short k402
 
 							     ;РУС:
-02C7  F6 06 0018r 04	     k401:   test    kb_flag_1,inv_shift
-02CC  74 32			     jz	     k26a		     ;rc по ненажатию Р/Л выход	    +
+02CD  A8 04		     k401:   test    al,inv_shift
+02CF  74 02			     jz	     k402		     ;rc по ненажатию Р/Л выход	    +
 			     ("светодиодный" выключен заранее)
-02CE  80 0E 0018r 02		     or	     kb_flag_1,lat	     ;rc нажата Р/Л и отпущена	РУС:	    +
+02D1  0C 02			     or	     al,lat		     ;rc нажата Р/Л и отпущена	РУС:	    +
 			     включить lat ///???
-02D3  EB 2B			     jmp     short k26a
+02D3  A2 0018r		     k402:   mov     kb_flag_1,al
+02D6  58			     pop     ax
+02D7  EB 27			     jmp     short k26a
 
 							     ;rc далее IBM-ский код
-02D5  2E: 8A A5	0136r	     k300:   mov     ah,cs:k7[di]	     ;rc аналогично IBM считыаем	    +
+02D9  2E: 8A A5	0136r	     k300:   mov     ah,cs:k7[di]	     ;rc аналогично IBM считыаем	    +
 			     маску	из k7	для совместимых упр клавиш
-02DA			     k301:
-02DA  A8 80			     test    al,80h	     ; клавиша отжата ?
-02DC  75 78			     jnz     k23     ; переход, если	клавиша отжата
+02DE			     k301:
+02DE  A8 80			     test    al,80h	     ; клавиша отжата ?
+02E0  75 74			     jnz     k23     ; переход, если	клавиша отжата
 
 			     ;	 Управляющая	клавиша нажата
 
-02DE  80 FC 10			     cmp     ah,scroll_shift ; нажата управляющая клавиша с
+02E2  80 FC 10			     cmp     ah,scroll_shift ; нажата управляющая клавиша с
 							     ;	запоминанием ?
-02E1  73 20			     jae     k18	     ; переход, если	да
+02E5  73 1C			     jae     k18	     ; переход, если	да
 
 			     ;---
-02E3  80 FC 06			     cmp     ah,6
-02E6  74 07			     je	     k302	     ; rc нажата Р/Л
+02E7  80 FC 06			     cmp     ah,6
+02EA  74 06			     je	     k302	     ; rc нажата Р/Л
 
-02E8  08 26 0017r		     or	     kb_flag,ah	     ; установка масок управляющих	    +
+02EC  08 26 0017r		     or	     kb_flag,ah	     ; установка масок управляющих	    +
 			     клавиш
 							     ; без запоминания
-02EC  E9 00B2			     jmp     k26	     ; к выходу из прерывания
+02F0  EB 0E			     jmp     short k26a	     ; к выходу из прерывания
 
-02EF  80 0E 0018r 06	     k302:   or	     kb_flag_1,inv_shift+lat ;rc обработка нажатия Р/Л:	    +
+02F2			     k302:
+02F2  50			     push    ax
+02F3  A0 0018r			     mov     al,kb_flag_1
+02F6  0C 06			     or	     al,inv_shift+lat	     ;rc обработка нажатия Р/Л:	    +
 			     ставим факт нажатия и латиницу
-02F4  F6 06 0018r 01		     test    kb_flag_1,lat_shift     ;rc светодиодный ЛАТ есть?
-02F9  74 05			     jz	     k26a		     ;rc нет	-> выходим
-02FB  80 26 0018r FD		     and     kb_flag_1,not lat	     ;rc есть -> сбрасываем латиницу
+02F8  A8 01			     test    al,lat_shift	     ;rc светодиодный ЛАТ есть?
+02FA  74 D7			     jz	     k402		     ;rc нет	-> выходим
+02FC  24 FD			     and     al,not lat		     ;rc есть -> сбрасываем латиницу
+02FE  EB D3			     jmp     short k402
+			     ;---------------------
 0300			     k26a:
 0300  E9 009E			     jmp     k26
+			     ;---------------------
 
 			     ;	 Опрос нажатия клавиши с запоминанием
 
@@ -696,6 +706,7 @@ keybrd.ASM
 0325			     k20:
 0325  B8 5230			     mov     ax,5230h
 0328  E9 FD13			     jmp     k57	   ; установка	кода нуля
+
 032B			     k21:
 032B  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift
 0330  74 F3			     jz	     k20
@@ -760,7 +771,7 @@ keybrd.ASM
 			     (выдает 0a00h расшир код)
 038A  3C 5C			     cmp     al,92
 038C  75 03			     jne     k406b
-038E  E9 FEEE			     jmp     k406			     ;rc обработчик клавиши Ё	    +
+038E  E9 FEFD			     jmp     k406			     ;rc обработчик клавиши Ё	    +
 			     (выдает ASCII F0h/F1h в режиме РУС)
 0391			     k406b:					     ;rc далее как в IBM
 0391  F6 06 0018r 08		     test    kb_flag_1,hold_state
@@ -1011,9 +1022,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "04-03-22"
+??DATE				  Text	 "04-04-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "23:01:31"
+??TIME				  Text	 "22:51:36"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
@@ -1105,8 +1116,8 @@ K12				  Byte	 CODE:0215
 K13				  Byte	 CODE:021F
 K14				  Byte	 CODE:0229
 K15				  Byte	 CODE:0236
-K16				  Near16 CODE:026C
-K17				  Near16 CODE:0294
+K16				  Near16 CODE:027B
+K17				  Near16 CODE:02A2
 K18				  Near16 CODE:0303
 K19				  Near16 CODE:0317
 K2				  Near16 CODE:0113
@@ -1123,9 +1134,9 @@ K28				  Near16 CODE:03B5
 K29				  Near16 CODE:03BE
 K3				  Near16 CODE:0124
 K30				  Near16 ----:---- Extern
-K300				  Near16 CODE:02D5
-K301				  Near16 CODE:02DA
-K302				  Near16 CODE:02EF
+K300				  Near16 CODE:02D9
+K301				  Near16 CODE:02DE
+K302				  Near16 CODE:02F2
 K303				  Near16 CODE:034A
 K304				  Near16 CODE:0366
 K306				  Near16 CODE:03C9
@@ -1141,11 +1152,12 @@ K38				  Near16 CODE:042A
 K39				  Near16 CODE:044D
 K4				  Near16 CODE:0000
 K40				  Near16 CODE:0468
-K400				  Near16 CODE:02C0
-K401				  Near16 CODE:02C7
-K406				  Near16 CODE:027F
+K400				  Near16 CODE:02C9
+K401				  Near16 CODE:02CD
+K402				  Near16 CODE:02D3
+K406				  Near16 CODE:028E
 K406B				  Near16 CODE:0391
-K407				  Near16 CODE:0291
+K407				  Near16 CODE:029F
 K41				  Near16 CODE:0472
 K42				  Near16 CODE:047C
 K43				  Near16 CODE:0486
@@ -1186,7 +1198,7 @@ KB_CTL				  Number 0061
 KB_DAT				  Number 0060
 KB_FLAG				  Byte	 DATA:0017
 KB_FLAG_1			  Byte	 DATA:0018
-KB_INT				  Far16	 CODE:0244
+KB_INT				  Far16	 CODE:0253
 KEYBOARD_IO			  Far16	 CODE:00E3
 LAST_VAL			  Byte	 DATA:006B
 LAT				  Number 0002
