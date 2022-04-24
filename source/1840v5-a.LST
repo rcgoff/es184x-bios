@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
+Turbo Assembler	 Version 5.0	    04-24-22 13:25:04	    Page 1
 1840v5-a.ASM
 
 
@@ -6,7 +6,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 			     ;ES1840 bios v.5
 			     ;Modified by Leonid Yadrennikov, Tyumen.
 			     ;05.10.2021-04.04.2021.
-			     ;Based on ES1840 bios v.4 source code made	by Gleb	Larionov, Prague.
+			     ;Based on ES1840 bios v.4 source code made by Gleb Larionov, Prague.
 
 			     ;New features are:
 			     ;-this BIOS can work with both ES1840 and ES1841 memory boards;
@@ -15,12 +15,12 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 			     ;	     ES1841, RAM size if auto-detected;
 			     ;-upper bound for RAM in any case is 704 Kb;
 			     ;-power-on	memory test is twice as	fast then in ES1840 BIOS v.4;
-			     ;-improved	memory diagnostics:
-			     ;	     --this BIOS can detect bank (0/1) where RAM error occured (like ES-1841)
-			     ;	     --in addition and unlike ES1841, this BIOS	also can detect	bank where
-			     ;	       parity chip error ocured.
-			     ;-keyboard	driver supports	both ISO 8859-5	and CP866 code tables,
-			     ;	     with hot switching	between	them by	Ctrl-Inf.
+			     ;-improved memory diagnostics:
+			     ;      --this BIOS can detect bank (0/1) where RAM error occured (like ES-1841)
+			     ;      --in addition and unlike ES1841, this BIOS also can detect bank where
+			     ;        parity chip error ocured.
+			     ;-keyboard driver supports both ISO 8859-5 and CP866 code tables,
+			     ;      with hot switching between them by Ctrl-Inf.
 
 			     EXTERN  BCT:near
 			     EXTERN  OSH2:near
@@ -46,7 +46,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 			     INCLUDE POSTEQU0.INC
 			     ;___________________
-			     ;	БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА (БСУВВ)
+			     ; БАЗОВАЯ СИСТЕМА ВВОДА/ВЫВОДА (БСУВВ)
 			     ;___________________
       =0060		     port_a  equ     60h
       =F000		     cod     equ     0f000h
@@ -77,7 +77,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
       =0004		     e1l     equ     4
 			     INCLUDE DSEG40.INC
 			     ;_______________
-			     ;	Расположение прерываний 8086
+			     ; Расположение прерываний 8086
 			     ;_________________________
 0000			     abs0    segment at	0
 0000			     zb	     label   byte
@@ -126,7 +126,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 7C00			     abs0    ends
 
 			     ;______________________
-			     ;	Использование стека только во	время инициализации
+			     ; Использование стека только во время инициализации
 			     ;______________________
 0000			     stac    segment at	30h
 0000  80*(????)			     dw	     128 dup(?)
@@ -137,7 +137,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0100			     stac    ends
 
 			     ;______________________
-			     ;	Область данных ПЗУ
+			     ; Область данных ПЗУ
 			     ;____________________
 0000			     data segment at 40h
 0000  04*(????)		     rs232_base	dw 4 dup(?)
@@ -153,11 +153,11 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0013  ????		     memory_size dw  ?
 0015  ????		     io_ram_size dw  ?
 			     ;_______________
-			     ;	Область данных клавиатуры
+			     ; Область данных клавиатуры
 			     ;_________________
 0017  ??		     kb_flag db	     ?
 
-			     ;	Размещение флажков в kb_flag
+			     ; Размещение флажков в kb_flag
 
       =0080		     ins_state equ   80h
       =0040		     caps_state	equ  40h
@@ -190,7 +190,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 003E			     kb_buffer_end label word
 
-			     ;	head=tail указывает на заполнение буфера
+			     ; head=tail указывает на заполнение буфера
 
       =0045		     num_key equ     69
       =0046		     scroll_key	equ  70
@@ -208,7 +208,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
       =0057		     lat_key equ     87
 
 			     ;____________________
-			     ;	Область данных НГМД
+			     ; Область данных НГМД
 			     ;____________________
 003E  ??		     seek_status db  ?
 			     ;
@@ -241,7 +241,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 
 			     ;_____________________
-			     ;	Область данных ЭЛИ
+			     ; Область данных ЭЛИ
 			     ;_____________________
 0049  ??		     crt_mode db     ?
 004A  ????		     crt_cols dw     ?
@@ -258,20 +258,20 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0066  ??		     crt_pallette db ?
 
 			     ;___________________
-			     ;	Область данных НМД
+			     ; Область данных НМД
 			     ;___________________
 0067  ????		     io_rom_init dw  ?
 0069  ????		     io_rom_seg	dw   ?
 006B  ??		     last_val db     ?
 
 			     ;___________________
-			     ;	Область данных таймера
+			     ; Область данных таймера
 			     ;___________________
 006C  ????		     timer_low dw    ?
 006E  ????		     timer_high	dw   ?
 0070  ??		     timer_ofl db    ?
 			     ;___________________
-			     ;	Область данных системы
+			     ; Область данных системы
 			     ;___________________
 0071  ??		     bios_break	db   ?
 0072  ????		     reset_flag	dw   ?
@@ -280,8 +280,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0076  ??		     control_byte  db  ?
 0077  ??		     port_off  db  ?
 					     org     7ch
-007C			     stat_offset     label   byte ; смещение для хранения состояний	    +
-			     модема
+007C			     stat_offset     label   byte ; смещение для хранения состояний модема
 
 				     org     80h
 0080  ????		     buffer_start    dw	     ?
@@ -297,14 +296,14 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 3FF0			     data    ends
 
 			     ;___________________
-			     ;	Область расширения данных
+			     ; Область расширения данных
 			     ;_________________________________
 0000			     xxdata segment  at	50h
 0000  ??		     status_byte db  ?
 0001			     xxdata  ends
 
 			     ;_________________
-			     ;	Буфер ЭЛИ
+			     ; Буфер ЭЛИ
 			     ;___________________
 0000			     video_ram segment at 0b800h
 0000			     regen   label   byte
@@ -317,16 +316,14 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 
 			     ;____________________
-			     ;	Основной массив в ПЗУ	(сегмент	code)
+			     ; Основной массив в ПЗУ (сегмент code)
 			     ;____________________
 
 0000			     code segment byte public
 
-      =0016		     infolen equ     16h		     ; строка с датой последних	    +
-			     изменений	(хранится в infolen40.asm)
-								     ; ссылка на нее	- infostr
-								     ; в infolen40.asm	прописан начальный +
-			     адрес	BIOS - E000h
+      =0016		     infolen equ     16h		     ; строка с датой последних изменений (хранится в infolen40.asm)
+								     ; ссылка на нее - infostr
+								     ; в infolen40.asm прописан начальный адрес BIOS - E000h
 
 0000  00D4r		     c1		     dw	offset c11	     ; адрес    возврата
 0002  01E0r		     caw	     dw	offset ca3
@@ -359,7 +356,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 001F  26				     db	     26h	     ;rc ES segment prefix
 0020  AD				     lodsw
 0021  33 C3				     xor     ax, bx
-0023  75 29				     jnz     c4			     ;rc if error, make	it 8bit	compartible
+0023  75 29				     jnz     c4			     ;rc if error, make it 8bit compartible
 0025  E4 62				     in	     al, port_c
 0027  24 40				     and     al, 40h
 0029  B0 00				     mov     al, 0
@@ -385,33 +382,30 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0049  BA 0001				     mov     dx, 1
 004C  EB C6				     jmp     short c2a
 
-004E			     c4:					     ;rc make 16-bit test result 8-bit (old) error  +
-			     processing	compartible
+004E			     c4:					     ;rc make 16-bit test result 8-bit (old) error processing compartible
 004E  3C 00				     cmp al,0
-0050  75 03				     jne c7x		     ;rc L-byte	- proceed as usual, precerving NZ flag
+0050  75 03				     jne c7x		     ;rc L-byte - proceed as usual, precerving NZ flag
 0052  8A C4				     mov al,ah		     ;rc else make compartible with 8bit
-0054  4F				     dec di		     ;rc set DI	to even	address	and NZ flag
+0054  4F				     dec di		     ;rc set DI to even address and NZ flag
 0055			     c7x:
 0055  C3				     retn
 0056			     stgtst_cnt	     endp
 
 
 			     ;____________________
-			     ;	Сброс системы - фаза 1
+			     ; Сброс системы - фаза 1
 			     ;____________________
 			     ;_____________________
-			     ;	Проверка 16К памяти
+			     ; Проверка 16К памяти
 			     ;_____________________
 			     ;___________________
-			     ;	ТЕСТ.01
-			     ;	     Тест процессора 8086. Осуществляет проверку	    +
-			     регистра
-			     ;	     признаков, команд перехода и считывания-записи
-			     ;	     общих	и сегментных	регистров.
+			     ; ТЕСТ.01
+			     ;      Тест процессора 8086. Осуществляет проверку регистра
+			     ;      признаков, команд перехода и считывания-записи
+			     ;      общих и сегментных регистров.
 			     ;_____________________________________
 0056			     reset   label   near
-0056  FA		     start:  cli		     ; сброс признака разрешения		    +
-			     прерывания
+0056  FA		     start:  cli		     ; сброс признака разрешения прерывания
 0057  B4 D5			     mov     ah,0d5h	     ;уст признаки SF,CF,ZF,AF
 0059  9E			     sahf
 005A  73 4E			     jnc     err01	     ;CF=0,в программу ошибок
@@ -424,9 +418,9 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0067  73 41			     jnc     err01	     ;признак AF=0
 0069  B0 40			     mov     al,40h	     ;уст признак переполнения
 006B  D0 E0			     shl     al,1	     ;уст для контроля
-006D  71 3B			     jno     err01	     ;признак OF	не уст
+006D  71 3B			     jno     err01	     ;признак OF не уст
 006F  32 E4			     xor     ah,ah	     ;уст AH=0
-0071  9E			     sahf		     ;уст в	исходное состояние SF,CF,ZF,PF
+0071  9E			     sahf		     ;уст в исходное состояние SF,CF,ZF,PF
 0072  72 36			     jc	     err01	     ;признак CF=1
 0074  74 34			     jz	     err01	     ;признак ZF=1
 0076  78 32			     js	     err01	     ;признак SF=1
@@ -435,11 +429,11 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 007B  B1 05			     mov     cl,5	     ;загрузить счетчик
 007D  D2 EC			     shr     ah,cl	     ;выделить бит переноса
 007F  72 29			     jc	     err01	     ;признак IF=1
-0081  D0 E4			     shl     ah,1	     ;контроль,	что OF сброшен
+0081  D0 E4			     shl     ah,1	     ;контроль, что OF сброшен
 0083  70 25			     jo	     err01
 0085  B8 FFFF			     mov     ax,0ffffh	     ;уст эталона в AX
 0088  F9			     stc
-0089  8E D8		     c8:     mov     ds,ax	     ;запись во	все регистры
+0089  8E D8		     c8:     mov     ds,ax	     ;запись во все регистры
 008B  8C DB			     mov     bx,ds
 008D  8E C3			     mov     es,bx
 008F  8C C1			     mov     cx,es
@@ -450,14 +444,13 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0099  8B F5			     mov     si,bp
 009B  8B FE			     mov     di,si
 009D  73 07			     jnc     c9
-009F  33 C7			     xor     ax,di	     ;проверка всех	регистров
+009F  33 C7			     xor     ax,di	     ;проверка всех регистров
 							     ;эталонами "FFFF", "0000"
 00A1  75 07			     jnz     err01
 00A3  F8			     clc
 00A4  73 E3			     jnc     c8
 00A6			     c9:
-00A6  0B C7			     or	     ax,di	     ;нулевым шаблоном все регистры	    +
-			     проверены	?
+00A6  0B C7			     or	     ax,di	     ;нулевым шаблоном все регистры проверены ?
 00A8  74 02			     jz	     c10	     ;ДА - переход к следующему тесту
 00AA  EB AA		     err01:  jmp   short  start
 			     ;_______________________
@@ -466,13 +459,11 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 00AC			     c10:
 00AC  B0 00			     mov     al,0	     ;запретить прерывaния NMI
 00AE  E6 A0			     out     0a0h,al
-00B0  E6 83			     out     83h,al	     ;инициализация регистрa страниц	    +
-			     ПДП
-00B2  B0 99			     mov     al,99h	     ;уст A,C -ввод, B -	вывод
+00B0  E6 83			     out     83h,al	     ;инициализация регистрa страниц ПДП
+00B2  B0 99			     mov     al,99h	     ;уст A,C -ввод, B - вывод
 00B4  E6 63			    out	     cmd_port,al	     ;запись в регистр режима
 								     ;трехканального порта
-00B6  B0 FC			     mov     al,0fch		     ;блокировка контроля по	    +
-			     четности
+00B6  B0 FC			     mov     al,0fch		     ;блокировка контроля по четности
 00B8  E6 61			     out     port_b,al
 00BA  2A C0			     sub     al,al
 00BC  BA 03D8			     mov     dx,3d8h
@@ -488,35 +479,33 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 00D3  90				     nop
 00D4  75 D4		     c11:    jne     err01
 			     ;------------------------
-			     ;	ТЕСТ.03
-			     ;	 Осуществляет проверку, инициализацию и запуск	    +
-			     ПДП и
-			     ; таймера 1	для регенерации памяти
+			     ; ТЕСТ.03
+			     ;  Осуществляет проверку, инициализацию и запуск ПДП и
+			     ; таймера 1 для регенерации памяти
 			     ;_________________________
-			     ;	 Блокировка контроллера ПДП
+			     ;  Блокировка контроллера ПДП
 
 00D6  B0 04		     ros:    mov     al,04
 00D8  E6 08			     out     dma08,al
 
-			     ;	 Проверка правильности функционирования
-			     ;	 таймера	1
+			     ;  Проверка правильности функционирования
+			     ;  таймера 1
 
-00DA  B0 54			     mov     al,54h	     ;выбор таймера	1,LSB, режим 2
+00DA  B0 54			     mov     al,54h	     ;выбор таймера 1,LSB, режим 2
 00DC  E6 43			     out     timer+3,al
 00DE  2B C9			     sub     cx,cx
 00E0  8A D9			     mov     bl,cl
-00E2  8A C1			     mov     al,cl	     ;уст начального счетчика таймера в+
-			     0
+00E2  8A C1			     mov     al,cl	     ;уст начального счетчика таймера в 0
 00E4  E6 41			     out     timer+1,al
 00E6			     c12:
 00E6  B0 40			     mov     al,40h
 00E8  E6 43			     out     timer+3,al
 00EA  E4 41			     in	     al,timer+1	     ;считывание счетчика таймера 1
 00EC  0A D8			     or	     bl,al	     ;все биты таймера включены ?
-00EE  80 FB FF			     cmp     bl,0ffh	     ;ДА - сравнение	с FF
+00EE  80 FB FF			     cmp     bl,0ffh	     ;ДА - сравнение с FF
 00F1  74 04			     je	     c13	     ;биты таймера сброшены
 00F3  E2 F1			     loop    c12	     ;биты таймера установлены
-00F5  EB B3			     jmp     short err01     ;сбой таймера 1, останов	системы
+00F5  EB B3			     jmp     short err01     ;сбой таймера 1, останов системы
 00F7			     c13:
 00F7  8A C3			     mov     al,bl	     ;уст счетчика таймера 1
 00F9  2B C9			     sub     cx,cx
@@ -530,29 +519,27 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0107  E2 F4			     loop    c14	     ;цикл таймера
 0109  EB 9F			     jmp     short err01
 
-			     ;	 Инициализация таймера 1
+			     ;  Инициализация таймера 1
 
 010B			     c15:
 010B  B0 54			     mov     al,54h
 010D  E6 43			     out     timer+3,al	     ;запись в регистр режима таймера
-010F  B0 07			     mov     al,7    ;уст коэффициента деления для		    +
-			     регенерации
+010F  B0 07			     mov     al,7    ;уст коэффициента деления для регенерации
 0111  E6 41			     out     timer+1,al	     ;запись в счетчик таймера 1
 0113  E6 0D			     out     dma+0dh,al	     ;послать гашение ПДП
 
-			     ;	 Цикл проверки регистров ПДП
+			     ;  Цикл проверки регистров ПДП
 
 0115  B0 FF			     mov     al,0ffh	     ;запись шаблона FF во все регистры
 0117  8A D8		     c16:    mov     bl,al	     ;сохранить шаблон для сравнения
 0119  8A F8			     mov     bh,al
-011B  B9 0008			     mov     cx,8	     ;уст цикла	счетчика
-011E  BA 0000			     mov     dx,dma	     ;уст адреса регистра порта		    +
-			     ввода/вывода
+011B  B9 0008			     mov     cx,8	     ;уст цикла счетчика
+011E  BA 0000			     mov     dx,dma	     ;уст адреса регистра порта ввода/вывода
 0121  EE		     c17:    out     dx,al	     ;запись  шаблона в регистр
-0122  EE			     out     dx,al	     ;старшие 16	бит регистра
+0122  EE			     out     dx,al	     ;старшие 16 бит регистра
 0123  B8 0101			     mov     ax,0101h	     ;изменение AX перед считыванием
 0126  EC			     in	     al,dx
-0127  8A E0			     mov     ah,al	     ;сохранить младшие	16 бит регистра
+0127  8A E0			     mov     ah,al	     ;сохранить младшие 16 бит регистра
 0129  EC			     in	     al,dx
 012A  3B D8			     cmp     bx,ax	     ;считан тот же шаблон ?
 012C  74 03			     je	     c18	     ;ДА - проверка следующего регистра
@@ -560,28 +547,25 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0131			     c18:			     ;выбор следующего регистра ПДП
 0131  42			     inc     dx		     ;установка адреса следующего
 							     ;регистра ПДП
-0132  E2 ED			     loop    c17	     ;запись шаблона для следующего	    +
-			     регистра
+0132  E2 ED			     loop    c17	     ;запись шаблона для следующего регистра
 0134  F6 D0			     not     al		       ;уст шаблона в 0
 0136  74 DF			     jz	     c16
 
-			     ;	 Инициализация и запуск ПДП
+			     ;  Инициализация и запуск ПДП
 
 0138  B0 FF			     mov     al,0ffh	     ;уст счетчика 64K для регенерации
 013A  E6 01			     out     dma+1,al
 013C  E6 01			     out     dma+1,al
-013E  B0 58			     mov     al,058h	     ;уст режим	ПДП,	счетчик 0,		    +
-			     считывание
+013E  B0 58			     mov     al,058h	     ;уст режим ПДП, счетчик 0, считывание
 0140  E6 0B			     out     dma+0bh,al	     ;запись в регистр режима ПДП
 0142  B0 00			     mov     al,0	     ;доступность контроллера ПДП
 0144  E6 08			     out     dma+8,al	     ;уст регистр команд ПДП
-0146  E6 0A			     out     dma+10,al	     ;доступность канала 0 для		    +
-			     регенерации
-0148  B0 41			     mov     al,41h	     ;уст режим	дла канала 1
+0146  E6 0A			     out     dma+10,al	     ;доступность канала 0 для регенерации
+0148  B0 41			     mov     al,41h	     ;уст режим дла канала 1
 014A  E6 0B			     out     dma+0bh,al
-014C  B0 42			     mov     al,42h	     ;уст режим	для канала 2
+014C  B0 42			     mov     al,42h	     ;уст режим для канала 2
 014E  E6 0B			     out     dma+0bh,al
-0150  B0 43			     mov     al,43h	     ;уст режим	для канала 3
+0150  B0 43			     mov     al,43h	     ;уст режим для канала 3
 0152  E6 0B			     out     dma+0bh,al
 			     ;======================================RCgoff begin
 			     ;-----------------turn ES1841 memory on, if present
@@ -601,25 +585,22 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 016F  FE C0				     inc     al
 0171  02 C0				     add     al, al
 0173  BA 0000				     mov     dx, 0
-0176  8B E8				     mov     bp,ax			     ;BP will be segment count (and will be +
-			     0,	i.e. no	error, after finish)
+0176  8B E8				     mov     bp,ax			     ;BP will be segment count (and will be 0, i.e. no error, after finish)
 0178  33 C0				     xor     ax, ax			     ;write 0 to mem
 017A  FC				     cld
 
-017B  2B FF				     sub     di, di			     ;not in loop because after	writing	    +
-			     32768 words already will be DI=0
+017B  2B FF				     sub     di, di			     ;not in loop because after writing 32768 words already will be DI=0
 017D			     c19:
 017D  B9 8000				     mov     cx, 32768
-0180  F3> AB				     rep stosw				     ;clear full segment (32768	words=6536  +
-			     bytes)
+0180  F3> AB				     rep stosw				     ;clear full segment (32768 words=6536 bytes)
 0182  81 C2 1000			     add     dx, 4096			     ;next segment
 0186  8E C2				     mov     es, dx
 0188  4D				     dec     bp
 0189  74 02				     jz	     c21
 018B  EB F0				     jmp     short c19
 			     ;____________________
-			     ;	 Инициализация контроллера
-			     ;	 прерываний 8259
+			     ;  Инициализация контроллера
+			     ;  прерываний 8259
 			     ;____________________
 018D			     c21:
 018D  B0 13			     mov     al,13h	     ;ICW1 - EDGE, SNGL, ICW4
@@ -630,8 +611,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0197  E6 21			     out     inta01,al
 0199  2B C0				     sub     ax, ax
 019B  8E C0				     mov     es, ax
-												     ;DS still points to    +
-			     BIOS data area
+												     ;DS still points to BIOS data area
 019D  89 1E 0072r			     mov     ds:reset_flag, bx
 01A1  89 36 0013r			     mov     ds:memory_size, si
 01A5  81 3E 0072r 1234			     cmp     ds:reset_flag, 1234h
@@ -646,8 +626,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 01BE  43				     inc     bx
 01BF  8C 0F				     mov     [bx], cs
 01C1  E8 03F1				     call    kbd_reset
-01C4  80 FB 65				     cmp     bl, 65h	     ; Manufacturing test mode - viz document in BIOS root  +
-			     or	http://www.vcfed.org/forum/archive/index.php/t-12377.html
+01C4  80 FB 65				     cmp     bl, 65h	     ; Manufacturing test mode - viz document in BIOS root or http://www.vcfed.org/forum/archive/index.php/t-12377.html
 01C7  75 0E				     jnz     c23
 01C9  B2 FF				     mov     dl, 0FFh
 
@@ -664,32 +643,32 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 01D8  17				     pop     ss
 					     assume ss:code
 01D9  FA				     cli
-01DA  BC 0002r				     mov     sp, offset	caw  ; [caw] = offset ca3 (next	jmp -> indirect	call)
+01DA  BC 0002r				     mov     sp, offset	caw  ; [caw] = offset ca3 (next jmp -> indirect call)
 01DD  E9 FE24				     jmp     stgtst
 
 01E0			     ca3:
 01E0  74 03				     jz	     c25
 01E2  E9 FEC5				     jmp     err01
 
-			     ;	 Установка сегмента стека	и SP
+			     ;  Установка сегмента стека и SP
 
 01E5			     c25:
-01E5  B8 0030			     mov     ax,sta	     ;получить величину	стека
+01E5  B8 0030			     mov     ax,sta	     ;получить величину стека
 01E8  8E D0			     mov     ss,ax	     ;уст стек
 01EA  BC 0100r			     mov     sp,offset tos   ;стек готов
-01ED  EB 1C			     jmp     short tst6	     ;переход к	следующему тесту
+01ED  EB 1C			     jmp     short tst6	     ;переход к следующему тесту
 
-			     ;ros_checksum proc	 near
+			     ;ros_checksum proc  near
 			     ;	     mov     cx,8192	     ;число байт для сложения
-			     ;	     xor     al,al
+			     ;      xor     al,al
 			     ;c26:   add     al,cs:[bx]
 			     ;	     inc     bx		     ;указание следующего байта
 			     ;	     loop    c26	     ;сложить все байты в модуле ROS
 			     ;	     or	     al,al	     ;сумма = 0 ?
-			     ;	     ret
+			     ;      ret
 			     ;ros_checksum endp
 			     ;______________________
-			     ;	 Начальный тест надежности
+			     ;  Начальный тест надежности
 			     ;______________________
 				     assume  cs:code,es:abs0
 
@@ -704,15 +683,14 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
       =000E		     d2l     equ     14
 			     ;______________________
-			     ;	 ТЕСТ.06
-			     ;	      Тест контроллера прерываний
-			     ;	      8259
+			     ;  ТЕСТ.06
+			     ;       Тест контроллера прерываний
+			     ;       8259
 			     ;_______________________
 020B			     tst6:
-			     ;	 Проверка регистра масок прерываний (IMR)
+			     ;  Проверка регистра масок прерываний (IMR)
 
-020B  FA			     cli		     ;сброс признака разрешения		    +
-			     прерываний
+020B  FA			     cli		     ;сброс признака разрешения прерываний
 020C  B0 00			     mov     al,0	     ;уст IMR в 0
 020E  E6 21			     out     inta01,al
 0210  E4 21			     in	     al,inta01	     ;считывание IMR
@@ -728,82 +706,70 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0222  8E C0			     mov     es,ax
 
 
-			     ;	 Контроль ожидания прерывания
+			     ;  Контроль ожидания прерывания
 
 0224  FC			     cld		     ; уст признак направления
-0225  B9 0020			     mov     cx,20h	     ;rc все	прерывания 00..1F, относящиеся +
-			     к	BIOS
+0225  B9 0020			     mov     cx,20h	     ;rc все прерывания 00..1F, относящиеся к BIOS
 0228  33 FF			     xor     di,di
 022A			     d3:
-022A  B8 0288r			     mov     ax,offset d11   ; установить адрес процедуры	    +
-			     прерываний
+022A  B8 0288r			     mov     ax,offset d11   ; установить адрес процедуры прерываний
 022D  AB			     stosw
-022E  B8 F000			     mov     ax,cod  ; получить	адрес сегмента процедуры
+022E  B8 F000			     mov     ax,cod  ; получить адрес сегмента процедуры
 0231  AB			     stosw
 0232  E2 F6			     loop    d3
 
-			     ;	 Установка указателя вектора прерывания NMI
+			     ;  Установка указателя вектора прерывания NMI
 0234  26: C7 06	0008r	  +	     mov     es:nmi_ptr,offset nmi_int
       0295r
 			     ;-----уст вектора прерываний 5
 023B  26: C7 06	0014r	  +	     mov     es:int5_ptr,offset	print_screen   ; печать экрана
       0000e
 
-			     ;	 Прерывания замаскированы
+			     ;  Прерывания замаскированы
 
 0242  32 E4			     xor     ah,ah	     ;очистить регистр AH
-0244  FB			     sti		     ; установка признака разрешения	    +
-			     прерывания
-0245  2B C9			     sub     cx,cx	     ; ожидание	1 сек любого прерывания,
+0244  FB			     sti		     ; установка признака разрешения прерывания
+0245  2B C9			     sub     cx,cx	     ; ожидание 1 сек любого прерывания,
 0247  E2 FE		     d4:     loop    d4		     ; которое может произойти
 0249  E2 FE		     d5:     loop    d5
 024B  0A E4			     or	     ah,ah	     ; прерывание возникло ?
-024D  74 08			     jz	     d7		     ; нет -	к следующему	тесту
-024F  BA 0101		     d6:     mov     dx,101h	     ; уст длительности звукового	    +
-			     сигнала
-0252  E8 0315			     call    err_beep	     ; идти	в программу звукового	    +
-			     сигнала
+024D  74 08			     jz	     d7		     ; нет - к следующему тесту
+024F  BA 0101		     d6:     mov     dx,101h	     ; уст длительности звукового сигнала
+0252  E8 0315			     call    err_beep	     ; идти в программу звукового сигнала
 0255  FA			     cli
 0256  F4			     hlt		     ; останов системы
 			     ;__________________
-			     ;	 ТЕСТ.07
-			     ;	      Проверка таймера 8253
+			     ;  ТЕСТ.07
+			     ;       Проверка таймера 8253
 			     ;___________________
 0257			     d7:
-0257  B4 00			     mov     ah,0	     ; сброс признака прерывания		    +
-			     таймера
-0259  32 ED			     xor     ch,ch	     ; очистить	регистр CH
-025B  B0 FE			     mov     al,0feh   ; маскировать	все прерывания, кроме	LVL 0
+0257  B4 00			     mov     ah,0	     ; сброс признака прерывания таймера
+0259  32 ED			     xor     ch,ch	     ; очистить регистр CH
+025B  B0 FE			     mov     al,0feh   ; маскировать все прерывания, кроме LVL 0
 025D  E6 21			     out     inta01,al	     ; запись IMR
-025F  B0 10			     mov     al,00010000b    ; выбрать TIM 0, LSD, режим 0,	BINARY
-0261  E6 43			     out     tim_ctl,al	 ;записать регистр режима управления +
-			     таймера
+025F  B0 10			     mov     al,00010000b    ; выбрать TIM 0, LSD, режим 0, BINARY
+0261  E6 43			     out     tim_ctl,al	 ;записать регистр режима управления таймера
 0263  B1 16			     mov     cl,16h	     ; уст счетчик программного цикла
 0265  8A C1			     mov     al,cl	     ; установить счетчик таймера 0
-0267  E6 40			     out     timero,al	     ; записать	счетчик таймера 0
-0269  F6 C4 FF		     d8:     test    ah,0ffh	     ; прерывание таймера 0 произошло	?
-026C  75 04			     jnz     d9		     ; да - таймер считал	медленно
-026E  E2 F9			     loop    d8		     ; ожидание	прерывания			    +
-			     определенное время
-0270  EB DD			     jmp     short d6	;прерывание таймера 0 не произошло -    +
-			     ошибка
+0267  E6 40			     out     timero,al	     ; записать счетчик таймера 0
+0269  F6 C4 FF		     d8:     test    ah,0ffh	     ; прерывание таймера 0 произошло ?
+026C  75 04			     jnz     d9		     ; да - таймер считал медленно
+026E  E2 F9			     loop    d8		     ; ожидание прерывания определенное время
+0270  EB DD			     jmp     short d6	;прерывание таймера 0 не произошло - ошибка
 0272  B1 12		     d9:     mov     cl,18	     ; уст счетчик программного цикла
-0274  B0 FF			     mov     al,0ffh	     ; записать	счетчик таймера 0
+0274  B0 FF			     mov     al,0ffh	     ; записать счетчик таймера 0
 0276  E6 40			     out     timero,al
-0278  B4 00			     mov     ah,0	     ; сброс признака,полученного	    +
-			     прерывания
-027A  B0 FE			     mov     al,0feh	     ; недоступность прерываний		    +
-			     таймера 0
+0278  B4 00			     mov     ah,0	     ; сброс признака,полученного прерывания
+027A  B0 FE			     mov     al,0feh	     ; недоступность прерываний таймера 0
 027C  E6 21			     out     inta01,al
-027E  F6 C4 FF		     d10:    test    ah,0ffh	     ; прерывание таймера 0 произошло	?
+027E  F6 C4 FF		     d10:    test    ah,0ffh	     ; прерывание таймера 0 произошло ?
 0281  75 CC			     jnz     d6		     ; да - таймер считает быстро
-0283  E2 F9			     loop    d10	     ; ожидание	прерывания			    +
-			     определенное время
+0283  E2 F9			     loop    d10	     ; ожидание прерывания определенное время
 0285  EB 37			     jmp     short tst8		     ; переход к следующему тесту
 0287  90			     nop
 			     ;____________________
-			     ;	 Программа обслуживания
-			     ;	 временного прерывания
+			     ;  Программа обслуживания
+			     ;  временного прерывания
 			     ;____________________
 0288			     d11     proc    near
 0288  B4 01			     mov     ah,1
@@ -812,7 +778,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 028D  E6 21			     out     inta01,al
 028F  B0 20			     mov     al,eoi
 0291  E6 20			     out     inta00,al
-0293  58			     pop     ax		     ; восстановить	регистр AX
+0293  58			     pop     ax		     ; восстановить регистр AX
 0294  CF			     iret
 0295			     d11     endp
 
@@ -830,18 +796,17 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 02A8  BE 01FDr			     mov     si,offset d2    ; адрес поля сообщения об ошибке
 02AB  B9 000E			     mov     cx,d2l	     ; длина поля сообщения об ошибке
 02AE			     d13:
-02AE  B8 0000			     mov     ax,0	     ; инициировать	и установить	режим  +
-			     ЭЛИ
+02AE  B8 0000			     mov     ax,0	     ; инициировать и установить режим ЭЛИ
 02B1  CD 10			     int     10h	     ; вызвать процедуру VIDEO_IO
 02B3  E8 0329			     call    p_msg	     ; распечатать ошибку
 02B6  FA			     cli
 02B7  F4			     hlt		     ; останов системы
 02B8			     d14:
-02B8  58			     pop     ax		     ; восстановить	AX
+02B8  58			     pop     ax		     ; восстановить AX
 02B9  CF			     iret
 02BA			     nmi_int endp
 			     ;____________________
-			     ;	 Начальный тест надежности
+			     ;  Начальный тест надежности
 			     ;____________________
 				     assume  cs:code,ds:data
 
@@ -849,35 +814,32 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 02BA  20 32 30 31	     e1	     db	     ' 201'
       =0004		     e1l     equ     04h
 
-			     ;	 Выполнение программы БСУВВ,
-			     ;	 генерирующей вектора прерываний
+			     ;  Выполнение программы БСУВВ,
+			     ;  генерирующей вектора прерываний
 
 02BE			     tst8:
-02BE  FC			     cld		     ; установить признак направления   +
-			     вперед
-02BF  BF 0040r			     mov     di,offset video_int   ; уст адреса области	прерываний
+02BE  FC			     cld		     ; установить признак направления вперед
+02BF  BF 0040r			     mov     di,offset video_int   ; уст адреса области прерываний
 02C2  0E			     push    cs
 02C3  1F			     pop     ds		     ; уст адреса таблицы векторов
-02C4  BE 0010e			     mov     si,offset vector_table+10h	 ; смещение VECTOR_TABLE+(2*8) (начало+
-			     прогр	прерыв)
+02C4  BE 0010e			     mov     si,offset vector_table+10h	 ; смещение VECTOR_TABLE+(2*8) (начало прогр прерыв)
 02C7  B9 0010			     mov     cx,10h
-02CA  A5		     e1a:    movsw	     ; передать	таблицу векторов	в память
+02CA  A5		     e1a:    movsw	     ; передать таблицу векторов в память
 02CB  47			     inc     di
 02CC  47			     inc     di
 02CD  E2 FB			     loop    e1a
 
-			     ;	 Установка таймера 0 в	режим 3
+			     ;  Установка таймера 0 в режим 3
 
 02CF  B0 FF			     mov     al,0ffh
 02D1  E6 21			     out     inta01,al
 02D3  B0 36			     mov     al,36h	     ; выбор счетчика 0,считывания-за-
-			     ; писи	младшего,затем старшего байта	счетчика,уст	    +
-			     режима 3
+			     ; писи младшего,затем старшего байта счетчика,уст режима 3
 02D5  E6 43			     out     timer+3,al	     ; запись режима таймера
 02D7  B0 C7			     mov     al,0c7h
-02D9  E6 40			     out     timer,al	     ; записать	младшую часть счетчика
+02D9  E6 40			     out     timer,al	     ; записать младшую часть счетчика
 02DB  B0 DB			     mov     al,0dbh
-02DD  E6 40			     out     timer,al	     ; записать	старшую часть счетчика
+02DD  E6 40			     out     timer,al	     ; записать старшую часть счетчика
 
 
 				     assume  ds:data
@@ -888,32 +850,27 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 02EA  74 03			     jz	     e3a
 02EC  E8 0000e			     call    bct     ;загрузка знакогенератора Ч/Б ЭЛИ
 			     ;_____________________
-			     ;	 ТЕСТ.08
-			     ;	      Инициализация и запуск
-			     ;	      контроллера ЭЛИ
+			     ;  ТЕСТ.08
+			     ;       Инициализация и запуск
+			     ;       контроллера ЭЛИ
 			     ;______________________
-02EF  E4 60		     e3a:    in	     al,port_a	     ; считывание состояния			    +
-			     переключателей
+02EF  E4 60		     e3a:    in	     al,port_a	     ; считывание состояния переключателей
 02F1  B4 00			     mov     ah,0
-02F3  A3 0010r			     mov     equip_flag,ax   ; запомнить считанное состояние	    +
-			     пере-
+02F3  A3 0010r			     mov     equip_flag,ax   ; запомнить считанное состояние пере-
 							     ; ключателей
-02F6  24 30			     and     al,30h	     ; выделить	переключатели ЭЛИ
-02F8  75 03			     jnz     e7		     ; переключатели ЭЛИ установлены	в 0+
-			     ?
+02F6  24 30			     and     al,30h	     ; выделить переключатели ЭЛИ
+02F8  75 03			     jnz     e7		     ; переключатели ЭЛИ установлены в 0 ?
 02FA  E9 0098			     jmp     e19	     ; пропустить тест ЭЛИ
 02FD			     e7:
 02FD  86 E0			     xchg    ah,al
 02FF  80 FC 30			     cmp     ah,30h	     ; адаптер ч/б ?
-0302  74 09			     je	     e8		     ; да - установить режим для ч/б	    +
-			     адаптера
-0304  FE C0			     inc     al	      ;	уст цветной режим для	цветного	    +
-			     адаптера
+0302  74 09			     je	     e8		     ; да - установить режим для ч/б адаптера
+0304  FE C0			     inc     al	      ; уст цветной режим для цветного адаптера
 0306  80 FC 20			     cmp     ah,20h	     ; режим 80х25 установлен ?
-0309  75 02			     jne     e8		     ; нет -	уст режим для 40х25
+0309  75 02			     jne     e8		     ; нет - уст режим для 40х25
 030B  B0 03			     mov     al,3	     ; установить режим 80х25
 030D			     e8:
-030D  50			     push    ax		     ; хранить режим ЭЛИ	в стеке
+030D  50			     push    ax		     ; хранить режим ЭЛИ в стеке
 030E  2A E4			     sub     ah,ah	     ;
 0310  CD 10			     int     10h
 0312  58			     pop     ax
@@ -921,21 +878,18 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0314  BB B000			     mov     bx,0b000h
 0317  BA 03B8			     mov     dx,3b8h	     ; регистр режима для ч/б
 031A  B9 0800			     mov     cx,4096/2	     ; счетчик байт для ч/б адаптера
-031D  B0 01			     mov     al,1	     ; уст режим для	ч/б адаптера
+031D  B0 01			     mov     al,1	     ; уст режим для ч/б адаптера
 031F  80 FC 30			     cmp     ah,30h	     ; ч/б адаптер ЭЛИ подключен ?
 0322  74 0B			     je	     e9		     ; переход к проверке буфера ЭЛИ
 0324  BB B800			     mov     bx,0b800h
-0327  BA 03D8			     mov     dx,3d8h	     ; регистр режима для цветного	    +
-			     адаптера
+0327  BA 03D8			     mov     dx,3d8h	     ; регистр режима для цветного адаптера
 032A  B9 2000			     mov     cx,4000h/2
-032D  FE C8			     dec     al		     ; уст режим в 0 для цветного		    +
-			     адаптера
+032D  FE C8			     dec     al		     ; уст режим в 0 для цветного адаптера
 			     ;
-			     ;	     Проверка буфера ЭЛИ
+			     ;      Проверка буфера ЭЛИ
 			     ;
 032F			     e9:
-032F  EE			     out     dx,al	     ; блокировка ЭЛИ для цветного	    +
-			     адаптера
+032F  EE			     out     dx,al	     ; блокировка ЭЛИ для цветного адаптера
 0330  8E C3			     mov     es,bx
 0332  B8 0040			     mov     ax,dat	     ; DS - сегмент данных
 0335  8E D8			     mov     ds,ax
@@ -949,79 +903,71 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 			     ;___________________________
 			     ;
-			     ;	 ТЕСТ.09
-			     ;	      Осуществляет проверку	формирования строк в	    +
-			     буфере ЭЛИ
+			     ;  ТЕСТ.09
+			     ;       Осуществляет проверку формирования строк в буфере ЭЛИ
 			     ;_________________________
 034C			     e10:
-034C  58			     pop     ax	  ; получить считанные	переключатели ЭЛИ в+
-			     AH
+034C  58			     pop     ax	  ; получить считанные переключатели ЭЛИ в AH
 034D  50			     push    ax		     ; сохранить их
 034E  B4 00			     mov     ah,0
 0350  CD 10			     int     10h
-0352  B8 7020			     mov     ax,7020h	     ; запись пробелов в	режиме реверса
+0352  B8 7020			     mov     ax,7020h	     ; запись пробелов в режиме реверса
 0355  2B FF			     sub     di,di	     ; установка начала области
 0357  B9 0028			     mov     cx,40	     ;
-035A  FC			     cld	 ; установить	признак направления для	    +
-			     уменьшения
-035B  F3> AB			     rep     stosw	     ; записать	в память
+035A  FC			     cld	 ; установить признак направления для уменьшения
+035B  F3> AB			     rep     stosw	     ; записать в память
 			     ;______________________
-			     ;	  ТЕСТ.10
-			     ;	       Осуществляет	проверку линий интерфейса ЭЛИ
+			     ;   ТЕСТ.10
+			     ;        Осуществляет проверку линий интерфейса ЭЛИ
 			     ;______________________
-035D  58			     pop     ax		     ; получить	считанные переключатели
+035D  58			     pop     ax		     ; получить считанные переключатели
 035E  50			     push    ax		     ; сохранить их
 035F  80 FC 30			     cmp     ah,30h	     ; ч/б адаптер подключен ?
-0362  BA 03BA			     mov     dx,03bah	     ; уст адрес порта состояния ч/б	    +
-			     дисплея
-0365  74 03			     je	     e11	     ; да - переход к	следующей строке
+0362  BA 03BA			     mov     dx,03bah	     ; уст адрес порта состояния ч/б дисплея
+0365  74 03			     je	     e11	     ; да - переход к следующей строке
 0367  BA 03DA			     mov     dx,03dah	     ; цветной адаптер подключен
 			     ;
-			     ;	     Тест строчной развертки
+			     ;      Тест строчной развертки
 			     ;
 036A			     e11:
 036A  B4 08			     mov     ah,8
 036C			     e12:
 036C  2B C9			     sub     cx,cx
-036E  EC		     e13:    in	     al,dx	 ;считывание порта состояния		    +
-			     контроллера СМ607
-036F  22 C4			     and     al,ah	     ; проверка	строки
+036E  EC		     e13:    in	     al,dx	 ;считывание порта состояния контроллера СМ607
+036F  22 C4			     and     al,ah	     ; проверка строки
 0371  75 04			     jnz     e14
 0373  E2 F9			     loop    e13
 0375  EB 13			     jmp     short e17	     ; переход к сообщению об ошибке
 0377  2B C9		     e14:    sub     cx,cx
-0379  EC		     e15:    in	     al,dx     ;считывание порта	состояния		    +
-			     контроллера СМ607
+0379  EC		     e15:    in	     al,dx     ;считывание порта состояния контроллера СМ607
 037A  22 C4			     and     al,ah
 037C  74 04			     jz	     e16
 037E  E2 F9			     loop    e15
 0380  EB 08			     jmp     short e17
 			     ;
-			     ;	     Следующий	строчный импульс
+			     ;      Следующий строчный импульс
 			     ;
 0382			     e16:
-0382  B1 03			     mov     cl,3	     ; получить	следующий бит для	    +
-			     контроля
+0382  B1 03			     mov     cl,3	     ; получить следующий бит для контроля
 0384  D2 EC			     shr     ah,cl
 0386  75 E4			     jnz     e12
 0388  EB 06			     jmp     short e18	     ; отобразить курсор на экране
 			     ;
-			     ;	     Сообщение	об ошибке конттроллера СМ607
+			     ;      Сообщение об ошибке конттроллера СМ607
 			     ;
 038A			     e17:
 038A  BA 0103			     mov     dx,103h
 038D  E8 01DA			     call    err_beep
 			     ;
-			     ;	     Отображение курсора на	экране
+			     ;      Отображение курсора на экране
 			     ;
 0390			     e18:
-0390  58			     pop     ax		     ; получить	считанные			    +
-			     переключатели	в AH
+0390  58			     pop     ax		     ; получить считанные переключатели в AH
 0391  B4 00			     mov     ah,0	     ; установить режим
 0393  CD 10			     int     10h
 			     ;______________________
-			     ;	 ТЕСТ.11
-			     ;	      Дополнительный тест памяти
+			     ;  ТЕСТ.11
+			     ;       Дополнительный тест памяти
 			     ;______________________
 				     assume  ds:data
 0395			     e19:
@@ -1037,33 +983,31 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 03AB  F6 E4			     mul     ah
 03AD  A3 0013r			     mov     ds:memory_size, ax
 03B0			     skip_size_det:
-03B0  A1 0013r			     mov     ax,ds:memory_size		     ;restore if reboot	and no damages if power-on
+03B0  A1 0013r			     mov     ax,ds:memory_size		     ;restore if reboot and no damages if power-on
 03B3  A3 0015r			     mov     ds:io_ram_size, ax
 03B6  9D			     popf
 03B7  74 58			     je	     tst12			     ;skip memtest on reboot
 
 
 
-			     ;	 Проверка любой действительной памяти
-			     ;	 на считывание и запись
+			     ;  Проверка любой действительной памяти
+			     ;  на считывание и запись
 
 03B9  E9 0233			     jmp     e190
 
-			     ;	 Печать адреса и эталона, если
-			     ;	 произошла ошибка данных
+			     ;  Печать адреса и эталона, если
+			     ;  произошла ошибка данных
 
 03BC			     osh:
 03BC  50			     push    ax
-03BD  3D 0000			     cmp ax,0		     ;rc это	ошибка четности?
+03BD  3D 0000			     cmp ax,0		     ;rc это ошибка четности?
 03C0  74 0E			     je	parity
 
 03C2			     usual:
 03C2  8C C0			     mov ax,es
-03C4  8A C4			     mov al,ah		     ; получить	адрес (8 старших		    +
-			     разрядов) в AL
+03C4  8A C4			     mov al,ah		     ; получить адрес (8 старших разрядов) в AL
 03C6  E8 0020			     call prn_hex_byte
-03C9  58			     pop ax		     ; получить	XOR записанного и		    +
-			     прочтенного
+03C9  58			     pop ax		     ; получить XOR записанного и прочтенного
 03CA  E8 001C			     call prn_hex_byte
 03CD  E9 0000e			     jmp osh2
 
@@ -1072,7 +1016,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 03D0  8B F7			     mov si,di		     ;restore SI independently of D-flag
 03D2  93			     xchg ax,bx		     ;pattern for test in al (from bl)
 03D3  AA			     stosb
-			     ;clear parity flip-flop on	CPU module
+			     ;clear parity flip-flop on CPU module
 03D4  E4 61			     in	al,port_b
 03D6  50			     push ax
 03D7  0C 20			     or	al,00100000b	     ;clear parity flip-flop (bit5=1)
@@ -1084,9 +1028,8 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 03DF  AC			     lodsb
 03E0  E4 62			     in	     al, port_c	     ;read parity checker
 03E2  24 40			     and     al, 40h
-03E4  74 01			     jz	h_parity	     ;Z	means: L-byte wasn't erroneous
-03E6  4F			     dec di		     ;since DI was incremented by stosb, for L-error we	should	    +
-			     restore it
+03E4  74 01			     jz	h_parity	     ;Z means: L-byte wasn't erroneous
+03E6  4F			     dec di		     ;since DI was incremented by stosb, for L-error we should restore it
 03E7			     h_parity:
 03E7  EB D9			     jmp short usual
 
@@ -1094,20 +1037,18 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 03E9  50			     push ax
 03EA  B1 04			     mov     cl,4
 03EC  D2 E8			     shr     al,cl	     ;
-03EE  E8 02A9			     call    xlat_print_cod  ; преобразование и печать старшего+
-			     разряда
+03EE  E8 02A9			     call    xlat_print_cod  ; преобразование и печать старшего разряда
 03F1  58			     pop ax
 03F2  24 0F			     and     al,0fh
-03F4  E8 02A3			     call    xlat_print_cod  ; преобразование и печать младшего+
-			     разряда
+03F4  E8 02A3			     call    xlat_print_cod  ; преобразование и печать младшего разряда
 03F7  C3			     ret
 03F8			     prn_hex_byte endp
 
 			     ;______________________
-			     ;	 Сброс системы - фаза 4
+			     ;  Сброс системы - фаза 4
 			     ;______________________
 			     ;
-			     ;	 Коды сообщений об ошибках
+			     ;  Коды сообщений об ошибках
 			     ;_______________________
 
 				     assume  cs:code,ds:data
@@ -1120,13 +1061,12 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 03FF  0378			     dw	     378h
 0401			     f4e     label   word
 0401  30 31 32 33 34 35	36+  ascii_tbl db    '0123456789abcdef'
-      37 38 39 61 62 63	64+
-      65 66
+      37 38 39 61 62 63	64 
 
 
 			     ;______________________
-			     ;	 ТЕСТ.12
-			     ;	 Тест клавиатуры
+			     ;  ТЕСТ.12
+			     ;  Тест клавиатуры
 			     ;______________________
 0411			     tst12:
 
@@ -1135,20 +1075,19 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0416  E8 019C			     call    kbd_reset	     ; Сброс клавиатуры
 0419  B0 4D			     mov     al,4dh	     ; доступность клавиатуры
 041B  E6 61			     out     port_b,al
-041D  E3 27			     jcxz    f6		     ; нет -	печать ошибки
+041D  E3 27			     jcxz    f6		     ; нет - печать ошибки
 041F  80 FB AA			     cmp     bl,0aah	     ; код сканирования 'AA' ?
-0422  75 22			     jne     f6		     ; нет -	печать ошибки
+0422  75 22			     jne     f6		     ; нет - печать ошибки
 
-			     ;	 Поиск "залипших" клавиш
+			     ;  Поиск "залипших" клавиш
 
-0424  B0 CC			     mov     al,0cch	   ; сброс	клавиатуры, уст			    +
-			     синхронизации
+0424  B0 CC			     mov     al,0cch	   ; сброс клавиатуры, уст синхронизации
 0426  E6 61			     out     port_b,al
 0428  B0 4C			     mov     al,4ch	   ; доступность клавиатуры
 042A  E6 61			     out     port_b,al
 042C  2B C9			     sub     cx,cx
 			     ;
-			     ;	     Ожидание прерывания клавиатуры
+			     ;      Ожидание прерывания клавиатуры
 			     ;
 042E			     f5:
 042E  E2 FE			     loop    f5		     ; задержка
@@ -1159,24 +1098,23 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0438  B1 04			     mov     cl,4
 043A  D2 E8			     shr     al,cl
 043C  E8 025B			     call    xlat_print_cod  ; преобразование и печать
-043F  8A C5			     mov     al,ch	     ; восстановить	код сканирования
-0441  24 0F			     and     al,0fh	     ; выделить	младший байт
+043F  8A C5			     mov     al,ch	     ; восстановить код сканирования
+0441  24 0F			     and     al,0fh	     ; выделить младший байт
 0443  E8 0254			     call    xlat_print_cod  ; преобразование и печать
-0446  BE 03F8r		     f6:     mov     si,offset f1    ; получить	адрес поля сообщения об
+0446  BE 03F8r		     f6:     mov     si,offset f1    ; получить адрес поля сообщения об
 							     ; ошибке
-0449  B9 0004			     mov     cx,f1l	      ;	длина поля сообщения об ошибке
-044C  E8 0190			     call    p_msg	      ;	вывод сообщения об ошибке	на	    +
-			     экран
+0449  B9 0004			     mov     cx,f1l	      ; длина поля сообщения об ошибке
+044C  E8 0190			     call    p_msg	      ; вывод сообщения об ошибке на экран
 
-			     ;	 Установка таблицы векторов прерываний
+			     ;  Установка таблицы векторов прерываний
 
 044F			     f7:
 044F  2B C0			     sub     ax,ax
 0451  8E C0			     mov     es,ax
-0453  B9 0008			     mov     cx,8	     ; получить	счетчик векторов
+0453  B9 0008			     mov     cx,8	     ; получить счетчик векторов
 0456  0E			     push    cs
 0457  1F			     pop     ds
-0458  BE 0000e			     mov     si,offset vector_table   ;	адрес таблицы векторов
+0458  BE 0000e			     mov     si,offset vector_table   ; адрес таблицы векторов
 045B  BF 0020r			     mov     di,offset int_ptr
 045E  FC			     cld
 045F  A5		     f7a:    movsw
@@ -1185,21 +1123,19 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0462  E2 FB			     loop    f7a
 0464  EB 01			     jmp short tst14
 
-0466  00			     db	     (?)	     ;rc для	устранения съезжания	при	    +
-			     переделке	загрузчика таблицы векторв прерываний
+0466  00			     db	     (?)	     ;rc для устранения съезжания при переделке загрузчика таблицы векторв прерываний
 
 			     ;______________________
-			     ;	 ТЕСТ.14
-			     ;	 Осуществляет проверку НГМД
+			     ;  ТЕСТ.14
+			     ;  Осуществляет проверку НГМД
 			     ;______________________
 0467  B8 0040		     tst14:  mov     ax,dat	     ; уст. регистр DS
 046A  8E D8			     mov     ds,ax
-046C  B0 FC			     mov     al,0fch  ;	доступность прерываний таймера и	    +
-			     клавиатуры
+046C  B0 FC			     mov     al,0fch  ; доступность прерываний таймера и клавиатуры
 046E  E6 21			     out     inta01,al
-0470  A0 0010r			     mov     al,byte ptr equip_flag  ; получить	состояние переклю-
+0470  A0 0010r			     mov     al,byte ptr equip_flag  ; получить состояние переклю-
 								     ; чателей
-0473  A8 01			     test    al,01h	     ; первоначальная загрузка с	НГМД ?
+0473  A8 01			     test    al,01h	     ; первоначальная загрузка с НГМД ?
 0475  75 03			     jnz     f10	     ; да - проверка управления НГМД
 0477  E9 00ED			     jmp     f23
 047A			     f10:
@@ -1208,20 +1144,20 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 047E  B4 00			     mov     ah,0	     ; сброс контроллера НГМД
 0480  CD 13			     int     13h	     ; переход к сбросу НГМД
 0482  F6 C4 FF			     test    ah,0ffh	     ; состояние верно ?
-0485  75 20			     jnz     f13	     ; нет -	сбой устройства
+0485  75 20			     jnz     f13	     ; нет - сбой устройства
 
-			     ;	 Включить мотор устройства 0
+			     ;  Включить мотор устройства 0
 
-0487  BA 03F2			     mov     dx,03f2h	     ; получить	адрес адаптера НГМД
-048A  B0 1C			     mov     al,1ch	     ; включить	мотор
+0487  BA 03F2			     mov     dx,03f2h	     ; получить адрес адаптера НГМД
+048A  B0 1C			     mov     al,1ch	     ; включить мотор
 048C  EE			     out     dx,al
 048D  2B C9			     sub     cx,cx
 
-			     ;	  Ожидание включения мотора НГМД
+			     ;   Ожидание включения мотора НГМД
 
 048F			     f11:
 048F  E2 FE			     loop    f11
-0491			     f12:			     ; ожидание	мотора 1
+0491			     f12:			     ; ожидание мотора 1
 0491  E2 FE			     loop    f12
 0493  33 D2			     xor     dx,dx
 0495  B5 01			     mov     ch,1	     ; выбор первой дорожки
@@ -1232,23 +1168,23 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 04A2  E8 0000e			     call    seek
 04A5  73 09			     jnc     f14	     ; выключить мотор
 
-			     ;	  Ошибки НГМД
+			     ;   Ошибки НГМД
 
 04A7			     f13:
-04A7  BE 03FCr			     mov     si,offset f3    ; получить	адрес поля сообщения об
+04A7  BE 03FCr			     mov     si,offset f3    ; получить адрес поля сообщения об
 							     ; ошибке
 04AA  B9 0003			     mov     cx,f3l	     ; установить счетчик
-04AD  E8 012F			     call    p_msg	     ; идти	в программу ошибок
+04AD  E8 012F			     call    p_msg	     ; идти в программу ошибок
 
-			     ;	 Выключить мотор устройства 0
+			     ;  Выключить мотор устройства 0
 
 04B0			     f14:
 04B0  B0 0C			     mov     al,0ch	     ; выключить мотор устройства 0
 04B2  BA 03F2			     mov     dx,03f2h	     ; уст адрес порта управления НГМД
 04B5  EE			     out     dx,al
 
-			     ;	 Установка печати и базового адреса
-			     ;	 адаптера стыка С2, если устройства	подключены
+			     ;  Установка печати и базового адреса
+			     ;  адаптера стыка С2, если устройства подключены
 
 04B6			     f15:
 04B6  83 FD 00			     cmp     bp,0000h
@@ -1266,33 +1202,28 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 04D3  2A E4		     dal:    sub     ah,ah
 04D5  A0 0049r			     mov     al,crt_mode
 04D8  CD 10			     int     10h
-04DA  C7 06 001Ar 001Er			     mov     ds:buffer_head, offset kb_buffer ;	ERROR -	Must be	approx.	6 lines	    +
-			     upper, before int 16h
-04E0  C7 06 001Cr 001Er			     mov     ds:buffer_tail, offset kb_buffer ;	ERROR -	Must be	approx.	6 lines	    +
-			     upper, before int 16h
+04DA  C7 06 001Ar 001Er			     mov     ds:buffer_head, offset kb_buffer ; ERROR - Must be approx. 6 lines upper, before int 16h
+04E0  C7 06 001Cr 001Er			     mov     ds:buffer_tail, offset kb_buffer ; ERROR - Must be approx. 6 lines upper, before int 16h
 04E6  BD 03FFr			     mov     bp,offset f4    ; таблица PRT_SRC
 04E9  BE 0000			     mov     si,0
 04EC			     f16:
-04EC  2E: 8B 56	00		     mov     dx,cs:[bp]	     ; получить	базовый адрес печати
-04F0  B0 AA			     mov     al,0aah	     ; записать	данные в	порт А
+04EC  2E: 8B 56	00		     mov     dx,cs:[bp]	     ; получить базовый адрес печати
+04F0  B0 AA			     mov     al,0aah	     ; записать данные в порт А
 04F2  EE			     out     dx,al
 04F3  2A C0			     sub     al,al
 04F5  EC			     in	     al,dx	     ; считывание порта А
-04F6  3C AA			     cmp     al,0aah	     ; шаблон данных тот	же
-04F8  75 06			     jne     f17	 ; нет - проверка следующего		    +
-			     устройства печати
-04FA  89 94 0008r		     mov     word ptr printer_base[si],dx  ;да-уст	базовый адрес
+04F6  3C AA			     cmp     al,0aah	     ; шаблон данных тот же
+04F8  75 06			     jne     f17	 ; нет - проверка следующего устройства печати
+04FA  89 94 0008r		     mov     word ptr printer_base[si],dx  ;да-уст базовый адрес
 04FE  46			     inc     si		     ; вычисление следующего слова
 04FF  46			     inc     si
 0500			     f17:
-0500  45			     inc     bp		     ; указать следующий базовый	адрес
+0500  45			     inc     bp		     ; указать следующий базовый адрес
 0501  45			     inc     bp
 0502  81 FD 0401r		     cmp     bp,offset f4e   ; все возможные адреса проверены ?
-0506  75 E4			     jne     f16	     ; нет, к проверке следующего	адреса+
-			     печати
+0506  75 E4			     jne     f16	     ; нет, к проверке следующего адреса печати
 0508  BB 0000			     mov     bx,0
-050B  BA 03FF			     mov     dx,3ffh	     ; проверка	подключения адаптера	1   +
-			     стыка	С2
+050B  BA 03FF			     mov     dx,3ffh	     ; проверка подключения адаптера 1 стыка С2
 050E  B0 8A			     mov     al,8ah
 0510  EE			     out     dx,al
 0511  BA 02FF			     mov     dx,2ffh
@@ -1309,8 +1240,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0524  C7 87 0000r 03F8		     mov  word ptr rs232_base[bx],3f8h	; уст адрес адаптера 1
 052A  43			     inc     bx
 052B  43			     inc     bx
-052C  BA 02FC		     f18:    mov     dx,2fch	     ; проверка	подключения адаптера	2   +
-			     стыка	С2
+052C  BA 02FC		     f18:    mov     dx,2fch	     ; проверка подключения адаптера 2 стыка С2
 052F  B0 AA			     mov     al,0aah
 0531  EE			     out     dx,al
 0532  42			     inc     dx
@@ -1325,8 +1255,8 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 
 
-			     ;_____Установка EQUIP_FLAG для	инди-
-			     ;	   кации номера печати
+			     ;_____Установка EQUIP_FLAG для инди-
+			     ;    кации номера печати
 
 0543			     f19:
 0543  E9 0000e				     jmp     f19a
@@ -1346,115 +1276,102 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 055E			     f20b:
 055E  BA 0001				     mov     dx, 1
-0561  E8 0006			     call    err_beep	     ; переход к подпрограмме звукового+
-			     сигнала
+0561  E8 0006			     call    err_beep	     ; переход к подпрограмме звукового сигнала
 0564			     f21:
 0564  E9 017A				     jmp     boot_strap
 
 0567			     f23:
 0567  E9 FF4C			     jmp     f15
 
-			     ;	  Установка длительности звукового сигнала
+			     ;   Установка длительности звукового сигнала
 
 				     assume  cs:code,ds:data
 056A			     err_beep proc   near
 056A  9C			     pushf		     ; сохранить признаки
-056B  FA			     cli		     ; сброс признака разрешения		    +
-			     прерывания
+056B  FA			     cli		     ; сброс признака разрешения прерывания
 056C  1E			     push    ds		     ; сохранить DS
 056D  B8 0040			     mov     ax,dat	     ; DS - сегмент данных
 0570  8E D8			     mov     ds,ax
 0572  0A F6			     or	     dh,dh
 0574  74 0B			     jz	     g3
-0576			     g1:			      ;	длинный звуковой	сигнал
-0576  B3 06			     mov     bl,6	      ;	счетчик для звуковых сигналов
-0578  E8 0018			     call    beep	      ;	выполнить звуковой сигнал
-057B  E2 FE		     g2:     loop    g2		      ;	задержка между звуковыми		    +
-			     сигналами
+0576			     g1:			      ; длинный звуковой сигнал
+0576  B3 06			     mov     bl,6	      ; счетчик для звуковых сигналов
+0578  E8 0018			     call    beep	      ; выполнить звуковой сигнал
+057B  E2 FE		     g2:     loop    g2		      ; задержка между звуковыми сигналами
 057D  FE CE			     dec     dh
 057F  75 F5			     jnz     g1
-0581			     g3:			      ;	короткий звуковой сигнал
-0581  B3 01			     mov     bl,1   ; счетчик для короткого звукового	    +
-			     сигнала
+0581			     g3:			      ; короткий звуковой сигнал
+0581  B3 01			     mov     bl,1   ; счетчик для короткого звукового сигнала
 0583  E8 000D			     call    beep	     ; выполнить звуковой сигнал
-0586  E2 FE		     g4:     loop    g4		     ; задержка	между звуковыми		    +
-			     сигналами
+0586  E2 FE		     g4:     loop    g4		     ; задержка между звуковыми сигналами
 0588  FE CA			     dec     dl		     ;
 058A  75 F5			     jnz     g3		     ; выполнить
 058C  E2 FE		     g5:     loop    g5		     ; длинная задержка перед возвратом
 058E  E2 FE		     g6:     loop    g6
 0590  1F			     pop     ds		     ; восстановление DS
-0591  9D			     popf		; восстановление первоначальных	    +
-			     признаков
+0591  9D			     popf		; восстановление первоначальных признаков
 0592  C3			     ret		     ; возврат к программе
 0593			     err_beep	     endp
 
-			     ;	 Подпрограмма звукового сигнала
+			     ;  Подпрограмма звукового сигнала
 
 0593			     beep    proc    near
-0593  B0 B6			     mov     al,10110110b    ; таймер 2,младший и	старший счет-
+0593  B0 B6			     mov     al,10110110b    ; таймер 2,младший и старший счет-
 							     ; чики, двоичный счет
-0595  E6 43			     out     timer+3,al	     ; записать	в регистр режима
+0595  E6 43			     out     timer+3,al	     ; записать в регистр режима
 0597  B8 045E			     mov     ax,45eh	     ; делитель
-059A  E6 42			     out     timer+2,al	     ; записать	младший счетчик
+059A  E6 42			     out     timer+2,al	     ; записать младший счетчик
 059C  8A C4			     mov     al,ah
-059E  E6 42			     out     timer+2,al	     ; записать	старший счетчик
-05A0  E4 61			     in	     al,port_b	     ; получить	текущее состояние порта
+059E  E6 42			     out     timer+2,al	     ; записать старший счетчик
+05A0  E4 61			     in	     al,port_b	     ; получить текущее состояние порта
 05A2  8A E0			     mov     ah,al	     ; сохранить это состояние
-05A4  0C 03			     or	     al,03	     ; включить	звук
+05A4  0C 03			     or	     al,03	     ; включить звук
 05A6  E6 61			     out     port_b,al
 05A8  2B C9			     sub     cx,cx	     ; установить счетчик ожидания
-05AA  E2 FE		     g7:     loop    g7		     ; задержка	перед выключением
-05AC  FE CB			     dec     bl		     ; задержка	счетчика закончена ?
-05AE  75 FA			     jnz     g7	     ; нет -	продолжение подачи звукового	    +
-			     сигнала
-05B0  8A C4			     mov     al,ah	     ; восстановить	значение порта
+05AA  E2 FE		     g7:     loop    g7		     ; задержка перед выключением
+05AC  FE CB			     dec     bl		     ; задержка счетчика закончена ?
+05AE  75 FA			     jnz     g7	     ; нет - продолжение подачи звукового сигнала
+05B0  8A C4			     mov     al,ah	     ; восстановить значение порта
 05B2  E6 61			     out     port_b,al
 05B4  C3			     ret		     ; возврат к программе
 05B5			     beep    endp
 			     ;_____________________
-			     ;	 Эта	процедура вызывает программный
-			     ;	 сброс клавиатуры
+			     ;  Эта процедура вызывает программный
+			     ;  сброс клавиатуры
 			     ;_____________________
 05B5			     kbd_reset proc  near
-05B5  B0 0C			     mov     al,0ch	; установить низкий уровень		    +
-			     синхронизации
-05B7  E6 61			     out     port_b,al	     ; записать	порт B
-05B9  B9 7530			     mov     cx,30000	     ; время длительности низкого	    +
-			     уровня
+05B5  B0 0C			     mov     al,0ch	; установить низкий уровень синхронизации
+05B7  E6 61			     out     port_b,al	     ; записать порт B
+05B9  B9 7530			     mov     cx,30000	     ; время длительности низкого уровня
 05BC  E2 FE		     g8:     loop    g8
 05BE  B0 CC			     mov     al,0cch	     ; уст CLK
 05C0  E6 61			     out     port_b,al
 05C2			     sp_test:
-05C2  B0 4C			     mov     al,4ch	     ; уст высокий уровень			    +
-			     синхронизации
+05C2  B0 4C			     mov     al,4ch	     ; уст высокий уровень синхронизации
 05C4  E6 61			     out     port_b,al
 05C6  B0 FD			     mov     al,0fdh	     ; разрешить прерывания клавиатуры
-05C8  E6 21			     out     inta01,al	     ; записать	регистр масок
-05CA  FB			     sti		     ; уст признака разрешения		    +
-			     прерывания
+05C8  E6 21			     out     inta01,al	     ; записать регистр масок
+05CA  FB			     sti		     ; уст признака разрешения прерывания
 05CB  B4 00			     mov     ah,0
-05CD  2B C9			     sub     cx,cx	     ; уст счетчика ожидания	прерываний
+05CD  2B C9			     sub     cx,cx	     ; уст счетчика ожидания прерываний
 05CF  F6 C4 FF		     g9:     test    ah,0ffh	     ; прерывание клавиатуры возникло ?
-05D2  75 02			     jnz     g10   ;  да - считывание возвращенного кода	    +
-			     сканирования
-05D4  E2 F9			     loop    g9		     ; нет -	цикл ожидания
-05D6  E4 60		     g10:    in	     al,port_a	 ; считать код сканирования		    +
-			     клавиатуры
+05D2  75 02			     jnz     g10   ;  да - считывание возвращенного кода сканирования
+05D4  E2 F9			     loop    g9		     ; нет - цикл ожидания
+05D6  E4 60		     g10:    in	     al,port_a	 ; считать код сканирования клавиатуры
 05D8  8A D8			     mov     bl,al	     ; сохранить этот код
 05DA  B0 CC			     mov     al,0cch	     ; очистка клавиатуры
 05DC  E6 61			     out     port_b,al
 05DE  C3			     ret		     ; возврат к программе
 05DF			     kbd_reset	     endp
 			     ;_____________________
-			     ;	 Эта	программа выводит на экран дисплея
-			     ;	 сообщения об ошибках
+			     ;  Эта программа выводит на экран дисплея
+			     ;  сообщения об ошибках
 			     ;
-			     ;	   Необходимые условия:
-			     ;	 SI = адрес поля сообщения об ошибке
-			     ;	 CX = длина поля сообщения об ошибке
-			     ;	 Максимальный размер передаваемой
-			     ;	 информации -	36 знаков
+			     ;    Необходимые условия:
+			     ;  SI = адрес поля сообщения об ошибке
+			     ;  CX = длина поля сообщения об ошибке
+			     ;  Максимальный размер передаваемой
+			     ;  информации - 36 знаков
 			     ;
 			     ;______________________
 05DF			     p_msg   proc    near
@@ -1463,15 +1380,14 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 05E1  E8 00AD			     call prt_str
 05E4  B8 0E0D			     mov     ax,0e0dh	; переместить курсор в начало строки
 05E7  CD 10			     int     10h
-05E9  B8 0E0A			     mov     ax,0e0ah  ; переместить	курсор на следующую	    +
-			     строку
+05E9  B8 0E0A			     mov     ax,0e0ah  ; переместить курсор на следующую строку
 05EC  CD 10			     int     10h
 05EE  C3			     ret
 05EF			     p_msg   endp
 
 
 05EF			     e190:
-05EF  BE 0000e			     mov     si,offset infostr	     ; адрес поля информации	о BIOS
+05EF  BE 0000e			     mov     si,offset infostr	     ; адрес поля информации о BIOS
 05F2  B9 0016			     mov     cx, infolen	     ; длина информации
 05F5  E8 FFE9			     call    p_msg_noerr	     ; вывод на экран
 05F8  1E			     push    ds
@@ -1480,11 +1396,11 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 05FE			     e20b:
 05FE  8B 1E 0013r		     mov     bx, ds:memory_size
-0602  2B D8			     sub     bx, ax	     ;ax stores	16d, subtract tested bytes so bytes to test are	in bx
-0604  93			     xchg    bx,ax	     ;order for	div command format
+0602  2B D8			     sub     bx, ax	     ;ax stores 16d, subtract tested bytes so bytes to test are in bx
+0604  93			     xchg    bx,ax	     ;order for div command format
 0605  F7 F3			     div     bx		     ;now ax stores amount of 16K-fragments to test
 0607  91			     xchg    cx,ax	     ;now cx has that amount
-0608  93			     xchg    bx,ax	     ;ax stores	16d back
+0608  93			     xchg    bx,ax	     ;ax stores 16d back
 0609  BB 0400			     mov     bx, 400h
 
 060C			     e20c:
@@ -1541,12 +1457,11 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 065E  1F			     pop     ds		     ;restore pointer to BIOS data area
 							     ;from the very beginning of e190
 065F  89 0E 0013r		     mov     ds:memory_size, cx
-0663  3D AAAA			     cmp     ax,0aaaah	     ;rc это	отсутствие памяти?
+0663  3D AAAA			     cmp     ax,0aaaah	     ;rc это отсутствие памяти?
 0666  74 EA			     je	     pre12	     ;rc отсутствие, значит - не ошибка
 0668  E9 FD51			     jmp     osh
 
-066B  03*(??)			     db	     3 dup (?)	     ;rc для	устранения съезжаний		    +
-			     адресов последующего кода
+066B  03*(??)			     db	     3 dup (?)	     ;rc для устранения съезжаний адресов последующего кода
 
 066E			     prt_hex	     proc near
 066E  B4 0E				     mov     ah, 14
@@ -1556,9 +1471,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 0673  20 4B 62 20 4F 4B	0D   e300	     db	' Kb OK',0Dh
 067A  45 52 52 4F 52 20	28+  f39	     db	'ERROR (RESUME="F1" KEY)'
-      52 45 53 55 4D 45	3D+
-      22 46 31 22 20 4B	45+
-      59 29
+      52 45 53 55 4D 45	3D 
 
 0691			     prt_str	     proc near
 0691  FC				     cld
@@ -1571,8 +1484,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 			     ;_____________________
 			     ;
-			     ;	 Процедура вывода на экран сообщения об ошибке в    +
-			     коде ASCII
+			     ;  Процедура вывода на экран сообщения об ошибке в коде ASCII
 			     ;
 			     ;_______________________
 
@@ -1589,7 +1501,7 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 06A7			     xlat_print_cod endp
 
 
-			     ;	 Таблица	кодов русских больших букв (заглавных)
+			     ;  Таблица кодов русских больших букв (заглавных)
 
 06A7			     rust2   label   byte
 06A7  1B 21 40 23 24 25	5E+	     db	     1bh,'!@#$',37,05eh,'&*()_+'
@@ -1616,15 +1528,12 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 
 			     ;___int 19_____________
-			     ;	 Программа загрузки системы с НГМД
+			     ;  Программа загрузки системы с НГМД
 			     ;
-			     ; Программа считывает содержимое дорожки 0 сектора 1 +
-			     в
+			     ; Программа считывает содержимое дорожки 0 сектора 1 в
 			     ; ячейку boot_locn (адрес 7C00,сегмент 0)
-			     ;	 Если НГМД отсутствует или произошла аппаратная    +
-			     ошибка,
-			     ; устанавливается прерывание типа INT	18H, которое	    +
-			     вызывает
+			     ;  Если НГМД отсутствует или произошла аппаратная ошибка,
+			     ; устанавливается прерывание типа INT 18H, которое вызывает
 			     ; выполнение программ тестирования и инициализации
 			     ; системы
 			     ;
@@ -1632,62 +1541,57 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 				     assume  cs:code,ds:data
 06E1			     boot_strap	proc near
 
-06E1  FB			     sti		   ; установить признак разрешения	    +
-			     прерывания
+06E1  FB			     sti		   ; установить признак разрешения прерывания
 06E2  B8 0040			     mov     ax,dat	   ; установить адресацию
 06E5  8E D8			     mov     ds,ax
 06E7  A1 0010r			     mov     ax,equip_flag ; получить состояние переключателей
-06EA  A8 01			     test    al,1	   ; опрос	первоначальной загрузки
+06EA  A8 01			     test    al,1	   ; опрос первоначальной загрузки
 06EC  74 23			     jz	     h3
 
-			     ;	 Система	загружается с НГМД
-			     ;	 CX содержит счетчик повторений
+			     ;  Система загружается с НГМД
+			     ;  CX содержит счетчик повторений
 
 06EE  B9 0004			     mov     cx,4	     ; установить счетчик повторений
 06F1			     h1:			     ; первоначальная загрузка
 06F1  51			     push    cx		     ; сохранить счетчик повторений
 06F2  B4 00			     mov     ah,0	     ; сброс НГМД
 06F4  CD 13			     int     13h
-06F6  72 14			     jc	     h2		     ; если	ошибка,повторить
+06F6  72 14			     jc	     h2		     ; если ошибка,повторить
 06F8  B4 02			     mov     ah,2	     ; считать сектор 1
 06FA  BB 0000			     mov     bx,0	     ;
 06FD  8E C3			     mov     es,bx
 06FF  BB 7C00r			     mov     bx,offset boot_locn
 0702  BA 0000			     mov     dx,0	     ;
-0705  B9 0001			     mov     cx,1	     ; сектор 1 ,	дорожка 0
+0705  B9 0001			     mov     cx,1	     ; сектор 1 , дорожка 0
 0708  B0 01			     mov     al,1	     ; считывание первого сектора
 070A  CD 13			     int     13h
-070C  59		     h2:     pop     cx		     ; восстановить	счетчик повторений
-070D  73 05			     jnc     h4		     ; уст CF при	безуспешном считывании
-070F  E2 E0			     loop    h1		     ; цикл	повторения
+070C  59		     h2:     pop     cx		     ; восстановить счетчик повторений
+070D  73 05			     jnc     h4		     ; уст CF при безуспешном считывании
+070F  E2 E0			     loop    h1		     ; цикл повторения
 
-			     ;	 Загрузка с НГМД недоступна
+			     ;  Загрузка с НГМД недоступна
 
 0711			     h3:			     ; кассета
 0711  E9 F996			     jmp     err01   ; отсутствует дискет загрузки
 
-			     ;	 Загрузка завершилась успешно
+			     ;  Загрузка завершилась успешно
 
 0714			     h4:				     ;
-0714  EA 00007C00sr			     jmp far ptr boot_locn   ; db 0EAh,	00h, 7Ch, 00h, 00h   ; (0000:7C00)   ;	    +
-			     ###Gleb###
+0714  EA 00007C00sr			     jmp far ptr boot_locn   ; db 0EAh,	00h, 7Ch, 00h, 00h   ; (0000:7C00)   ; ###Gleb###
 
 0719			     boot_strap	     endp
 			     ;--------------------
-			     ;	 Эта	программа посылает байт в	контроллер		    +
-			     адаптера НГМД
-			     ; после проверки корректности управления и		    +
-			     готовности
+			     ;  Эта программа посылает байт в контроллер адаптера НГМД
+			     ; после проверки корректности управления и готовности
 			     ; контроллера.
-			     ;	 Программа ожидает байт состояния определенное	    +
-			     время
+			     ;  Программа ожидает байт состояния определенное время
 			     ; и проверяет готовность НГМД к работе.
 			     ;
-			     ;	 ВВОД   (AH) - выводимый байт
+			     ;  ВВОД   (AH) - выводимый байт
 			     ;
-			     ;	 ВЫВОД  CY=0 - успешно,
-			     ;		CY=1 - не успешно.Состояние
-			     ;		НГМД анализируется.
+			     ;  ВЫВОД  CY=0 - успешно,
+			     ;  CY=1 - не успешно.Состояние
+			     ;  НГМД анализируется.
 			     ;-----------------------
 0719			     nec_output	proc near
 0719  52			     push    dx		     ; сохранить регистры
@@ -1695,15 +1599,14 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 071B  BA 03F4			     mov     dx,03f4h	     ; состояние порта
 071E  33 C9			     xor     cx,cx	     ; счетчик времени вывода
 0720			     j23:
-0720  EC			     in	     al,dx	     ; получить	состояние
-0721  A8 40			     test    al,040h	     ; проверка	управляющих бит
-0723  74 0C			     jz	     j25	     ; биты	управления нормальные
+0720  EC			     in	     al,dx	     ; получить состояние
+0721  A8 40			     test    al,040h	     ; проверка управляющих бит
+0723  74 0C			     jz	     j25	     ; биты управления нормальные
 0725  E2 F9			     loop    j23
 0727			     j24:
 0727  80 0E 0041r 80		     or	     diskette_status,time_out
 072C  59			     pop     cx
-072D  5A			     pop     dx	     ; установить код ошибки	и восстановить +
-			     регистры
+072D  5A			     pop     dx	     ; установить код ошибки и восстановить регистры
 072E  58			     pop     ax		     ; адрес возврата
 072F  F9			     stc		     ;
 0730  C3			     ret
@@ -1711,16 +1614,16 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 0731			     j25:
 0731  33 C9			     xor     cx,cx	     ; обнуление счетчика
 0733			     j26:
-0733  EC			     in	     al,dx	     ; получить	состояние
-0734  A8 80			     test    al,080h	     ; проверка	готовности
+0733  EC			     in	     al,dx	     ; получить состояние
+0734  A8 80			     test    al,080h	     ; проверка готовности
 0736  75 04			     jnz     j27	     ; да - идти на выход
 0738  E2 F9			     loop    j26	     ; повторить
 073A  EB EB			     jmp     short j24	     ; ошибка состояния
 073C			     j27:			     ; выход
-073C  8A C4			     mov     al,ah	     ; получить	байт
-073E  BA 03F5			     mov     dx,03f5h	     ; переслать байт данных	в порт
+073C  8A C4			     mov     al,ah	     ; получить байт
+073E  BA 03F5			     mov     dx,03f5h	     ; переслать байт данных в порт
 0741  EE			     out     dx,al
-0742  59			     pop     cx		     ; восстановить	регистры
+0742  59			     pop     cx		     ; восстановить регистры
 0743  5A			     pop     dx
 0744  C3			     ret		     ;
 0745			     nec_output	     endp
@@ -1729,9 +1632,9 @@ Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "04-04-22"
+??DATE				  Text	 "04-24-22"
 ??FILENAME			  Text	 "1840v5-a"
-??TIME				  Text	 "23:39:57"
+??TIME				  Text	 "13:25:04"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE

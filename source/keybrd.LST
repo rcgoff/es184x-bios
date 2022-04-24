@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    04-04-22 23:39:57	    Page 1
+Turbo Assembler	 Version 5.0	    04-24-22 13:25:04	    Page 1
 keybrd.ASM
 
 
@@ -17,37 +17,33 @@ keybrd.ASM
 
 			     ;___int 16_________________
 			     ;
-			     ;	 Программа поддержки клавиатуры
+			     ;  Программа поддержки клавиатуры
 			     ;
-			     ;	 Эта	программа считывает в регистр
+			     ;  Эта программа считывает в регистр
 			     ; AX код сканирования клавиши и код
 			     ; ASCII из буфера клавиатуры.
 			     ;
-			     ;	 Программа выполняет три функции, код
+			     ;  Программа выполняет три функции, код
 			     ; которых задается в регистре AH:
 			     ;
-			     ;	  AH=0 - считать	следующий символ
-			     ;		  из буфера.При выходе	код
-			     ;		  сканирования в AH,код
-			     ;		  ASCII	в AL.
-			     ;	 AH=1 -	установить ZF, если код
-			     ;		  ASCII	прочитан:
+			     ;   AH=0 - считать следующий символ
+			     ;    из буфера.При выходе код
+			     ;    сканирования в AH,код
+			     ;    ASCII в AL.
+			     ;  AH=1 - установить ZF, если код
+			     ;    ASCII прочитан:
 			     ;
-			     ;		  ZF=0 - буфер заполнен,
-			     ;		  ZF=1 - буфер пустой.
-			     ;	 При	выходе в	AX помещен адрес вершины буфера	    +
-			     клавиатуры.
-			     ;	 AH=2 -	возврат текущего	состояния в регистр AL
-			     ;		   из	постоянно распределенной	области памяти +
-			     с
-			     ;		адресом 00417H.
+			     ;    ZF=0 - буфер заполнен,
+			     ;    ZF=1 - буфер пустой.
+			     ;  При выходе в AX помещен адрес вершины буфера клавиатуры.
+			     ;  AH=2 - возврат текущего состояния в регистр AL
+			     ;     из постоянно распределенной области памяти с
+			     ;  адресом 00417H.
 			     ;
-			     ;	 При	выполнении программ клавиатуры используются +
-			     флажки,
-			     ; которые устанавливаются в	постоянно			    +
-			     распределенной области
-			     ; памяти по адресам	00417H и 00418H и имеют значение:
-			     ;	 00417H
+			     ;  При выполнении программ клавиатуры используются флажки,
+			     ; которые устанавливаются в постоянно распределенной области
+			     ; памяти по адресам 00417H и 00418H и имеют значение:
+			     ;  00417H
 			     ;	       0 - правое	переключение регистра;
 			     ;	       1 - левое переключение регистра;
 			     ;		  2 - УПР;
@@ -56,32 +52,24 @@ keybrd.ASM
 			     ;	       5 - ЦИФ;
 			     ;	       6 - ФПБ;
 			     ;	       7 - ВСТ;
-			     ;	 00418H
-			     ;	       0 - состояние клавиши ЛАТ между нажатием	и	    +
-			     отжатием;
+			     ;  00418H
+			     ;	       0 - состояние клавиши ЛАТ между нажатием	и отжатием;
 			     ;	       1 - ЛАТ;
 			     ;	       2 - Р/Л;
 			     ;	       3 - пауза;
 			     ;	       4 - ФСД;
 			     ;	       5 - ЦИФ;
 			     ;	       6 - ФПБ;
-			     ;	       7 - ВСТ.
+			     ;        7 - ВСТ.
 			     ;
-			     ;	 Флажки, соответствующие разрядам 4-7 постоянно	    +
-			     распределенной
-			     ; области памяти с адресом 00417H, устанавливаются по    +
-			     нажатию
-			     ; клавиш ВСТ, ФПБ, ЦИФ, ФСД и сохраняют свои значения  +
-			     до сле-
+			     ;  Флажки, соответствующие разрядам 4-7 постоянно распределенной
+			     ; области памяти с адресом 00417H, устанавливаются по нажатию
+			     ; клавиш ВСТ, ФПБ, ЦИФ, ФСД и сохраняют свои значения до сле-
 			     ; дующего нажатия соответствующей клавиши.
-			     ; Одноименные флажки, соответствующие разрядам 4-7	    +
-			     постоянно
-			     ; распределенной области памяти	с адресом 00418H, и	    +
-			     флажки
-			     ; ДОП, УПР, левое переключение регистра, правое	    +
-			     переключение
-			     ; регистра, Р/Л устанавливаются по нажатию клавиш и   +
-			     сбрасываются
+			     ; Одноименные флажки, соответствующие разрядам 4-7 постоянно
+			     ; распределенной области памяти с адресом 00418H, и флажки
+			     ; ДОП, УПР, левое переключение регистра, правое переключение
+			     ; регистра, Р/Л устанавливаются по нажатию клавиш и сбрасываются
 			     ; по отжатию.
 			     ;
 			     ;------------------------------
@@ -90,11 +78,11 @@ keybrd.ASM
 
 0000			     k4	     proc    near
 0000  83 C3 02			     add     bx,2
-			     ;1841   cmp  bx,buffer_end		      ;	конец буфера	?
-0003  81 FB 003Er		     cmp  bx,offset kb_buffer_end     ;	конец буфера	?
-0007  75 03			     jne     k5			      ;	нет - продолжить
-			     ;1841   mov     bx,buffer_start	      ;	да - уст начала буфера
-0009  BB 001Er			     mov     bx,offset kb_buffer      ;	да - уст начала буфера
+			     ;1841   cmp  bx,buffer_end		      ; конец буфера ?
+0003  81 FB 003Er		     cmp  bx,offset kb_buffer_end     ; конец буфера ?
+0007  75 03			     jne     k5			      ; нет - продолжить
+			     ;1841   mov     bx,buffer_start	      ; да - уст начала буфера
+0009  BB 001Er			     mov     bx,offset kb_buffer      ; да - уст начала буфера
 000C			     k5:
 000C  C3			     ret
 000D			     k4	     endp
@@ -127,8 +115,8 @@ keybrd.ASM
 
 			     ;------ PLAIN OLD LOWER CASE
 
-0032			     k54:				     ;rc обычный	нижний регистр
-0032  3C 3B			     cmp     al,59		     ; TEST FOR	FUNCTION KEYS
+0032			     k54:				     ;rc обычный нижний регистр
+0032  3C 3B			     cmp     al,59		     ; TEST FOR FUNCTION KEYS
 0034  72 3E			     jb	     caps		     ; NOT-LOWER-FUNCTION
 0036  B0 00			     mov     al,0		     ; SCAN CODE IN AH ALREADY
 0038  EB 04			     jmp     short k57		     ; BUFFER_FILL
@@ -137,14 +125,14 @@ keybrd.ASM
 
 003A			     k56:				     ; TRANSLATE-CHAR
 003A  FE C8			     dec     al			     ; CONVERT ORIGIN
-003C  2E: D7			     xlat    cs:k11		     ; CONVERT THE SCAN	CODE TO	ASCII
+003C  2E: D7			     xlat    cs:k11		     ; CONVERT THE SCAN CODE TO ASCII
 
-			     ;------ PUT CHARACTER INTO	BUFFER
+			     ;------ PUT CHARACTER INTO BUFFER
 
 003E			     k57:				     ; BUFFER-FILL
 003E  3C FF			     cmp     al,-1		     ; IS THIS AN IGNORE CHAR
 0040  74 07			     je	     k59		     ; YES, DO NOTHING WITH IT
-0042  80 FC FF			     cmp     ah,-1		     ; LOOK FOR	-1 PSEUDO SCAN
+0042  80 FC FF			     cmp     ah,-1		     ; LOOK FOR -1 PSEUDO SCAN
 0045  74 02			     je	     k59		     ; NEAR_INTERRUPT_RETURN
 
 0047			     k58:				     ; BUFFER-FILL-NOTEST
@@ -155,12 +143,12 @@ keybrd.ASM
 
 004C			     k61:				     ; NOT-CAPS-STATE
 004C  8B 1E 001Cr		     mov     bx,buffer_tail	     ; GET THE END POINTER TO THE BUFFER
-0050  8B F3			     mov     si,bx		     ; SAVE THE	VALUE
+0050  8B F3			     mov     si,bx		     ; SAVE THE VALUE
 0052  E8 FFAB			     call   k4			     ; ADVANCE THE TAIL
 0055  3B 1E 001Ar		     cmp     bx,buffer_head	     ; HAS THE BUFFER WRAPPED AROUND
 0059  74 09			     je	     k62		     ; BUFFER_FULL_BEEP
 005B  89 04			     mov     word ptr [si],ax	     ; STORE THE VALUE
-005D  89 1E 001Cr		     mov     buffer_tail,bx	     ; MOVE THE	POINTER	UP
+005D  89 1E 001Cr		     mov     buffer_tail,bx	     ; MOVE THE POINTER UP
 0061  E9 032F			     jmp     k26		     ; INTERRUPT_RETURN
 
 			     ;------ BUFFER IS FULL, SOUND THE BEEPER
@@ -169,7 +157,7 @@ keybrd.ASM
 0064  E8 FFA6			     call    error_beep
 0067  E9 0329			     jmp     k26		     ; INTERRUPT_RETURN
 
-			     ;------ TRANSLATE SCAN FOR	PSEUDO SCAN CODES
+			     ;------ TRANSLATE SCAN FOR PSEUDO SCAN CODES
 
 006A			     k63:				     ; TRANSLATE-SCAN
 006A  2C 3B			     sub     al,59		     ; CONVERT ORIGIN TO FUNCTION KEYS
@@ -181,43 +169,39 @@ keybrd.ASM
 
 			     ;------ set keyb boolean value: 0=lower, 1=upper case
 
-0074  8A 16 0018r	     caps:   mov     dl,kb_flag_1			     ;bit 1 set	=lat
-0078  D0 E2			     shl     dl,1				     ;for second call, where setting rus/lat+
-			     table
+0074  8A 16 0018r	     caps:   mov     dl,kb_flag_1			     ;bit 1 set =lat
+0078  D0 E2			     shl     dl,1				     ;for second call, where setting rus/lat table
 007A  80 E2 04			     and     dl,lat*2
 007D  80 F2 04			     xor     dl,lat*2				     ;bit 2 set=rus
 0080  BB 0205r			     mov     bx,offset capst			     ;lat caps-able table
 0083  74 03			     jz	     decd				     ;Z=lat
 0085  BB 020Dr			     mov     bx,offset capstru			     ;rus caps-able table
 0088  50		     decd:   push    ax					     ;save scancode in AL and AH
-										     ;(later code destroys AH, DECODE -	dec +
-			     al)
+										     ;(later code destroys AH, DECODE - dec al)
 			     ;------ decode necessary byte in array
 			     ;and position in the byte
 			     ;on call, AL contains scan-code
 			     ;BX contains pointer to array
 			     ;on return, we have boolean value:
 			     ;is this code CapsLock-influenced (CY=0) or not (CY=1)
-			     ;ax and cx	will be	destroyed
+			     ;ax and cx will be destroyed
 
 0089			     decode  proc near
 0089  53			     push bx
 008A  B4 00			     mov ah,0
-008C  48			     dec ax	     ;dec because scancodes starts from	1 (not 0). ax (not al) i.e. 1 byte  +
-			     instead of	2
+008C  48			     dec ax	     ;dec because scancodes starts from 1 (not 0). ax (not al) i.e. 1 byte instead of 2
 008D  B5 00			     mov ch,0
 008F  B3 08			     mov bl,8
-0091  F6 F3			     div bl	     ;now quotient (byte nr) is	in AL and the remainder	(index in byte)	is  +
-			     in	AH
+0091  F6 F3			     div bl	     ;now quotient (byte nr) is in AL and the remainder (index in byte) is in AH
 			     ;get byte from table
-0093  8A CC			     mov cl,ah	     ;remainder	(index in byte)
+0093  8A CC			     mov cl,ah	     ;remainder (index in byte)
 0095  5B			     pop bx	     ;restore pointer to array
 0096  2E: D7			     xlat cs:capst
-			     ;set necessary bit	to 1 in	mask
-0098  FE C1			     inc cl	     ;index in byte starts from	0, but we're shifting from CY
+			     ;set necessary bit to 1 in mask
+0098  FE C1			     inc cl	     ;index in byte starts from 0, but we're shifting from CY
 009A  F9			     stc
-009B  D2 DD			     rcr ch,cl	     ;index=0 means bit	7 (CAPST filled	in tha way) - shift to RIGHT
-			     ;get necessary bit	in carry flag
+009B  D2 DD			     rcr ch,cl	     ;index=0 means bit 7 (CAPST filled in tha way) - shift to RIGHT
+			     ;get necessary bit in carry flag
 009D  22 C5			     and al,ch
 009F  D2 D0			     rcl al,cl
 00A1			     decode  endp
@@ -226,20 +210,16 @@ keybrd.ASM
 00A1  E8 0029			     call    upplow				     ;CY = uppercase, CL=2
 			     ;prepare pointer for keyboard table selection
 00A4  BB 0000			     mov     bx,0
-00A7  D3 D3			     rcl     bx,cl				     ;BX=2 if uppercase	(offset	in bytes for+
-			     upper case)
+00A7  D3 D3			     rcl     bx,cl				     ;BX=2 if uppercase (offset in bytes for upper case)
 00A9  02 DA			     add     bl,dl				     ;DL=4 if rus table, see above
 00AB  80 3E 0091r 02		     cmp     byte ptr idnpol+1,02		     ;idnpol=0800:iso, =0802:866
 00B0  75 06			     jnz     setbl				     ;skip if not 866
 			     ;offset for 866 tables
-00B2  80 C3 04			     add     bl,4				     ;if BL was	00xx, now 01xx;	if BL was   +
-			     01xx,now 10xx
-00B5  80 E3 0B			     and     bl,00001011b			     ;clear bit	3 (avoid 00xx->01xx	    +
-			     transformation)
+00B2  80 C3 04			     add     bl,4				     ;if BL was	00xx, now 01xx; if BL was 01xx,now 10xx
+00B5  80 E3 0B			     and     bl,00001011b			     ;clear bit 3 (avoid 00xx->01xx transformation)
 			     ;table selection
 00B8  2E 8B 9F		     setbl:  db	     2eh,8bh,9fh
-00BB  00C1r			     dw	     scode_tbl_sel			     ;this is equal to:	"setbl:	mov  bx,cs: +
-			     [offset scode_tbl_sel+bx]"
+00BB  00C1r			     dw	     scode_tbl_sel			     ;this is equal to: "setbl: mov  bx,cs: [offset scode_tbl_sel+bx]"
 00BD  58			     pop     ax					     ;restore scancode in AL and AH
 00BE  E9 FF79			     jmp     k56
 
@@ -261,19 +241,18 @@ keybrd.ASM
 00CD  B1 02		     upplow: mov     cl,2
 00CF  D2 DB			     rcr     bl,cl				     ;bl = /caps_able in Z position (bit 6)
 00D1  A0 0017r			     mov     al,kb_flag
-00D4  A8 03			     test    al,left_shift+right_shift		     ;z	flag=0 if SHIFT
+00D4  A8 03			     test    al,left_shift+right_shift		     ;z flag=0 if SHIFT
 00D6  9F			     lahf
 00D7  8A FC			     mov     bh,ah				     ;bh = /shift
-00D9  A8 40			     test    al,caps_state			     ;z	flag=0 if CAPS
+00D9  A8 40			     test    al,caps_state			     ;z flag=0 if CAPS
 00DB  9F			     lahf					     ;ah = /caps
 
 			     ;formula is: value= SHIFT xor (CAPS & CAPS_ABLE)
-			     ;that is equal to:	/SHIFT xor (/CAPS or /CAPS_ABLE)
+			     ;that is equal to: /SHIFT xor (/CAPS or /CAPS_ABLE)
 
-			     ;now, calculate by	formula
+			     ;now, calculate by formula
 00DC  0A E3			     or	     ah,bl
-00DE  32 E7			     xor     ah,bh				     ;now bit6 (Z-position) of ah contains  +
-			     answer
+00DE  32 E7			     xor     ah,bh				     ;now bit6 (Z-position) of ah contains answer
 00E0  D2 D4			     rcl     ah,cl				     ;now CY contains answer
 00E2  C3			     retn
 
@@ -285,64 +264,54 @@ keybrd.ASM
 00E6  BB 0000s			     mov     bx,data
 00E9  8E DB			     mov     ds,bx	     ; установить сегмент данных
 00EB  0A E4			     or	     ah,ah	     ; AH=0
-00ED  74 0B			     jz	     k1		  ; переход к считыванию следующего	    +
-			     символа
+00ED  74 0B			     jz	     k1		  ; переход к считыванию следующего символа
 00EF  FE CC			     dec     ah		     ; AH=1
 00F1  74 20			     jz	     k2		  ; переход к считыванию кода ASCII
 00F3  FE CC			     dec     ah			  ; AH=2
-00F5  74 2D			     jz	     k3		  ; переход к получению байта		    +
-			     состояния
+00F5  74 2D			     jz	     k3		  ; переход к получению байта состояния
 00F7  5B			     pop     bx			  ; восстановить регистр
 00F8  1F			     pop     ds
 00F9  CF			     iret
 
-			     ;	 Считывание кода сканирования	и кода ASCII из буфера +
-			     клавиатуры
+			     ;  Считывание кода сканирования и кода ASCII из буфера клавиатуры
 			     ;
 00FA			     k1:
 00FA  FB			     sti	     ; уст признака разрешения прерывания
 00FB  90			     nop		     ; задержка
-00FC  FA			     cli	     ; сброс признака разрешения	прерывания
+00FC  FA			     cli	     ; сброс признака разрешения прерывания
 00FD  8B 1E 001Ar		     mov     bx,buffer_head  ; уст вершину буфера по чтению
-0101  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить	с вершиной буфера по	    +
-			     записи
+0101  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить с вершиной буфера по записи
 0105  74 F3			     jz	     k1
-0107  8B 07			     mov     ax,word ptr [bx] ;	получить код	сканирования и код  +
-			     ASCII
+0107  8B 07			     mov     ax,word ptr [bx] ; получить код сканирования и код ASCII
 0109  E8 FEF4			     call    k4
-010C  89 1E 001Ar		     mov     buffer_head,bx  ; запомнить вершину буфера по	    +
-			     чтению
-0110  5B			     pop     bx		     ; восстановить	регистр
-0111  1F			     pop     ds		     ; восстановить	сегмент
+010C  89 1E 001Ar		     mov     buffer_head,bx  ; запомнить вершину буфера по чтению
+0110  5B			     pop     bx		     ; восстановить регистр
+0111  1F			     pop     ds		     ; восстановить сегмент
 0112  CF			     iret		     ; возврат к программе
 
-			     ;	 Считать	код ASCII
+			     ;  Считать код ASCII
 
 0113			     k2:
-0113  FA			     cli	     ; Сброс признака разрешения	прерывания
-0114  8B 1E 001Ar		     mov     bx,buffer_head  ; получить	указатель вершины	    +
-			     буфера
+0113  FA			     cli	     ; Сброс признака разрешения прерывания
+0114  8B 1E 001Ar		     mov     bx,buffer_head  ; получить указатель вершины буфера
 							     ; по чтению
-0118  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить	с вершиной буфера по	    +
-			     записи
+0118  3B 1E 001Cr		     cmp     bx,buffer_tail  ; сравнить с вершиной буфера по записи
 011C  8B 07			     mov     ax,word ptr [bx]
-011E  FB			     sti		     ; уст признак разрешения		    +
-			     прерывания
-011F  5B			     pop     bx		     ; восстановить	регистр
-0120  1F			     pop     ds		     ; восстановить	сегмент
+011E  FB			     sti		     ; уст признак разрешения прерывания
+011F  5B			     pop     bx		     ; восстановить регистр
+0120  1F			     pop     ds		     ; восстановить сегмент
 0121  CA 0002			     ret     2
 
-			     ;	 Получение младшего байта	состояния (флажков)
+			     ;  Получение младшего байта состояния (флажков)
 
 0124			     k3:
-0124  A0 0017r			     mov     al,kb_flag	     ; получить	младший байт	состояния  +
-			     на
-0127  5B			     pop     bx		     ; восстановить	регистр
-0128  1F			     pop     ds		     ; восстановить	сегмент
+0124  A0 0017r			     mov     al,kb_flag	     ; получить младший байт состояния на
+0127  5B			     pop     bx		     ; восстановить регистр
+0128  1F			     pop     ds		     ; восстановить сегмент
 0129  CF			     iret		     ; возврат к программе
 012A			     keyboard_io     endp
 
-			     ;	 Таблица	кодов сканирования управляющих клавиш
+			     ;  Таблица кодов сканирования управляющих клавиш
 
 012A			     k6	     label   byte
 012A  52			     db	     ins_key
@@ -352,7 +321,7 @@ keybrd.ASM
 0133  5A 57 5B			     db	     inv_key_r,lat_key,rus_key
       =000C		     k6l     equ     0ch
 
-			     ;	 Таблица	масок нажатых управляющих клавиш
+			     ;  Таблица масок нажатых управляющих клавиш
 
 0136			     k7	     label   byte
 0136  80			     db	     ins_shift
@@ -360,9 +329,8 @@ keybrd.ASM
 013C  02 01			     db	     left_shift,right_shift
 
 
-			     ;	 Таблица	кодов сканирования при нажатой клавише    +
-			     УПР для
-			     ; кодов сканирования клавиш	меньше 59
+			     ;  Таблица кодов сканирования при нажатой клавише УПР для
+			     ; кодов сканирования клавиш меньше 59
 
 013E  1B FF 00 FF FF FF	1E+  k8	     db	     27,-1,0,-1,-1,-1,30,-1
       FF
@@ -379,9 +347,8 @@ keybrd.ASM
       FF
 0176  20 FF			     db	     ' ',-1
 
-			     ;	 Таблица	кодов сканирования при нажатой клавише    +
-			     УПР для
-			     ; кодов сканирования клавиш	больше 59
+			     ;  Таблица кодов сканирования при нажатой клавише УПР для
+			     ; кодов сканирования клавиш больше 59
 0178			     k9	     label   byte
 0178  5E 5F 60 61 62 63	64+	     db	     94,95,96,97,98,99,100,101
       65
@@ -391,7 +358,7 @@ keybrd.ASM
       FF
 0190  FF			     db	     -1
 
-			     ;	 Таблица	кодов ASCII нижнего	регистра клавиатуры
+			     ;  Таблица кодов ASCII нижнего регистра клавиатуры
 
 0191			     k10     label   byte
 0191  1B 31 32 33 34 35	36+	     db	     27,'1234567'	     ;byte1
@@ -410,7 +377,7 @@ keybrd.ASM
       FF
 01C9  20 7D			     db	     ' }'		     ;byte8
 
-			     ;	 Таблица	кодов ASCII верхнего регистра клавиатуры
+			     ;  Таблица кодов ASCII верхнего регистра клавиатуры
 
 01CB			     k11     label   byte
 01CB  1B 21 40 23 24 25	5E+	     db	     27,'!@#$',37,05eh,'&'   ;byte1
@@ -459,7 +426,7 @@ keybrd.ASM
 
 
 			     ;------ CapsLock table (cyrillic)
-			     ;first 3 bytes are	the same
+			     ;first 3 bytes are the same
 
 020D			     capstru label   byte
 			     ;					     ;byte1
@@ -488,32 +455,28 @@ keybrd.ASM
 
 
 
-			     ;	 Таблица	кодов сканирования клавиш Ф11 -	Ф20 (на	    +
-			     верхнем
-			     ; регистре	Ф1 - Ф10)
+			     ;  Таблица кодов сканирования клавиш Ф11 - Ф20 (на верхнем
+			     ; регистре Ф1 - Ф10)
 
 0215			     k12     label   byte
 0215  54 55 56 57 58 59	5A	     db	     84,85,86,87,88,89,90
 021C  5B 5C 5D			     db	     91,92,93
 
-			     ;	 Таблица	кодов сканирования одновременно нажатых +
-			     клавиш
+			     ;  Таблица кодов сканирования одновременно нажатых клавиш
 			     ; ДОП и Ф1 - Ф10
 
 021F			     k13     label byte
 021F  68 69 6A 6B 6C		     db	     104,105,106,107,108
 0224  6D 6E 6F 70 71		     db	     109,110,111,112,113
 
-			     ;	 Таблица	кодов правого пятнадцатиклавишного поля +
-			     на верхнем
+			     ;  Таблица кодов правого пятнадцатиклавишного поля на верхнем
 			     ; регистре
 
 0229			     k14     label   byte
 0229  37 38 39 2D 34 35	36+	     db	     '789-456+1230.'
       2B 31 32 33 30 2E
 
-			     ;	 Таблица	кодов правого пятнадцатиклавишного поля +
-			     на нижнем
+			     ;  Таблица кодов правого пятнадцатиклавишного поля на нижнем
 			     ; регистре
 
 0236			     k15     label byte
@@ -525,27 +488,20 @@ keybrd.ASM
 
 			     ;----INT 9--------------------------
 			     ;
-			     ;	  Программа обработки	прерывания клавиатуры
+			     ;   Программа обработки прерывания клавиатуры
 			     ;
-			     ; Программа считывает код сканирования клавиши в	    +
-			     регистр AL.
-			     ; Единичное состояние разряда 7 в коде сканирования  +
-			     означает,
+			     ; Программа считывает код сканирования клавиши в регистр AL.
+			     ; Единичное состояние разряда 7 в коде сканирования означает,
 			     ; что клавиша отжата.
-			     ;	 В результате выполнения программы в регистре AX	    +
-			     формируется
-			     ; слово, старший байт которого (AH) содержит код	    +
-			     сканирования,
-			     ; а младший (AL) -	код ASCII. Эта информация помещается в   +
-			     буфер
-			     ; клавиатуры. После	заполнения буфера подается	    +
-			     звуковой сигнал.
+			     ;  В результате выполнения программы в регистре AX формируется
+			     ; слово, старший байт которого (AH) содержит код сканирования,
+			     ; а младший (AL) - код ASCII. Эта информация помещается в буфер
+			     ; клавиатуры. После заполнения буфера подается звуковой сигнал.
 			     ;
 			     ;-----------------------------------
 
 0245			     kb_int proc far
-0245  FB			     sti		; установка признака разрешения	    +
-			     прерывания
+0245  FB			     sti		; установка признака разрешения прерывания
 0246  50			     push    ax
 0247  53			     push    bx
 0248  51			     push    cx
@@ -554,8 +510,7 @@ keybrd.ASM
 024B  57			     push    di
 024C  1E			     push    ds
 024D  06			     push    es
-024E  FC			     cld		    ; установить признак направления    +
-			     вперед
+024E  FC			     cld		    ; установить признак направления вперед
 024F  B8 0000s			     mov     ax,data	    ; установить адресацию
 0252  8E D8			     mov     ds,ax
 0254  E4 60			     in	     al,kb_dat	    ; считать код сканирования
@@ -564,119 +519,101 @@ keybrd.ASM
 0259  8A E0			     mov     ah,al	    ; сохранить считанное значение
 025B  0C 80			     or	     al,80h	    ; установить бит 7 порта 61
 025D  E6 61			     out     kb_ctl,al	    ; для работы с клавиатурой
-025F  86 E0			     xchg    ah,al	    ; восстановить значение	порта 61
+025F  86 E0			     xchg    ah,al	    ; восстановить значение порта 61
 0261  E6 61			     out     kb_ctl,al
 0263  58			     pop     ax		    ; восстановить код сканирования
 0264  8A E0			     mov     ah,al	    ; и сохранить его в AH
 
 			     ;---
 
-0266  3C FF			     cmp     al,0ffh  ;	сравнение с кодом заполнения буфера
-						      ;	клавиатуры
+0266  3C FF			     cmp     al,0ffh  ; сравнение с кодом заполнения буфера
+						      ; клавиатуры
 0268  75 03			     jnz     k16	     ; продолжить
-026A  E9 FDF7			     jmp     k62     ; переход на звуковой сигнал по		    +
-			     заполнению
+026A  E9 FDF7			     jmp     k62     ; переход на звуковой сигнал по заполнению
 						     ; буфера клавиатуры
 
 026D			     k16:
 026D  24 7F			     and     al,07fh	     ; сброс бита отжатия клавиши
 026F  0E			     push    cs
 0270  07			     pop     es
-0271  BF 012Ar			     mov     di,offset k6  ; установить адрес таблицы		    +
-			     сканирования
+0271  BF 012Ar			     mov     di,offset k6  ; установить адрес таблицы сканирования
 							   ; управляющих клавиш
 0274  B9 000C			     mov     cx,k6l
-0277  F2> AE			     repne   scasb   ; сравнение полученного кода		    +
-			     сканирования с содержимым таблицы
+0277  F2> AE			     repne   scasb   ; сравнение полученного кода сканирования с содержимым таблицы
 0279  8A C4			     mov     al,ah	     ; запомнить код сканирования
 027B  74 17			     je	     k17	     ; переход по совпадению
 027D  E9 00F4			     jmp     k25	     ; переход по несовпадению
 
-0280			     k406:				     ;rc это	обработчик клавиши Ё
+0280			     k406:				     ;rc это обработчик клавиши Ё
 0280  F6 06 0018r 02		     test    kb_flag_1,lat
-0285  75 6B			     jnz     k26a		     ;rc в ЛАТ-режиме	клавиша не	    +
-			     генерирует ничего,	выход
+0285  75 6B			     jnz     k26a		     ;rc в ЛАТ-режиме клавиша не генерирует ничего, выход
 0287  E8 FE43			     call    upplow		     ;rc CY=1: верхний регистр
 028A  B8 5CF1			     mov     ax,5cf1h		     ;rc ё
 028D  73 02			     jnc     k407
 028F  B0 F0			     mov     al,0f0h		     ;rc Ё (5ch в AH уже есть)
-0291			     k407:				     ;rc передвинул сюда,	двумя	    +
-			     строками выше	(это	ж не	получение маски)
+0291			     k407:				     ;rc передвинул сюда, двумя строками выше (это ж не получение маски)
 0291  E9 FDAA			     jmp     k57
 
-			     ;	 Получение маски нажатой управляющей клавиши
+			     ;  Получение маски нажатой управляющей клавиши
 
 
-0294  81 EF 012Br	     k17:    sub     di,offset k6+1	     ;rc получить индекс упр клавиши+
-			     в	табл k6, начиная с 0
+0294  81 EF 012Br	     k17:    sub     di,offset k6+1	     ;rc получить индекс упр клавиши в табл k6, начиная с 0
 0298  83 FF 08			     cmp     di,8
-029B  72 2E			     jb	     k300		     ;rc меньше 8	(это	совместимые	    +
-			     клавиши) обрабатываются как в IBM
-029D  B4 06			     mov     ah,6		     ;rc маска 0b00000110 для руслат	    +
-			     (inv_shift	+ lat)
+029B  72 2E			     jb	     k300		     ;rc меньше 8 (это совместимые клавиши) обрабатываются как в IBM
+029D  B4 06			     mov     ah,6		     ;rc маска 0b00000110 для руслат (inv_shift + lat)
 029F  83 FF 0A			     cmp     di,0ah
 02A2  72 2C			     jb	     k301		     ;rc если inv_key (Р/Л)
 02A4  A8 80			     test    al,80h
-02A6  74 4A			     jz	     k26a		     ;rc если не отпускание РУС или   +
-			     ЛАТ -> вых (борьба с автоповтором?)
+02A6  74 4A			     jz	     k26a		     ;rc если не отпускание РУС или ЛАТ -> вых (борьба с автоповтором?)
 
-							     ;rc здесь мы после отпускания РУС	    +
-			     или ЛАТ
+							     ;rc здесь мы после отпускания РУС или ЛАТ
 02A8  50			     push    ax
 02A9  A0 0018r			     mov     al,kb_flag_1
-02AC  24 FC			     and     al,not lat+lat_shift    ;rc not действует	на оба,		    +
-			     сбрасываем lat и "светодиодный" lat
+02AC  24 FC			     and     al,not lat+lat_shift    ;rc not действует на оба, сбрасываем lat и "светодиодный" lat
 02AE  83 FF 0B			     cmp     di,0bh
 02B1  74 0C			     je	     k401		     ;rc переход, если РУС
 							     ;rc если ЛАТ:
 02B3  A8 04			     test    al,inv_shift
-02B5  74 04			     jz	     k400		     ;rc переход	по ненажатию	Р/Л
-02B7  0C 01			     or	     al,lat_shift	     ;rc нажата Р/Л->отметить нажатие+
-			     ("светодиодный") ЛАТа и всё
+02B5  74 04			     jz	     k400		     ;rc переход по ненажатию Р/Л
+02B7  0C 01			     or	     al,lat_shift	     ;rc нажата Р/Л->отметить нажатие ("светодиодный") ЛАТа и всё
 02B9  EB 0A			     jmp     short k402
-02BB  0C 03		     k400:   or	     al,lat+lat_shift	     ;rc не нажата Р/Л и нажат		    +
-			     ЛАТ->включить ЛАТ и	факт нажатия	("светодиодный")
+02BB  0C 03		     k400:   or	     al,lat+lat_shift	     ;rc не нажата Р/Л и нажат ЛАТ->включить ЛАТ и факт нажатия ("светодиодный")
 02BD  EB 06			     jmp     short k402
 
 							     ;РУС:
 02BF  A8 04		     k401:   test    al,inv_shift
-02C1  74 02			     jz	     k402		     ;rc по ненажатию Р/Л выход	    +
-			     ("светодиодный" выключен заранее)
-02C3  0C 02			     or	     al,lat		     ;rc нажата Р/Л и отпущена	РУС:	    +
-			     включить lat ///???
+02C1  74 02			     jz	     k402		     ;rc по ненажатию Р/Л выход ("светодиодный" выключен заранее)
+02C3  0C 02			     or	     al,lat		     ;rc нажата Р/Л и отпущена РУС: включить lat ///???
 02C5  A2 0018r		     k402:   mov     kb_flag_1,al
 02C8  58			     pop     ax
 02C9  EB 27			     jmp     short k26a
 
 							     ;rc далее IBM-ский код
-02CB  2E: 8A A5	0136r	     k300:   mov     ah,cs:k7[di]	     ;rc аналогично IBM считыаем	    +
-			     маску	из k7	для совместимых упр клавиш
+02CB  2E: 8A A5	0136r	     k300:   mov     ah,cs:k7[di]	     ;rc аналогично IBM считыаем маску из k7 для совместимых упр клавиш
 02D0			     k301:
 02D0  A8 80			     test    al,80h	     ; клавиша отжата ?
-02D2  75 74			     jnz     k23     ; переход, если	клавиша отжата
+02D2  75 74			     jnz     k23     ; переход, если клавиша отжата
 
-			     ;	 Управляющая	клавиша нажата
+			     ;  Управляющая клавиша нажата
 
 02D4  80 FC 10			     cmp     ah,scroll_shift ; нажата управляющая клавиша с
-							     ;	запоминанием ?
-02D7  73 1C			     jae     k18	     ; переход, если	да
+							     ; запоминанием ?
+02D7  73 1C			     jae     k18	     ; переход, если да
 
 			     ;---
 02D9  80 FC 06			     cmp     ah,6
 02DC  74 06			     je	     k302	     ; rc нажата Р/Л
 
-02DE  08 26 0017r		     or	     kb_flag,ah	     ; установка масок управляющих	    +
-			     клавиш
+02DE  08 26 0017r		     or	     kb_flag,ah	     ; установка масок управляющих клавиш
 							     ; без запоминания
 02E2  EB 0E			     jmp     short k26a	     ; к выходу из прерывания
 
 02E4			     k302:
 02E4  50			     push    ax
 02E5  A0 0018r			     mov     al,kb_flag_1
-02E8  0C 06			     or	     al,inv_shift+lat	     ;rc обработка нажатия Р/Л:	    +
-			     ставим факт нажатия и латиницу
+02E8  0C 06			     or	     al,inv_shift+lat	     ;rc обработка нажатия Р/Л: ставим факт нажатия и латиницу
 02EA  A8 01			     test    al,lat_shift	     ;rc светодиодный ЛАТ есть?
-02EC  74 D7			     jz	     k402		     ;rc нет	-> выходим
+02EC  74 D7			     jz	     k402		     ;rc нет -> выходим
 02EE  24 FD			     and     al,not lat		     ;rc есть -> сбрасываем латиницу
 02F0  EB D3			     jmp     short k402
 			     ;---------------------
@@ -684,7 +621,7 @@ keybrd.ASM
 02F2  E9 009E			     jmp     k26
 			     ;---------------------
 
-			     ;	 Опрос нажатия клавиши с запоминанием
+			     ;  Опрос нажатия клавиши с запоминанием
 
 02F5			     k18:
 02F5  F6 06 0017r 04		     test    kb_flag,ctl_shift	       ; опрос клавиши УПР
@@ -702,7 +639,7 @@ keybrd.ASM
 
 0317			     k20:
 0317  B8 5230			     mov     ax,5230h
-031A  E9 FD21			     jmp     k57	   ; установка	кода нуля
+031A  E9 FD21			     jmp     k57	   ; установка кода нуля
 
 031D			     k21:
 031D  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift
@@ -718,24 +655,21 @@ keybrd.ASM
 0336  B8 5200			     mov     ax,ins_key*256
 0339  E9 FD02			     jmp     k57
 
-033C			     k303:					     ;rc отжатие	Р/Л
-033C  80 26 0018r FB		     and     kb_flag_1,not inv_shift	     ;rc сброс флажка нажатия	Р/Л
+033C			     k303:					     ;rc отжатие Р/Л
+033C  80 26 0018r FB		     and     kb_flag_1,not inv_shift	     ;rc сброс флажка нажатия Р/Л
 0341  80 36 0018r 02		     xor     kb_flag_1,lat		     ;rc переключение раскладки
 0346  EB 10			     jmp     short k304
 
-			     ;	 Управляющая	клавиша отжата
-						     ;rc если сюда попали	при нажатии		    +
-			     ЕС-клавиши Р/Л,	то ah=6
+			     ;  Управляющая клавиша отжата
+						     ;rc если сюда попали при нажатии ЕС-клавиши Р/Л, то ah=6
 0348			     k23:
 
 0348  80 FC 10			     cmp     ah,scroll_shift
-034B  73 1F			     jae     k24			     ;rc это	были переключатели +
-			     с	фиксацией?
-034D  F6 D4			     not     ah				     ;rc да -	переходим к ним
-034F  80 FC F9			     cmp     ah,0f9h			     ;rc было ah=6?	Р/Л?
+034B  73 1F			     jae     k24			     ;rc это были переключатели с фиксацией?
+034D  F6 D4			     not     ah				     ;rc да - переходим к ним
+034F  80 FC F9			     cmp     ah,0f9h			     ;rc было ah=6? Р/Л?
 0352  74 E8			     je	     k303			     ;rc да->обрабатываем
-0354  20 26 0017r		     and     kb_flag,ah			     ;rc это	и далее -			    +
-			     продолжение IBM-ского кода
+0354  20 26 0017r		     and     kb_flag,ah			     ;rc это и далее - продолжение IBM-ского кода
 0358			     k304:
 0358  3C B8			     cmp     al,alt_key+80h
 035A  75 37			     jne     k26
@@ -755,21 +689,16 @@ keybrd.ASM
 0372  EB 1F			     jmp     short k26
 			     ;---
 
-0374			     k25:					     ;rc как	и в IBM, здесь мы, если+
-			     не управляющая клавиша
-									     ;rc (т.е. ее код не в k6) или	    +
-			     если мы нажали	ins-num-caps-scroll,
-									     ;rc когда ранее была	зажата+
-			     ctrl или alt
+0374			     k25:					     ;rc как и в IBM, здесь мы, если не управляющая клавиша
+									     ;rc (т.е. ее код не в k6) или если мы нажали ins-num-caps-scroll,
+									     ;rc когда ранее была зажата ctrl или alt
 0374  3C 80			     cmp     al,80h
 0376  73 1B			     jae     k26
 0378  3C 59			     cmp     al,inf_key
-037A  74 25			     je	     k307			     ;rc обработчик клавиши ИНФ +
-			     (выдает 0a00h расшир код)
+037A  74 25			     je	     k307			     ;rc обработчик клавиши ИНФ (выдает 0a00h расшир код)
 037C  3C 5C			     cmp     al,92
 037E  75 03			     jne     k406b
-0380  E9 FEFD			     jmp     k406			     ;rc обработчик клавиши Ё	    +
-			     (выдает ASCII F0h/F1h в режиме РУС)
+0380  E9 FEFD			     jmp     k406			     ;rc обработчик клавиши Ё (выдает ASCII F0h/F1h в режиме РУС)
 0383			     k406b:					     ;rc далее как в IBM
 0383  F6 06 0018r 08		     test    kb_flag_1,hold_state
 0388  74 2A			     jz	     k28
@@ -792,13 +721,11 @@ keybrd.ASM
 039F  58			     pop     ax
 03A0  CF			     iret
 
-03A1  B8 A000		     k307:   mov     ax,0a000h		     ;rc клавиша	ИНФ,	расширенный	    +
-			     скан-код
-								     ;rc обработаем смену кодовой	    +
-			     таблицы, если Ctrl-Инф
+03A1  B8 A000		     k307:   mov     ax,0a000h		     ;rc клавиша ИНФ, расширенный скан-код
+								     ;rc обработаем смену кодовой таблицы, если Ctrl-Инф
 03A4  F6 06 0017r 04		     test    kb_flag,ctl_shift
 03A9  74 06			     jz	     inf_ret
-03AB  81 36 0091r 0002		     xor     idnpol+1,02h	     ;rc инвертируем	id таблицы
+03AB  81 36 0091r 0002		     xor     idnpol+1,02h	     ;rc инвертируем id таблицы
 03B1  E9 FC8A		     inf_ret:jmp     k57
 
 
@@ -875,8 +802,7 @@ keybrd.ASM
 0419  3C 3B			     cmp     al,59
 041B  73 03			     jae     k37
 041D			     k36:
-041D  E9 FF73			     jmp     k26	     ;в 1841 masm автоматически поставил	    +
-			     короткий переход (ранее, когда он был)
+041D  E9 FF73			     jmp     k26	     ;в 1841 masm автоматически поставил короткий переход (ранее, когда он был)
 0420			     k37:
 0420  3C 47			     cmp     al,71
 0422  73 F9			     jae     k36
@@ -944,14 +870,14 @@ keybrd.ASM
 
 048C			     k44:				     ; NOT-CTL-SHIFT
 
-048C  3C 47			     cmp     al,71		     ; TEST FOR	KEYPAD REGION
+048C  3C 47			     cmp     al,71		     ; TEST FOR KEYPAD REGION
 048E  73 2E			     jae     k48		     ; HANDLE KEYPAD REGION
 0490  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift
-0495  74 0A			     jz	     k54a		     ; TEST FOR	SHIFT STATE
+0495  74 0A			     jz	     k54a		     ; TEST FOR SHIFT STATE
 
-			     ;------ UPPER CASE, HANDLE	SPECIAL	CASES
+			     ;------ UPPER CASE, HANDLE SPECIAL CASES
 
-0497  3C 0F			     cmp     al,15		     ; BACK TAB	KEY
+0497  3C 0F			     cmp     al,15		     ; BACK TAB KEY
 0499  75 09			     jne     k45		     ; NOT-BACK-TAB
 049B  B8 0F00			     mov     ax,15*256		     ; SET PSEUDO SCAN CODE
 049E  E9 FB9D			     jmp     k57		     ; BUFFER_FILL
@@ -963,15 +889,15 @@ keybrd.ASM
 04A4  3C 37			     cmp     al,55		     ; PRINT SCREEN KEY
 04A6  75 09			     jne     k46		     ; NOT-PRINT-SCREEN
 
-			     ;------ ISSUE INTERRUPT TO	INDICATE PRINT SCREEN FUNCTION
+			     ;------ ISSUE INTERRUPT TO INDICATE PRINT SCREEN FUNCTION
 
 04A8  B0 20			     mov     al,eoi		     ; END OF CURRENT INTERRUPT
-04AA  E6 20			     out     020h,al		     ;	SO FURTHER THINGS CAN HAPPEN
+04AA  E6 20			     out     020h,al		     ; SO FURTHER THINGS CAN HAPPEN
 04AC  CD 05			     int     5h			     ; ISSUE PRINT SCREEN INTERRUPT
 04AE  E9 FEE7			     jmp     k27		     ; GO BACK WITHOUT EOI OCCURRING
 
 04B1			     k46:				     ; NOT-PRINT-SCREEN
-04B1  3C 3B			     cmp     al,59		     ; FUNCTION	KEYS
+04B1  3C 3B			     cmp     al,59		     ; FUNCTION KEYS
 04B3  72 06			     jb	     k47		     ; NOT-UPPER-FUNCTION
 04B5  BB 0215r			     mov     bx,offset k12	     ; UPPER CASE PSEUDO SCAN CODES
 04B8  E9 FBAF			     jmp     k63		     ; TRANSLATE_SCAN
@@ -979,19 +905,19 @@ keybrd.ASM
 04BB			     k47:				     ; NOT-UPPER-FUNCTION
 04BB  E9 FBB6			     jmp     caps
 
-			     ;------ KEYPAD KEYS, MUST TEST NUM	LOCK FOR DETERMINATION
+			     ;------ KEYPAD KEYS, MUST TEST NUM LOCK FOR DETERMINATION
 
 04BE			     k48:				     ; KEYPAD-REGION
 04BE  F6 06 0017r 20		     test    kb_flag,num_state	     ; ARE WE IN NUM_LOCK
-04C3  75 23			     jnz     k52		     ; TEST FOR	SURE
-04C5  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift ; ARE WE IN	SHIFT STATE
+04C3  75 23			     jnz     k52		     ; TEST FOR SURE
+04C5  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift ; ARE WE IN SHIFT STATE
 04CA  75 23			     jnz     k53		     ; IF SHIFTED, REALLY NUM STATE
 
 			     ;------ BASE CASE FOR KEYPAD
 
 04CC			     k49:				     ; BASE-CASE
 
-04CC  3C 4A			     cmp     al,74		     ; SPECIAL CASE FOR	A COUPLE OF KEYS
+04CC  3C 4A			     cmp     al,74		     ; SPECIAL CASE FOR A COUPLE OF KEYS
 04CE  74 0C			     je	     k50		     ; MINUS
 04D0  3C 4E			     cmp     al,78
 04D2  74 0E			     je	     k51
@@ -1005,11 +931,11 @@ keybrd.ASM
 04E2  B8 4E2B		     k51:    mov     ax,78*256+'+'	     ; PLUS
 04E5  E9 FB56			     jmp      k57		     ; BUFFER_FILL
 
-			     ;------ MIGHT BE NUM LOCK,	TEST SHIFT STATUS
+			     ;------ MIGHT BE NUM LOCK, TEST SHIFT STATUS
 
 04E8			     k52:				     ; ALMOST-NUM-STATE
 04E8  F6 06 0017r 03		     test    kb_flag,left_shift+right_shift
-04ED  75 DD			     jnz     k49		     ; SHIFTED TEMP OUT	OF NUM STATE
+04ED  75 DD			     jnz     k49		     ; SHIFTED TEMP OUT OF NUM STATE
 
 04EF			     k53:				     ; REALLY_NUM_STATE
 04EF  2C 46			     sub     al,70		     ; CONVERT ORIGIN
@@ -1022,9 +948,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "04-04-22"
+??DATE				  Text	 "04-24-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "23:39:57"
+??TIME				  Text	 "13:25:04"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
