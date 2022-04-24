@@ -169,9 +169,8 @@ k64:                                    ; TRANSLATE-SCAN-ORGD
 ;------ set keyb boolean value: 0=lower, 1=upper case
 
 caps:	mov	dl,kb_flag_1				;bit 1 set =lat
-	shl	dl,1					;for second call, where setting rus/lat table
-	and	dl,lat*2
-	xor	dl,lat*2				;bit 2 set=rus
+	and	dl,lat                                  
+	xor	dl,lat                                  ;DL:=rus*2 (bit 1 set=rus)
 	mov	bx,offset capst				;lat caps-able table
 	jz	decd                                    ;Z=lat
 	mov	bx,offset capstru			;rus caps-able table
@@ -206,25 +205,29 @@ decode	proc near
 decode	endp
 ;now CY = code in AL is /caps_able
 
-	call	upplow					;CY = uppercase, CL=2
+	call	upplow					;returns CY = uppercase, CL=2
 ;prepare pointer for keyboard table selection
-	mov	bx,0
-	rcl	bx,cl 					;BX=2 if uppercase (offset in bytes for upper case)
-	add	bl,dl					;DL=4 if rus table, see above
+	mov	bh,0
+	mov	bl,dl					;DL=2 if rus table, see above
+	rcl	bx,cl 					;make offset for tables: BX.1=1 if uppercase, BX.3=1 if rus
 	cmp	byte ptr idnpol+1,02                    ;idnpol=0800:iso, =0802:866
 	jnz	setbl					;skip if not 866
 ;offset for 866 tables
-	add	bl,4        				;if BL was 00xx, now 01xx; if BL was 01xx,now 10xx
-	and	bl,00001011b                            ;clear bit 3 (avoid 00xx->01xx transformation)
+	shl	dl,1                                    ;DL=rus*4
+	add	bl,dl        				;if rus,switch to 866
 ;table selection
 setbl:	db	2eh,8bh,9fh
 	dw	scode_tbl_sel 				;this is equal to: "setbl: mov	bx,cs:[offset scode_tbl_sel+bx]"
 	pop	ax					;restore scancode in AL and AH
 	jmp	k56
 
+	db	3 dup (0)
+
 scode_tbl_sel label word
 	dw	k10                     ;LAT LCASE
 	dw	k11                     ;LAT UCSASE
+	dw	0                       ;empty space for Alpha-DOS v1.05 ES1840.SYS compartibility:
+	dw	0                       ;   byte at F000:E820 should be 00h if "new keyboard"
 	dw	rust                    ;RUS ISO LCASE
 	dw	rust2                   ;RUS ISO UCASE
 	dw	low866			;RUS 866 LCASE
@@ -459,7 +462,6 @@ k15	label byte
 	db	-1,79,80,81,82,83
 
 ;1841 	org	0e987h
-	db	2 dup (0)
 
 ;----INT 9--------------------------
 ;
