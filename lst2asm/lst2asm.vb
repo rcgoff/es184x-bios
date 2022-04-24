@@ -17,10 +17,16 @@ Option Explicit
 '07.11.2021 - возможность отключения генерации ASM-файла;
 '             возможность удаления номеров строк из листинга
 '03.01.2022 - возможность перезаписи исходных LST-файлов
+'20.04.2022 - удаление лишней пустой строки в конце dup-последовательностей MASM3 и из LST-файла (было только из ASM)
+'             обработка обрезаемых строк в TASM-формате
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: ListBox выбора формата и вообще интерфейс
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: сохранение файлов с LF вместо CR-LF под другим именем (а не перезапись)
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: размещение настроек в INI-файле, чтобы не править код
+'ЕЩЕ НЕ РЕАЛИЗОВАНО: в TASM-листинге теряется информация о макрорасширениях (в самой первой поз. строки)
+'ОШИБКА: в небольшом (на несколько строк) листинге MASM3 неправильно работает слияние строк
+'ОШИБКА: если в файле есть макросы, EndingPhrase (по крайней мере для MASM3) будет Macros,
+'        а не Segments and Groups
 
 'константы формата листинга
 Private Type LstFormatTable
@@ -88,6 +94,7 @@ Case "MASM3 with line numbers"
     LstFormat.NextPageSkippedLines = 4
     LstFormat.EndingPhrase = "Segments and Groups:"
     LstFormat.EnumerStartLine = 5
+    LstFormat.LstFormat = "MASM3N"
 
 Case "MASM3 without line numbers"
         'если листинг без номеров страниц, позиции становятся на 8 (одну позицию tab) меньше. Это листинг, генерируемый на моем компе
@@ -98,6 +105,8 @@ Case "MASM3 without line numbers"
     LstFormat.LstMachCodeEnd = 26    'это не на 8 меньше, а посмотрел по реальному файлу до link-овки, только после ассемблера
     LstFormat.NextPageSkippedLines = 4
     LstFormat.EndingPhrase = "Segments and Groups:"
+    LstFormat.LstFormat = "MASM3"
+    
 
 Case "TASM5 with line numbers"
         'параметры листинга Turbo Assembler 5.0, по которому компилируются файлы Gleb'а из Чехии
@@ -109,6 +118,7 @@ Case "TASM5 with line numbers"
     LstFormat.NextPageSkippedLines = 5
     LstFormat.EndingPhrase = "Symbol Name"
     LstFormat.EnumerStartLine = 6
+    LstFormat.LstFormat = "TASM"
 End Select
 
 With Application.FileDialog(msoFileDialogFilePicker)
@@ -160,7 +170,8 @@ Dim longlineCnt As Integer
 
 Dim NewPageArray() As Integer   'номера строк - начал новых страниц
 Dim LongLineArray() As Integer  'номера переполнившихся (переход на новую строку) строк листинга
-Dim FirstCharCode As String
+Dim FirstCharCode As Integer
+Dim LastChar As String
 Dim stopListing As Integer
 Dim CRLFrewriteAnswer As Integer    'ответ пользователя - перезаписывать ли файл с неверным CR-LF
 Dim EndingFirstSym As String        'первый символ фразы, после которой в листинге идет таблица символов
@@ -201,11 +212,14 @@ Do While Not EOF(1)
     lstcnt = lstcnt + 1
     If Len(lstline) > 0 Then
         FirstCharCode = Asc(Left(lstline, 1))
+        LastChar = Right(lstline, 1)
         If FirstCharCode = 12 Then
             NewPageArray(newpageCnt) = lstcnt
             newpageCnt = newpageCnt + 1
             ReDim Preserve NewPageArray(1 To newpageCnt)
         End If
+        
+        'обработка перенесенных строк в MASM3
         If FirstCharCode = 9 And newpageCnt > 1 Then
         'не считаем пустые строки, оставшиеся после перевода страницы
             If lstcnt - NewPageArray(newpageCnt - 1) > (LstFormat.NextPageSkippedLines - 1) Then
@@ -220,6 +234,14 @@ Do While Not EOF(1)
                 ReDim Preserve LongLineArray(1 To longlineCnt)
             End If
         End If
+        
+        'обработка перенесенных строк в TASM
+        If LastChar = "+" Then
+            LongLineArray(longlineCnt) = lstcnt
+            longlineCnt = longlineCnt + 1
+            ReDim Preserve LongLineArray(1 To longlineCnt)
+        End If
+                        
         If Chr(FirstCharCode) = EndingFirstSym Then
             If Left(lstline, EndingPhraseLen) = LstFormat.EndingPhrase Then
                 stopListing = lstcnt 'конец зоны, где нужно укорачивать строки
@@ -251,11 +273,15 @@ Dim longlineCnt As Integer
 
 Dim prevline As String
 Dim i As Integer
+Dim k As Integer                    'счетчик цикла в поиске последнего значащего символа для TASM-строк
 Dim asmString As String
 Dim codeSection As String
 Dim PrevLineEndDup As Boolean       'предыдущая строка - последняя в DUP (закр. квадр. скобка)
 Dim FileExsistAnswer As Integer     'ответ пользователя, если файл существует
 Dim AllowLSTrewrite As Integer      'подтверждение затирания LST-файла
+Dim tasmLineCharCode As Integer     'коды символов в поиске последнего значащего символа для TASM-строк
+Dim commentBeginPosition As Integer 'для TASM-листинга, находится поиском в строке
+Dim lineAfterComment As String      'часть строки после символа комментария ";"
 
 
 lstcnt = 0
@@ -324,12 +350,22 @@ Do While Not EOF(1)
     
     'выполним слитие с перенесенной строкой, если она была ранее считана
     If Len(prevline) <> 0 Then
-           'по FAR-редактору, перенесенная строка в начале содержит 7 символов
+        Select Case Left(LstFormat.LstFormat, 4)
+        Case "MASM"
+           'по FAR-редактору, перенесенная строка MASM3 в начале содержит 7 символов
             '0x09 0x20 0x09 0x20 0x09 0x20 0x09
             lstline = Right(lstline, Len(lstline) - 7) 'обрезанная строка
             lstline = prevline + lstline
             longlineCnt = longlineCnt + 1
             prevline = ""
+        Case "TASM"
+            lstline = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
+            prevline = prevline + " "
+        End Select
+        
+        lstline = prevline + lstline
+        longlineCnt = longlineCnt + 1
+        prevline = ""
     End If
     
     If lstcnt = ListingArrays.LongLineArray(longlineCnt) Then
@@ -339,6 +375,17 @@ Do While Not EOF(1)
     'запомнить строку (в данном проходе) и слить ее со следующей,
     'имея в виду возможную прокрутку на границе страниц
         If lstcnt < stopListing Then    'только для классического листинга
+            
+            If LstFormat.LstFormat = "TASM" Then
+            'укоротим строку до последнего значащего символа
+                k = 0
+                Do
+                    k = k + 1
+                    'анализируем символы последовательно с конца строки, не считая последний символ "+"
+                    tasmLineCharCode = Asc(Mid(lstline, Len(lstline) - k, 1))
+                Loop While tasmLineCharCode = 32 Or tasmLineCharCode = 9
+                lstline = Left(lstline, Len(lstline) - k)
+            End If
         
             'запоминаем подстроку - первую часть переносимой строки
             prevline = lstline
@@ -355,26 +402,28 @@ Do While Not EOF(1)
     'а секция кода - нет. И такие строки не включаются в asm-файл
     '
     If Len(prevline) = 0 Then 'блокировка вывода в файлы части переносимой строки
+    
+    'TASM расставляет зачем-то табуляцию в длинных комментариях. уберем это
+    If LstFormat.LstFormat = "TASM" Then
+        commentBeginPosition = InStrRev(lstline, ";")
+        If commentBeginPosition <> 0 Then
+            lineAfterComment = Replace(lstline, vbTab, " ", commentBeginPosition)
+            lstline = Left(lstline, commentBeginPosition - 1) + lineAfterComment
+        End If
+    End If
+    
+    
         If filePermissions.CreateASMFile = True Then
             If lstcnt < stopListing Then
-    
                 codeSection = ViewPosMid(lstline, LstFormat.LstMachCodeBegin, LstFormat.LstMachCodeEnd)
                 asmString = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
                 If isStringEmpty(asmString) Then
+                    'удалим из ASM-файла ложную пустую строку, возникающую в конце dup-последовательностей
                     If isStringEmpty(codeSection) Then
                         If Not (PrevLineEndDup) Then Print #2, asmString
                     End If
                 Else
                     Print #2, asmString
-                End If
-            
-                'отловим ложную пустую строку, возникающую в конце dup-последовательностей,
-                'если после dup в строке кода ничего не было
-                If StringExceptSpacesTabs(codeSection) = "]" Then        'была ли текущая строка третьей в DUP-последовательности?
-                                                                         '(работать с ней будем на следующем проходе)
-                    PrevLineEndDup = True
-                Else
-                    PrevLineEndDup = False
                 End If
             End If
         End If
@@ -383,7 +432,18 @@ Do While Not EOF(1)
                 lstline = ViewPosMid(lstline, LstFormat.LstAddrBegin)
             End If
         End If
-        Print #3, lstline
+        'ложную пустую строку в конце DUP-последовательностей удалим и из листинга
+        If Not (PrevLineEndDup) Then Print #3, lstline
+        
+        'отловим ложную пустую строку, возникающую в конце dup-последовательностей
+        If lstcnt < stopListing Then
+                If StringExceptSpacesTabs(codeSection) = "]" Then        'была ли текущая строка третьей в DUP-последовательности?
+                                                                         '(работать с ней будем на следующем проходе)
+                    PrevLineEndDup = True
+                Else
+                    PrevLineEndDup = False
+                End If
+        End If
     End If
 Loop
 
@@ -540,3 +600,5 @@ Function StringExceptSpacesTabs(currStr As String) As String
  
 StringExceptSpacesTabs = currStr
 End Function
+
+
