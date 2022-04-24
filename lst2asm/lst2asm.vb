@@ -355,9 +355,6 @@ Do While Not EOF(1)
            'по FAR-редактору, перенесенная строка MASM3 в начале содержит 7 символов
             '0x09 0x20 0x09 0x20 0x09 0x20 0x09
             lstline = Right(lstline, Len(lstline) - 7) 'обрезанная строка
-            lstline = prevline + lstline
-            longlineCnt = longlineCnt + 1
-            prevline = ""
         Case "TASM"
             lstline = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
             prevline = prevline + " "
