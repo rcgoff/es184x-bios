@@ -2882,24 +2882,17 @@ membank		db ' (0)'		;rc для теста памяти
 		db ' (1)'
 
 ;
-;   Таблица кодов русских маленьких букв (строчных)
+;   Таблица кодов русских маленьких букв (строчных) ISO-кодировки
 ;
 rust	label	byte
  	db	1bh,'1234567890-='
-
-
  	db	08h,09h
- 	db	0d9h,0e6h,0e3h,0dah,0d5h,0ddh,0d3h,0e8h
-
- 	db	0e9h,0d7h,0d6h,0edh,0dh,-1,0e4h,0ebh
-
- 	db	0d2h,0d0h,0dfh,0e0h,0deh,0dbh,0d4h,';:'
-
- 	db	0d1h,0eeh,5ch,0efh,0e7h,0e1h,0dch,0d8h
-
- 	db	0e2h,0ech,',./',0e5h,'*'
-
- 	db	-1,' ',0eah
+ 	db	0d9h,0e6h,0e3h,0dah,0d5h,0ddh,0d3h,0e8h ;'йцукенгш'
+ 	db	0e9h,0d7h,0d6h,0edh,00dh,  -1,0e4h,0ebh ;'щзжэ',0dh,-1,'фы'
+ 	db	0d2h,0d0h,0dfh,0e0h,0deh,0dbh,0d4h, ';' ;'вапролд;'
+ 	db	 ':',0d1h,0eeh,05ch,0efh,0e7h,0e1h,0dch ;':бю\ячсм'
+ 	db	0d8h,0e2h,0ech, ',', '.', '/',0e5h, '*' ;'ить,./х*'
+ 	db	 -1, ' ', 0eah				;-1,' ъ'
 
 
 k30	label	byte

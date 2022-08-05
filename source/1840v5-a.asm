@@ -1222,23 +1222,17 @@ xlat_print_cod proc near
 xlat_print_cod endp
 
 
-;   Таблица кодов русских больших букв (заглавных)
+;   Таблица кодов русских больших букв (заглавных) ISO-кодировки
 
 rust2	label	byte
- 	db	1bh,'!@#$',37,05eh,'&*()_+'
-
-
+ 	db	1bh,'!@#$%^&*()_+'
  	db	08h,0
- 	db	0b9h,0c6h,0c3h,0bah,0b5h,0bdh,0b3h,0c8h
-
- 	db	0c9h,0b7h,0b6h,0cdh,0dh,-1,0c4h,0cbh
-
- 	db	0b2h,0b0h,0bfh,0c0h,0beh,0bbh,0b4h,27h
-
- 	db	'"',0b1h,0ceh,7ch,0cfh,0c7h,0c1h,0bch,0b8h
-
- 	db	0c2h,0cch,'<>?',0c5h,000,-1,' ',0cah
-
+ 	db	0b9h,0c6h,0c3h,0bah,0b5h,0bdh,0b3h,0c8h ;'ЙЦУКЕНГШ'
+ 	db	0c9h,0b7h,0b6h,0cdh,00dh,  -1,0c4h,0cbh ;'ЩЗЖЭ',0dh,-1,'ФЫ'
+ 	db	0b2h,0b0h,0bfh,0c0h,0beh,0bbh,0b4h,027h ;'ВАПРОЛД',27h 
+ 	db	 '"',0b1h,0ceh, '|',0cfh,0c7h,0c1h,0bch ;'"БЮ|ЯЧСМ' 
+ 	db	0b8h,0c2h,0cch, '<', '>', '?',0c5h,000h ;'ИТЬ<>?Х',0 
+	db	  -1, ' ',0cah				;-1,' Ъ' 
 
 
 

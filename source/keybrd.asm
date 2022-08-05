@@ -359,19 +359,19 @@ k10	label	byte
 	db	'wertyuio'		;byte3
 	db	'p[]',0dh,-1,'asd'	;byte4
 	db	'fghjkl;:'		;byte5
-	db	60h,7eh,05ch,'zxcvb'	;byte6
+	db	'`~\zxcvb'		;byte6
 	db	'nm,./{*',-1		;byte7
 	db	' }'			;byte8
 
 ;   Таблица кодов ASCII верхнего регистра клавиатуры
 
 k11	label	byte
-	db	27,'!@#$',37,05eh,'&'	;byte1
+	db	27,'!@#$%^&'		;byte1
 	db	'*()_+',08h,0,'Q'	;byte2
 	db	'WERTYUIO'		;byte3
 	db	'P',-1,-1,0dh,-1,'ASD'	;byte4
 	db	'FGHJKL',027h,'"'	;byte5
-	db	-1,-1,7ch,'ZXCVB'	;byte6
+	db	-1,-1,'|ZXCVB'		;byte6
 	db	'NM<>?',-1,0,-1		;byte7
 	db	' ',-1			;byte8
 
@@ -394,7 +394,7 @@ capst	label	byte
 ;		'fghjkl;:'		;byte5
 	db	00000011b
 
-;		60h,7eh,05ch,'zxcvb'	;byte6
+;		'`~\zxcvb'		;byte6
 	db	11100000b
 
 ;		'nm,./{*',-1		;byte7
@@ -423,10 +423,10 @@ capstru	label 	byte
 ;		'АПРОЛД',27h,'"' 	;byte5
 	db	00000011b
 
-;		'БЮ',7ch,'ЯЧСМИ'	;byte6
+;		'БЮ|ЯЧСМИ'		;byte6
 	db	00100000b
 
-;		'ТЬ','<>?','Х',0,-1	;byte7
+;		'ТЬ<>?Х',0,-1		;byte7
 	db	00111011b
 
 ;		' Ъ'		 	;byte8

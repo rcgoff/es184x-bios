@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    04-24-22 13:25:04	    Page 1
+Turbo Assembler	 Version 5.0	    08-05-22 07:15:06	    Page 1
 1840v5-a.ASM
 
 
@@ -1501,29 +1501,23 @@ Turbo Assembler	 Version 5.0	    04-24-22 13:25:04	    Page 1
 06A7			     xlat_print_cod endp
 
 
-			     ;  Таблица кодов русских больших букв (заглавных)
+			     ;  Таблица кодов русских больших букв (заглавных) ISO-кодировки
 
 06A7			     rust2   label   byte
-06A7  1B 21 40 23 24 25	5E+	     db	     1bh,'!@#$',37,05eh,'&*()_+'
+06A7  1B 21 40 23 24 25	5E+	     db	     1bh,'!@#$%^&*()_+'
       26 2A 28 29 5F 2B
-
-
 06B4  08 00			     db	     08h,0
-06B6  B9 C6 C3 BA B5 BD	B3+	     db	     0b9h,0c6h,0c3h,0bah,0b5h,0bdh,0b3h,0c8h
+06B6  B9 C6 C3 BA B5 BD	B3+	     db	     0b9h,0c6h,0c3h,0bah,0b5h,0bdh,0b3h,0c8h ;'ЙЦУКЕНГШ'
       C8
-
-06BE  C9 B7 B6 CD 0D FF	C4+	     db	     0c9h,0b7h,0b6h,0cdh,0dh,-1,0c4h,0cbh
+06BE  C9 B7 B6 CD 0D FF	C4+	     db	     0c9h,0b7h,0b6h,0cdh,00dh,	-1,0c4h,0cbh ;'ЩЗЖЭ',0dh,-1,'ФЫ'
       CB
-
-06C6  B2 B0 BF C0 BE BB	B4+	     db	     0b2h,0b0h,0bfh,0c0h,0beh,0bbh,0b4h,27h
+06C6  B2 B0 BF C0 BE BB	B4+	     db	     0b2h,0b0h,0bfh,0c0h,0beh,0bbh,0b4h,027h ;'ВАПРОЛД',27h
       27
-
-06CE  22 B1 CE 7C CF C7	C1+	     db	     '"',0b1h,0ceh,7ch,0cfh,0c7h,0c1h,0bch,0b8h
-      BC B8
-
-06D7  C2 CC 3C 3E 3F C5	00+	     db	     0c2h,0cch,'<>?',0c5h,000,-1,' ',0cah
-      FF 20 CA
-
+06CE  22 B1 CE 7C CF C7	C1+	     db	      '"',0b1h,0ceh, '|',0cfh,0c7h,0c1h,0bch ;'"БЮ|ЯЧСМ'
+      BC
+06D6  B8 C2 CC 3C 3E 3F	C5+	     db	     0b8h,0c2h,0cch, '<', '>', '?',0c5h,000h ;'ИТЬ<>?Х',0
+      00
+06DE  FF 20 CA			     db	       -1, ' ',0cah			     ;-1,' Ъ'
 
 
 
@@ -1632,9 +1626,9 @@ Turbo Assembler	 Version 5.0	    04-24-22 13:25:04	    Page 1
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "04-24-22"
+??DATE				  Text	 "08-05-22"
 ??FILENAME			  Text	 "1840v5-a"
-??TIME				  Text	 "13:25:04"
+??TIME				  Text	 "07:15:06"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE

@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    04-24-22 14:51:12	    Page 1
+Turbo Assembler	 Version 5.0	    08-05-22 07:15:07	    Page 1
 keybrd.ASM
 
 
@@ -374,7 +374,7 @@ keybrd.ASM
       64
 01B3  66 67 68 6A 6B 6C	3B+	     db	     'fghjkl;:'		     ;byte5
       3A
-01BB  60 7E 5C 7A 78 63	76+	     db	     60h,7eh,05ch,'zxcvb'    ;byte6
+01BB  60 7E 5C 7A 78 63	76+	     db	     '`~\zxcvb'		     ;byte6
       62
 01C3  6E 6D 2C 2E 2F 7B	2A+	     db	     'nm,./{*',-1	     ;byte7
       FF
@@ -383,7 +383,7 @@ keybrd.ASM
 			     ;  Таблица кодов ASCII верхнего регистра клавиатуры
 
 01CD			     k11     label   byte
-01CD  1B 21 40 23 24 25	5E+	     db	     27,'!@#$',37,05eh,'&'   ;byte1
+01CD  1B 21 40 23 24 25	5E+	     db	     27,'!@#$%^&'	     ;byte1
       26
 01D5  2A 28 29 5F 2B 08	00+	     db	     '*()_+',08h,0,'Q'	     ;byte2
       51
@@ -393,7 +393,7 @@ keybrd.ASM
       44
 01ED  46 47 48 4A 4B 4C	27+	     db	     'FGHJKL',027h,'"'	     ;byte5
       22
-01F5  FF FF 7C 5A 58 43	56+	     db	     -1,-1,7ch,'ZXCVB'	     ;byte6
+01F5  FF FF 7C 5A 58 43	56+	     db	     -1,-1,'|ZXCVB'	     ;byte6
       42
 01FD  4E 4D 3C 3E 3F FF	00+	     db	     'NM<>?',-1,0,-1	     ;byte7
       FF
@@ -418,7 +418,7 @@ keybrd.ASM
 			     ;		     'fghjkl;:'		     ;byte5
 020B  03			     db	     00000011b
 
-			     ;		     60h,7eh,05ch,'zxcvb'    ;byte6
+			     ;		     '`~\zxcvb'		     ;byte6
 020C  E0			     db	     11100000b
 
 			     ;		     'nm,./{*',-1	     ;byte7
@@ -447,10 +447,10 @@ keybrd.ASM
 			     ;		     'АПРОЛД',27h,'"'  ;byte5
 0213  03			     db	     00000011b
 
-			     ;		     'БЮ',7ch,'ЯЧСМИ' ;byte6
+			     ;		     'БЮ|ЯЧСМИ'		     ;byte6
 0214  20			     db	     00100000b
 
-			     ;		     'ТЬ','<>?','Х',0,-1  ;byte7
+			     ;		     'ТЬ<>?Х',0,-1		     ;byte7
 0215  3B			     db	     00111011b
 
 			     ;		     ' Ъ'		     ;byte8
@@ -950,9 +950,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "04-24-22"
+??DATE				  Text	 "08-05-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "14:51:12"
+??TIME				  Text	 "07:15:07"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
