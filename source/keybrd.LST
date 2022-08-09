@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    08-05-22 07:15:07	    Page 1
+Turbo Assembler	 Version 5.0	    08-09-22 23:57:54	    Page 1
 keybrd.ASM
 
 
@@ -413,7 +413,7 @@ keybrd.ASM
 0209  00			     db	     0
 
 			     ;		     'p[]',0dh,-1,'asd'	     ;byte4
-020A  78			     db	     01111000b
+020A  60			     db	     01100000b
 
 			     ;		     'fghjkl;:'		     ;byte5
 020B  03			     db	     00000011b
@@ -422,10 +422,10 @@ keybrd.ASM
 020C  E0			     db	     11100000b
 
 			     ;		     'nm,./{*',-1	     ;byte7
-020D  3F			     db	     00111111b
+020D  3E			     db	     00111110b
 
 			     ;		     ' }'		     ;byte8
-020E  FF			     db	     0ffh
+020E  7F			     db	     01111111b
 
 
 			     ;------ CapsLock table (cyrillic)
@@ -442,7 +442,7 @@ keybrd.ASM
 0211  00			     db	     0
 
 			     ;		     'ЗЖЭ',0dh,-1,'ФЫВ'	     ;byte4
-0212  18			     db	     00011000b
+0212  00			     db	     0
 
 			     ;		     'АПРОЛД',27h,'"'  ;byte5
 0213  03			     db	     00000011b
@@ -451,10 +451,10 @@ keybrd.ASM
 0214  20			     db	     00100000b
 
 			     ;		     'ТЬ<>?Х',0,-1		     ;byte7
-0215  3B			     db	     00111011b
+0215  3A			     db	     00111010b
 
 			     ;		     ' Ъ'		     ;byte8
-0216  BF			     db	     10111111b
+0216  3F			     db	     00111111b
 
 
 
@@ -950,9 +950,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "08-05-22"
+??DATE				  Text	 "08-09-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "07:15:07"
+??TIME				  Text	 "23:57:54"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE

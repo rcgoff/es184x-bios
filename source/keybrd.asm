@@ -389,7 +389,7 @@ capst	label	byte
 	db	0
 
 ;		'p[]',0dh,-1,'asd'	;byte4
-	db	01111000b
+	db	01100000b
 
 ;		'fghjkl;:'		;byte5
 	db	00000011b
@@ -398,10 +398,10 @@ capst	label	byte
 	db	11100000b
 
 ;		'nm,./{*',-1		;byte7
-	db	00111111b
+	db	00111110b
 
 ;		' }'			;byte8
-	db	0ffh
+	db	01111111b
 
 
 ;------ CapsLock table (cyrillic)
@@ -418,7 +418,7 @@ capstru	label 	byte
 	db	0
 
 ;		'ЗЖЭ',0dh,-1,'ФЫВ' 	;byte4
-	db	00011000b
+	db	0
 
 ;		'АПРОЛД',27h,'"' 	;byte5
 	db	00000011b
@@ -427,10 +427,10 @@ capstru	label 	byte
 	db	00100000b
 
 ;		'ТЬ<>?Х',0,-1		;byte7
-	db	00111011b
+	db	00111010b
 
 ;		' Ъ'		 	;byte8
-	db	10111111b
+	db	00111111b
 
 
 
