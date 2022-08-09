@@ -369,11 +369,11 @@ k11	label	byte
 	db	27,'!@#$%^&'		;byte1
 	db	'*()_+',08h,0,'Q'	;byte2
 	db	'WERTYUIO'		;byte3
-	db	'P',-1,-1,0dh,-1,'ASD'	;byte4
+	db	'P[]',0dh,-1,'ASD'	;byte4
 	db	'FGHJKL',027h,'"'	;byte5
-	db	-1,-1,'|ZXCVB'		;byte6
-	db	'NM<>?',-1,0,-1		;byte7
-	db	' ',-1			;byte8
+	db	'`~|ZXCVB'		;byte6
+	db	'NM<>?{',0,-1		;byte7
+	db	' }'			;byte8
 
 
 ;------ CapsLock table (latin)
@@ -389,19 +389,19 @@ capst	label	byte
 	db	0
 
 ;		'p[]',0dh,-1,'asd'	;byte4
-	db	01100000b
+	db	0
 
 ;		'fghjkl;:'		;byte5
 	db	00000011b
 
 ;		'`~\zxcvb'		;byte6
-	db	11100000b
+	db	00100000b
 
 ;		'nm,./{*',-1		;byte7
-	db	00111110b
+	db	00111010b
 
 ;		' }'			;byte8
-	db	01111111b
+	db	00111111b
 
 
 ;------ CapsLock table (cyrillic)

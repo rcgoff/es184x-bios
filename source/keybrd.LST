@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 5.0	    08-09-22 23:57:54	    Page 1
+Turbo Assembler	 Version 5.0	    08-10-22 00:03:23	    Page 1
 keybrd.ASM
 
 
@@ -389,15 +389,15 @@ keybrd.ASM
       51
 01DD  57 45 52 54 59 55	49+	     db	     'WERTYUIO'		     ;byte3
       4F
-01E5  50 FF FF 0D FF 41	53+	     db	     'P',-1,-1,0dh,-1,'ASD'  ;byte4
+01E5  50 5B 5D 0D FF 41	53+	     db	     'P[]',0dh,-1,'ASD'	     ;byte4
       44
 01ED  46 47 48 4A 4B 4C	27+	     db	     'FGHJKL',027h,'"'	     ;byte5
       22
-01F5  FF FF 7C 5A 58 43	56+	     db	     -1,-1,'|ZXCVB'	     ;byte6
+01F5  60 7E 7C 5A 58 43	56+	     db	     '`~|ZXCVB'		     ;byte6
       42
-01FD  4E 4D 3C 3E 3F FF	00+	     db	     'NM<>?',-1,0,-1	     ;byte7
+01FD  4E 4D 3C 3E 3F 7B	00+	     db	     'NM<>?{',0,-1	     ;byte7
       FF
-0205  20 FF			     db	     ' ',-1		     ;byte8
+0205  20 7D			     db	     ' }'		     ;byte8
 
 
 			     ;------ CapsLock table (latin)
@@ -413,19 +413,19 @@ keybrd.ASM
 0209  00			     db	     0
 
 			     ;		     'p[]',0dh,-1,'asd'	     ;byte4
-020A  60			     db	     01100000b
+020A  00			     db	     0
 
 			     ;		     'fghjkl;:'		     ;byte5
 020B  03			     db	     00000011b
 
 			     ;		     '`~\zxcvb'		     ;byte6
-020C  E0			     db	     11100000b
+020C  20			     db	     00100000b
 
 			     ;		     'nm,./{*',-1	     ;byte7
-020D  3E			     db	     00111110b
+020D  3A			     db	     00111010b
 
 			     ;		     ' }'		     ;byte8
-020E  7F			     db	     01111111b
+020E  3F			     db	     00111111b
 
 
 			     ;------ CapsLock table (cyrillic)
@@ -950,9 +950,9 @@ keybrd.ASM
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "08-09-22"
+??DATE				  Text	 "08-10-22"
 ??FILENAME			  Text	 "keybrd  "
-??TIME				  Text	 "23:57:54"
+??TIME				  Text	 "00:03:23"
 ??VERSION			  Number 0500
 @CPU				  Text	 0101H
 @CURSEG				  Text	 CODE
