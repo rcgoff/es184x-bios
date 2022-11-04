@@ -19,6 +19,7 @@ Option Explicit
 '03.01.2022 - возможность перезаписи исходных LST-файлов
 '20.04.2022 - удаление лишней пустой строки в конце dup-последовательностей MASM3 и из LST-файла (было только из ASM)
 '             обработка обрезаемых строк в TASM-формате
+'05.11.2022 - исправлена ошибка удаления пустой строки в конце dup-последовательностей (если нет создания ASM)
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: ListBox выбора формата и вообще интерфейс
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: сохранение файлов с LF вместо CR-LF под другим именем (а не перезапись)
@@ -400,19 +401,19 @@ Do While Not EOF(1)
     '
     If Len(prevline) = 0 Then 'блокировка вывода в файлы части переносимой строки
     
-    'TASM расставляет зачем-то табуляцию в длинных комментариях. уберем это
-    If LstFormat.LstFormat = "TASM" Then
-        commentBeginPosition = InStrRev(lstline, ";")
-        If commentBeginPosition <> 0 Then
-            lineAfterComment = Replace(lstline, vbTab, " ", commentBeginPosition)
-            lstline = Left(lstline, commentBeginPosition - 1) + lineAfterComment
+        'TASM расставляет зачем-то табуляцию в длинных комментариях. уберем это
+        If LstFormat.LstFormat = "TASM" Then
+            commentBeginPosition = InStrRev(lstline, ";")
+            If commentBeginPosition <> 0 Then
+                lineAfterComment = Replace(lstline, vbTab, " ", commentBeginPosition)
+                lstline = Left(lstline, commentBeginPosition - 1) + lineAfterComment
+            End If
         End If
-    End If
     
     
-        If filePermissions.CreateASMFile = True Then
-            If lstcnt < stopListing Then
-                codeSection = ViewPosMid(lstline, LstFormat.LstMachCodeBegin, LstFormat.LstMachCodeEnd)
+        If lstcnt < stopListing Then
+            codeSection = ViewPosMid(lstline, LstFormat.LstMachCodeBegin, LstFormat.LstMachCodeEnd)
+            If filePermissions.CreateASMFile = True Then
                 asmString = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
                 If isStringEmpty(asmString) Then
                     'удалим из ASM-файла ложную пустую строку, возникающую в конце dup-последовательностей
