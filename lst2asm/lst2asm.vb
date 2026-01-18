@@ -20,6 +20,7 @@ Option Explicit
 '20.04.2022 - удаление лишней пустой строки в конце dup-последовательностей MASM3 и из LST-файла (было только из ASM)
 '             обработка обрезаемых строк в TASM-формате
 '05.11.2022 - исправлена ошибка удаления пустой строки в конце dup-последовательностей (если нет создания ASM)
+'18.01.2026 - добавлен формат MASM4
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: рассовывание включенных по include файлов в разные asm-файлы
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: ListBox выбора формата и вообще интерфейс
 'ЕЩЕ НЕ РЕАЛИЗОВАНО: сохранение файлов с LF вместо CR-LF под другим именем (а не перезапись)
@@ -72,8 +73,9 @@ Dim filePermissions As Permissions
 'здесь нужно раскомментировать нужный формат (только один!)
 '=====================================================================
 'LstFormatName = "MASM3 with line numbers"
-'LstFormatName = "MASM3 without line numbers"
-LstFormatName = "TASM5 with line numbers"
+LstFormatName = "MASM3 without line numbers"
+'LstFormatName = "MASM4 without line numbers"
+'LstFormatName = "TASM5 with line numbers"
 '=====================================================================
 '
 'specify permissions (true or false)
@@ -108,6 +110,15 @@ Case "MASM3 without line numbers"
     LstFormat.EndingPhrase = "Segments and Groups:"
     LstFormat.LstFormat = "MASM3"
     
+Case "MASM4 without line numbers"
+    LstFormat.isLineNumbersInFile = False
+    LstFormat.AsmFileDataBegin = 33
+    LstFormat.LstAddrBegin = 2
+    LstFormat.LstMachCodeBegin = 8
+    LstFormat.LstMachCodeEnd = 26    'это не на 8 меньше, а посмотрел по реальному файлу до link-овки, только после ассемблера
+    LstFormat.NextPageSkippedLines = 5
+    LstFormat.EndingPhrase = "Segments and Groups:"
+    LstFormat.LstFormat = "MASM4"
 
 Case "TASM5 with line numbers"
         'параметры листинга Turbo Assembler 5.0, по которому компилируются файлы Gleb'а из Чехии
@@ -353,9 +364,14 @@ Do While Not EOF(1)
     If Len(prevline) <> 0 Then
         Select Case Left(LstFormat.LstFormat, 4)
         Case "MASM"
-           'по FAR-редактору, перенесенная строка MASM3 в начале содержит 7 символов
-            '0x09 0x20 0x09 0x20 0x09 0x20 0x09
-            lstline = Right(lstline, Len(lstline) - 7) 'обрезанная строка
+            Select Case Mid(LstFormat.LstFormat, 5, 1)
+                Case "3"
+                    'по FAR-редактору, перенесенная строка MASM3 в начале содержит 7 символов
+                    '0x09 0x20 0x09 0x20 0x09 0x20 0x09
+                    lstline = Right(lstline, Len(lstline) - 7) 'обрезанная строка
+                Case "4"
+                    lstline = Right(lstline, Len(lstline) - 4) 'обрезанная строка
+            End Select
         Case "TASM"
             lstline = ViewPosMid(lstline, LstFormat.AsmFileDataBegin)
             prevline = prevline + " "
@@ -598,5 +614,3 @@ Function StringExceptSpacesTabs(currStr As String) As String
  
 StringExceptSpacesTabs = currStr
 End Function
-
-
